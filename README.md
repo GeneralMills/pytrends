@@ -15,6 +15,12 @@ Which is in turn based off of Sal Uryasev's pyGTrends.
 
 This program allows you to load a csv file with a list of terms to download csv's for.
 
+### Defaults
+* Geo defaults to US
+* Language defaults to US English
+* Category defaults to Food and Drink
+* Date defaults to 5yrs ago to today
+
 ### Input
 
 **Csv requires three columns**
