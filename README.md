@@ -5,7 +5,7 @@ PyGTrends
 
 Pseudo API for Google Trends 
 
-Written for Python 3.3
+Written for Python 3.3, requires a google account to use.
 
 Heavily based off Matt Reid's Google Trends API
 
