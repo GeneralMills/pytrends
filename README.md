@@ -1,4 +1,4 @@
-PyGTrends
+pytrends
 =========
 
 ### About
