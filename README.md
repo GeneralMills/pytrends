@@ -19,9 +19,11 @@ This program allows you to load a csv file with a list of terms to download csv'
 
 **Csv requires three columns**
 
-* Trend_Name (human readable, short name to use for naming the resulting file)
+**Trend_Name**
+
+* human readable, short name to use for naming the resulting file)
   
-**Topic_Flag **
+**Topic_Flag**
 
 * enables use of google's proprietary topic id which are already URLencoded
   
