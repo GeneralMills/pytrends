@@ -3,7 +3,7 @@ PyGTrends
 
 ### About
 
-Pseudo API for Google Trends 
+**Pseudo API for Google Trends**
 
 Written for Python 3.3, requires a google account to use.
 
