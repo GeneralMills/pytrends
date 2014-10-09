@@ -6,7 +6,7 @@ pytrends
 **Pseudo API for Google Trends**
 
 * Allows simple interface for automating downloads of csv reports from Google Trends.
-* Main feature is to help you trick google into thinking you are pulling from a browser.
+* Main feature is to help trick google into thinking the script is actually a browser.
 
 
 * Only good until Google changes their backend again :-P
@@ -29,7 +29,7 @@ pytrends
 
 **Parameters**
 * keywords
-  - the words you wish you get data for
+  - the words to get data for
   - Example "Pizza"
   - Alternately: "Pizza + Italian"
   - Alternately: "iron - chemical element" topic name is "%2Fm%2F025rw19" and needs use_topics=True
@@ -51,7 +51,7 @@ pytrends
   - "MM/YYYY #m" where # is the number of months from that date to pull data for
   - "10/2009 61m" would get data from October 2009 to October 2014
 * use_topic
-  - set to true if you wish to avoid URLencoding the keywords
+  - set to true to avoid URLencoding the keywords
 
 ### Save a Report to file
 **save_csv(path, trend_name)**
