@@ -60,7 +60,7 @@ class pyGTrends(object):
         self.opener.open(self.url_CookieCheck)
         self.opener.open(self.url_PrefCookie)
 
-    def request_report(self, trend_name, keywords, hl='en-US', cat=None, geo=None,
+    def request_report(self, keywords, hl='en-US', cat=None, geo=None,
                         date=None, use_topic=False):
 
         # prevent re-urlencoding of topic id's
@@ -99,7 +99,7 @@ class pyGTrends(object):
             logging.error("You must be signed in to export data from Google Trends")
             raise Exception(self.raw_data)
 
-    def csv(self, path, trend_name):
+    def save_csv(self, path, trend_name):
         fileName = path + trend_name + ".csv"
         f = open(fileName, "wb")
         f.write(self.raw_data)
