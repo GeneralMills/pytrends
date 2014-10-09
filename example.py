@@ -10,7 +10,7 @@ path = ""
 connector = pyGTrends(google_username, google_password)
 
 #make request
-connector.request_report("Pizza", "Pizza")
+connector.request_report("Pizza")
 
 #download file
 connector.csv(path, "pizza")
