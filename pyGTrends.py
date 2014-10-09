@@ -38,7 +38,12 @@ class pyGTrends(object):
 
     def _connect(self):
         """
-        connect to Google Trends
+        This code is from Sal Uryasev's pyGTrends and he may have
+        better documentation on it. I believe this goes through and
+        finds the cookie needed to trick google into allowing a
+        script to download reports.
+
+        Major changes were made to allow handling of byte responses.
         """
 
         self.cj = http.cookiejar.CookieJar()
@@ -51,7 +56,6 @@ class pyGTrends(object):
         resp = re.sub(r'\s\s+', ' ', bytes.decode(resp))
 
         m = galx.search(resp)
-        # print(resp)
         if not m:
             raise Exception("Cannot parse GALX out of login page")
         self.login_params["GALX"] = m.group("galx")
@@ -63,13 +67,14 @@ class pyGTrends(object):
     def request_report(self, keywords, hl='en-US', cat=None, geo=None,
                         date=None, use_topic=False):
 
-        # prevent re-urlencoding of topic id's
-        if use_topic == True:
+        #use_topic prevents re-urlencoding of topic id's.
+        if use_topic:
             query_param = {'q': keywords}
         else:
             query_param = urllib.parse.urlencode({'q': keywords})
 
-        #handle default of skipping parameters, which will default to give all available data
+        #This logic handles the default of skipping parameters
+        #Parameters that are set to '' will not filter the data requested.
         if cat is not None:
             cat_param = '&' + urllib.parse.urlencode({'cat':cat})
         else:
@@ -82,9 +87,9 @@ class pyGTrends(object):
             geo_param = '&' + urllib.parse.urlencode({'geo':geo})
         else:
             geo_param = ''
-
-        #default params
         hl_param = '&' + urllib.parse.urlencode({'hl':hl})
+
+        #These are the default parameters and shouldn't be changed.
         cmpt_param = "&cmpt=q"
         content_param = "&content=1"
         export_param = "&export=1"
