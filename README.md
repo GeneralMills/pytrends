@@ -5,52 +5,54 @@ pytrends
 
 **Pseudo API for Google Trends**
 
-Written for Python 3.3, requires a google account to use.
+* Allows simple interface to automating downloads of csv reports from Google Trends.
+* Main feature is to help you trick google into thinking you are pulling from a browser.
 
-Heavily based off Matt Reid's Google Trends API
 
-https://bitbucket.org/mattreid9956/google-trend-api/overview
+* Only good until Google changes their backend again :-P
 
-Which is in turn based off of Sal Uryasev's pyGTrends.
+**Requirements**
+* Written for Python 3.3
+* Requires a google account to use.
 
-This program allows you to load a csv file with a list of terms to download csv's for.
-
-### Defaults
-* Geo defaults to US
-* Language defaults to US English
-* Category defaults to Food and Drink
-* Date defaults to 5yrs ago to today
-
-### Input
-
-**Csv requires three columns**
-
-**Trend_Name**
-
-* human readable, short name to use for naming the resulting file)
-  
-**Topic_Flag**
-
-* enables use of google's proprietary topic id which are already URLencoded
-  
-* Example: "iron - chemical element" topic shows up as "%2Fm%2F025rw19" as the q= parameter in the URL if you do it manually.
-  
-**API_Query**
-
-* keywords to search or topic id
-
-### Building a URL
-
-**Google Trends URL**
-* http://www.google.com/trends/trendsReport?hl=en-US&cat=0-71&q=einkorn&geo=US&date=10%2F2011%2037m&cmpt=q&content=1&export=1
+### Request a Report
 
 **Parameters**
-* hl : Language
-* cat: category
-* q: keyword(s)
-* geo: geographic area
-* date: format is starting date: "MM/YYYY #m" where # is the number of months.
-* cmpt: default is q
-* content: default is 1
-* export: default is 1
+* keywords
+  - the words you wish you get data for
+  - Example "Pizza"
+  - Alternately: "Pizza + Italian"
+  - Alternately: "iron - chemical element" topic name is "%2Fm%2F025rw19" and needs use_topics=True
+* hl
+  - language
+  - find available parameters by inspecting the url when manually using Google Trends
+  - defaults to US english
+* cat
+  - category
+  - find available parameters by inspecting the url when manually using Google Trends
+  - defaults to none
+* geo
+  - geographical area
+  - find available parameters by inspecting the url when manually using Google Trends
+  - defaults to world
+* date
+  - date to start from
+  - defaults to all available data
+  - "MM/YYYY #m" where # is the number of months from that date to pull data for
+  - "10/2009 61m" would get data from October 2009 to October 2014
+* use_topic
+  - set to true if you wish to avoid URLencoding the keywords
 
+### Save a Report to file
+**Parameters**
+* path
+  - output path
+* trend_name
+  - human readable name for file
+
+### Credits
+
+* Heavily based off Sal Uryasev's pyGTrends
+
+* With some ideas pulled from Matt Reid's Google Trends API for python 2.x
+  - https://bitbucket.org/mattreid9956/google-trend-api/overview
