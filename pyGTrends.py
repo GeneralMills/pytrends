@@ -60,7 +60,7 @@ class pyGTrends(object):
         self.opener.open(self.url_CookieCheck)
         self.opener.open(self.url_PrefCookie)
 
-    def download_report(self, trend_name, keywords, hl='en-US', cat=None, geo=None,
+    def request_report(self, trend_name, keywords, hl='en-US', cat=None, geo=None,
                         date=None, use_topic=False):
 
         # prevent re-urlencoding of topic id's
@@ -89,7 +89,8 @@ class pyGTrends(object):
         content_param = "&content=1"
         export_param = "&export=1"
 
-        combined_params = query_param + cat_param + date_param + geo_param + hl_param + cmpt_param + content_param + export_param
+        combined_params = query_param + cat_param + date_param \
+                          + geo_param + hl_param + cmpt_param + content_param + export_param
         print(combined_params)
 
         self.raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
