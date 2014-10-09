@@ -5,14 +5,14 @@ pytrends
 
 **Pseudo API for Google Trends**
 
-* Allows simple interface to automating downloads of csv reports from Google Trends.
+* Allows simple interface for automating downloads of csv reports from Google Trends.
 * Main feature is to help you trick google into thinking you are pulling from a browser.
 
 
 * Only good until Google changes their backend again :-P
 
 **Requirements**
-* Written for Python 3.3
+* Written for Python 3.3, probably works for 3.x.
 * Requires a google account to use.
 
 ## Connect to Google
