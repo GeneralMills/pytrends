@@ -30,7 +30,7 @@ class pyGTrends(object):
                          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21"),
                         ("Accept", "text/plain")]
         self.url_ServiceLoginBoxAuth = "https://accounts.google.com/ServiceLoginBoxAuth"
-        self.url_Export = "http://www.google.com/trends/viz"
+        self.url_Export = "http://www.google.com/trends/trendsReport"
         self.url_CookieCheck = "https://www.google.com/accounts/CheckCookie?chtml=LoginDoneHtml"
         self.url_PrefCookie = "http://www.google.com"
         self.header_dictionary = {}
@@ -60,40 +60,46 @@ class pyGTrends(object):
         self.opener.open(self.url_CookieCheck)
         self.opener.open(self.url_PrefCookie)
 
-    def download_report(self, topicFg, trendName='Unknown', hl='en-US', cat='0-71', keywords='Unknown', geo='US',
-                        date='all', cmpt='q', content=1, export=1):
-        """
-        download a specific report
-        date, geo, geor, graph, sort, scale and sa
-        are all Google Trends specific ways to slice the data
-        """
-        param1 = urllib.parse.urlencode({
-            "hl": hl,
-            "cat": cat
-        })
+    def download_report(self, trend_name, keywords, hl='en-US', cat=None, geo=None,
+                        date=None, use_topic=False):
 
-        # prevent reencoding of topic id's
-        if topicFg == True:
-            param2 = param1 + "&q=" + keywords
+        # prevent re-urlencoding of topic id's
+        if use_topic == True:
+            query_param = {'q': keywords}
         else:
-            param2 = param1 + "&" + urllib.parse.urlencode({'q': keywords})
+            query_param = urllib.parse.urlencode({'q': keywords})
 
-        params = param2 + "&" + urllib.parse.urlencode({
-            "geo": geo,
-            "date": date,
-            "cmpt": cmpt,
-            "content": str(content),
-            "export": str(export)
-        })
+        #handle default of skipping parameters, which will default to give all available data
+        if cat is not None:
+            cat_param = '&' + urllib.parse.urlencode({'cat':cat})
+        else:
+            cat_param = ''
+        if date is not None:
+            date_param = '&' + urllib.parse.urlencode({'date':date})
+        else:
+            date_param = ''
+        if geo is not None:
+            geo_param = '&' + urllib.parse.urlencode({'geo':geo})
+        else:
+            geo_param = ''
 
-        self.raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + params).read()
+        #default params
+        hl_param = '&' + urllib.parse.urlencode({'hl':hl})
+        cmpt_param = "&cmpt=q"
+        content_param = "&content=1"
+        export_param = "&export=1"
+
+        combined_params = query_param + cat_param + date_param + geo_param + hl_param + cmpt_param + content_param + export_param
+        print(combined_params)
+
+        self.raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
 
         if self.raw_data in ["You must be signed in to export data from Google Trends"]:
             logging.error("You must be signed in to export data from Google Trends")
             raise Exception(self.raw_data)
 
-    def csv(self, path, trendName='Unknown'):
-        fileName = path + trendName.replace(" ", "_").replace("/", "_").replace(",", "_") + ".csv"
+    def csv(self, path, trend_name):
+        fileName = path + trend_name + ".csv"
         f = open(fileName, "wb")
         f.write(self.raw_data)
         f.close()
