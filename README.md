@@ -64,7 +64,7 @@ pytrends
 
 ### Credits
 
-* Heavily based off Sal Uryasev's pyGTrends
+* Connecting to google code heavily based off Sal Uryasev's pyGTrends
 
 * With some ideas pulled from Matt Reid's Google Trends API for python 2.x
   - https://bitbucket.org/mattreid9956/google-trend-api/overview
