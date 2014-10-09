@@ -6,8 +6,8 @@ pytrends
 **Pseudo API for Google Trends**
 
 * Allows simple interface to automating downloads of csv reports from Google Trends.
-
 * Main feature is to help you trick google into thinking you are pulling from a browser.
+
 
 * Only good until Google changes their backend again :-P
 
@@ -20,17 +20,24 @@ pytrends
 **Parameters**
 * keywords
   - the words you wish you get data for
+  - Example "Pizza"
+  - Alternately: "Pizza + Italian"
+  - Alternately: "iron - chemical element" topic name is "%2Fm%2F025rw19" and needs use_topics=True
 * hl
   - language
   - find available parameters by inspecting the url when manually using Google Trends
+  - defaults to US english
 * cat
   - category
   - find available parameters by inspecting the url when manually using Google Trends
+  - defaults to none
 * geo
   - geographical area
   - find available parameters by inspecting the url when manually using Google Trends
+  - defaults to world
 * date
   - date to start from
+  - defaults to all available data
   - "MM/YYYY #m" where # is the number of months from that date to pull data for
   - "10/2009 61m" would get data from October 2009 to October 2014
 * use_topic
@@ -42,31 +49,6 @@ pytrends
   - output path
 * trend_name
   - human readable name for file
-
-### Building a Google Trends URL
-**Google Trends URL**
-* http://www.google.com/trends/trendsReport?hl=en-US&q=pizza&cmpt=q&content=1&export=1
-
-**Available Parameters**
-* hl
-  - Language
-  - defaults to english
-* cat
-  - category
-  - not used by default
-* q
-  - keyword(s)
-  - Example "Pizza"
-  - Alternately: "Pizza + Italian"
-  - Alternately: "iron - chemical element" topic name is "%2Fm%2F025rw19" and needs use_topics=True
-* geo
-  - geographic area
-  - defaults to world
-* date
-  - date 
-  - not used by default
-  - format is starting date: "MM/YYYY #m" where # is the number of months
-  - "10/2009 61m" would get data from October 2009 to October 2014
 
 ### Credits
 
