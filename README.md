@@ -9,6 +9,8 @@ pytrends
 
 * Main feature is to help you trick google into thinking you are pulling from a browser.
 
+* Only good until Google changes their backend again :-P
+
 ### Credits
 
 * Heavily based off Sal Uryasev's pyGTrends
