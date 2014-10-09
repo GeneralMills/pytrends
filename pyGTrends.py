@@ -91,7 +91,6 @@ class pyGTrends(object):
 
         combined_params = query_param + cat_param + date_param \
                           + geo_param + hl_param + cmpt_param + content_param + export_param
-        print(combined_params)
 
         self.raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
 
