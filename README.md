@@ -11,13 +11,6 @@ pytrends
 
 * Only good until Google changes their backend again :-P
 
-### Credits
-
-* Heavily based off Sal Uryasev's pyGTrends
-
-* With some ideas pulled from Matt Reid's Google Trends API for python 2.x
-  - https://bitbucket.org/mattreid9956/google-trend-api/overview
-
 **Requirements**
 * Written for Python 3.3
 * Requires a google account to use.
@@ -75,3 +68,9 @@ pytrends
   - format is starting date: "MM/YYYY #m" where # is the number of months
   - "10/2009 61m" would get data from October 2009 to October 2014
 
+### Credits
+
+* Heavily based off Sal Uryasev's pyGTrends
+
+* With some ideas pulled from Matt Reid's Google Trends API for python 2.x
+  - https://bitbucket.org/mattreid9956/google-trend-api/overview
