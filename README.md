@@ -15,7 +15,17 @@ pytrends
 * Written for Python 3.3
 * Requires a google account to use.
 
+## Connect to Google
+**pyGTrends(google_username, google_password)**
+
+**Parameters**
+* google_username
+  - a valid gmail address
+* google_password
+  - password for the gmail account
+
 ### Request a Report
+**request_report(keywords, hl='en-US', cat=None, geo=None, date=None, use_topic=False)**
 
 **Parameters**
 * keywords
@@ -44,6 +54,8 @@ pytrends
   - set to true if you wish to avoid URLencoding the keywords
 
 ### Save a Report to file
+**save_csv(path, trend_name)**
+
 **Parameters**
 * path
   - output path
