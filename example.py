@@ -12,7 +12,9 @@ connector = pyGTrends(google_username, google_password)
 #make request
 connector.request_report("Pizza")
 
+#wait a random amount of time between requests to avoid bot detection
+time.sleep(randint(5,10))
+
 #download file
 connector.csv(path, "pizza")
-
 
