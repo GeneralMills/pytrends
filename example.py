@@ -16,5 +16,5 @@ connector.request_report("Pizza")
 time.sleep(randint(5,10))
 
 #download file
-connector.csv(path, "pizza")
+connector.save_csv(path, "pizza")
 
