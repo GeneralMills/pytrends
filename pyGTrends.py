@@ -69,25 +69,25 @@ class pyGTrends(object):
 
         #use_topic prevents re-urlencoding of topic id's.
         if use_topic:
-            query_param = {'q': keywords}
+            query_param = 'q=' + keywords
         else:
-            query_param = urllib.parse.urlencode({'q': keywords})
+            query_param = 'q=' + urllib.parse.urlencode(keywords)
 
         #This logic handles the default of skipping parameters
         #Parameters that are set to '' will not filter the data requested.
         if cat is not None:
-            cat_param = '&' + urllib.parse.urlencode({'cat':cat})
+            cat_param = '&cat=' + cat
         else:
             cat_param = ''
         if date is not None:
-            date_param = '&' + urllib.parse.urlencode({'date':date})
+            date_param = '&date=' + urllib.parse.urlencode(date)
         else:
             date_param = ''
         if geo is not None:
-            geo_param = '&' + urllib.parse.urlencode({'geo':geo})
+            geo_param = '&geo=' + geo
         else:
             geo_param = ''
-        hl_param = '&' + urllib.parse.urlencode({'hl':hl})
+        hl_param = '&hl=' + hl
 
         #These are the default parameters and shouldn't be changed.
         cmpt_param = "&cmpt=q"
