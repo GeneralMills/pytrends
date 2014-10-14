@@ -71,7 +71,7 @@ class pyGTrends(object):
         if use_topic:
             query_param = 'q=' + keywords
         else:
-            query_param = 'q=' + urllib.parse.urlencode(keywords)
+            query_param = 'q=' + urllib.parse.urlencode({'q':keywords})
 
         #This logic handles the default of skipping parameters
         #Parameters that are set to '' will not filter the data requested.
@@ -80,7 +80,7 @@ class pyGTrends(object):
         else:
             cat_param = ''
         if date is not None:
-            date_param = '&date=' + urllib.parse.urlencode(date)
+            date_param = '&' + str(urllib.parse.urlencode({'date':date}))
         else:
             date_param = ''
         if geo is not None:
@@ -96,6 +96,9 @@ class pyGTrends(object):
 
         combined_params = query_param + cat_param + date_param \
                           + geo_param + hl_param + cmpt_param + content_param + export_param
+
+        print("Now downloading information for:")
+        print("http://www.google.com/trends/trendsReport?" + combined_params)
 
         self.raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
 
