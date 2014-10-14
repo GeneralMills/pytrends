@@ -71,7 +71,7 @@ class pyGTrends(object):
         if use_topic:
             query_param = 'q=' + keywords
         else:
-            query_param = 'q=' + urllib.parse.urlencode({'q':keywords})
+            query_param = str(urllib.parse.urlencode({'q':keywords}))
 
         #This logic handles the default of skipping parameters
         #Parameters that are set to '' will not filter the data requested.
