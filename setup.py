@@ -14,7 +14,7 @@ setup(
     long_description=long_description,
     url='https://github.com/dreyco676/pytrends',
     author='John Hogue',
-    author_email='dreyco676@gmail.com',  # TODO
+    author_email='dreyco676@gmail.com',
     license='MIT',  # TODO
     classifiers=[
         'Development Status :: 4 - Beta',
