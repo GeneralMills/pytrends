@@ -1,4 +1,4 @@
-from pyGTrends import pyGTrends
+from pytrends import pyGTrends
 import time
 from random import randint
 
