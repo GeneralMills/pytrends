@@ -1,3 +1,7 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import int, open, str, zip
+from future import standard_library
+standard_library.install_aliases()
 
 import copy
 import csv
@@ -7,16 +11,14 @@ import http.cookiejar
 from io import StringIO
 import logging
 import re
-import urllib
-from urllib import request
-from urllib import parse
+import urllib.parse
+import urllib.request
 
 
 class pyGTrends(object):
     """
     Google Trends API
     """
-
     def __init__(self, username, password):
         """
         provide login and password to be used to connect to Google Analytics
@@ -50,7 +52,6 @@ class pyGTrends(object):
 
         Major changes were made to allow handling of byte responses.
         """
-
         self.cj = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         self.opener.addheaders = self.headers
@@ -71,7 +72,6 @@ class pyGTrends(object):
 
     def request_report(self, keywords, hl='en-US', cat=None, geo=None,
                         date=None, use_topic=False):
-
         #use_topic prevents re-urlencoding of topic id's.
         if use_topic:
             query_param = 'q=' + keywords
