@@ -12,7 +12,7 @@ from io import StringIO
 import logging
 import re
 import urllib.parse
-import urllib.request
+from urllib.request
 
 
 class pyGTrends(object):
