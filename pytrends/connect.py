@@ -11,6 +11,8 @@ else:  # Python 3
     from urllib.parse import urlencode
     from urllib.request import build_opener, HTTPCookieProcessor
 
+# TODO: add a simple cache to minimize unnecessary calls?
+# TODO: add rate-limiting to avoid angering the Google gods?
 
 class GoogleConnection(object):
     """
@@ -65,6 +67,7 @@ class GoogleConnection(object):
         """
         data = self.opener.open(query).read()
         data = data.decode(encoding='utf-8')
+        # TODO: is there a better way to handle this error? (how to provoke it?)
         if data in ['You must be signed in to export data from Google Trends']:
             print('You must be signed in to export data from Google Trends!')
             raise Exception(data)
