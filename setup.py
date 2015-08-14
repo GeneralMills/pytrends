@@ -24,6 +24,5 @@ setup(
         'License :: OSI Approved :: MIT License'  # TODO
         ],
     keywords='google trends pseudo-API',
-    install_requires=['future>=0.15.0'],
     packages=['pytrends'],
 )
