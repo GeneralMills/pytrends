@@ -1,6 +1,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 from datetime import date, datetime
+import io
+import json
 import sys
 if sys.version_info[0] == 2:  # Python 2
     from urllib import quote, urlencode
@@ -13,23 +15,26 @@ from .parse import parse_data
 
 class GoogleTrends(object):
     """
-    Class to download and parse data from Google Trends.
+    Class to fetch and save data from Google Trends.
     """
     def __init__(self, username, password):
         self.search_filters = {'web', 'images', 'news', 'froogle', 'youtube'}
-        self.base_url = 'http://www.google.com/trends/trendsReport?'
+        self.base_url = 'http://www.google.com/trends/trendsReport?&'
         self.connection = GoogleConnection(username, password)
 
-    def query(self, terms, is_topic,
+    def query(self, terms, is_topic=False,
               start_date=None, end_date=None,
               category_filter=None, geo_filter=None, search_filter=None):
         """
+        Query Google Trends for `terms`, optionally filtering by date,
+        category, geography, and search type.
+
         Parameters
         ----------
         terms : list of str
             list of search terms for which to get google trends data;
             may be either raw "search terms" or (Freebase-based) "topics"
-        is_topic : bool or list of bool
+        is_topic : bool or list of bool, optional
             a list of boolean values matched to corresponding items in `terms`,
             where `True` indicates that the term is to be treated as a topic,
             and `False` indicates that the term is to be treated as a search term;
@@ -93,8 +98,6 @@ class GoogleTrends(object):
         self.raw_data = self.connection.download_data(query_url)
 
     def _process_query_terms(self, terms, is_topic):
-        """
-        """
         if len(terms) > 5:
             raise ValueError('Google Trends allows 5 or fewer terms at at time')
         if isinstance(is_topic, bool):
@@ -109,8 +112,6 @@ class GoogleTrends(object):
         return query_param
 
     def _process_date_filter(self, start_date, end_date, search_filter=None):
-        """
-        """
         if not search_filter or search_filter == 'web':
             min_start_date = date(year=2004, month=1, day=1)
         else:
@@ -135,11 +136,27 @@ class GoogleTrends(object):
                 start_date = min_start_date
         return start_date, end_date
 
-    def save_csv(self, path, trend_name):
-        fileName = path + trend_name + ".csv"
-        f = open(fileName, "wb")
-        f.write(self.raw_data)
-        f.close()
+    def save_data(fname):
+        """
+        Save data to disk at `fname`, which includes the full /path/to/file.
+        Allowed extensions are .csv and .json; if the latter, raw Google Trends
+        data (which comes in CSV form) will be parsed into JSON
+        """
+        if fname.endswith('.csv'):
+            with io.open(fname, mode='w', encoding='utf-8') as f:
+                f.write(self.raw_data)
+        elif fname.endswith('.json'):
+            with io.open(fname, mode='w', encoding='utf-8') as f:
+                json.dump(parse_data(self.raw_data), f, ensure_ascii=False, indent=4)
+        else:
+            raise Exception('Data can only be saved as .csv or .json')
 
-    def get_data(self):
-        return self.raw_data
+    def get_data(self, parsed=False):
+        if parsed is False:
+            return self.raw_data
+        else:
+            return self.parsed_data
+
+    @property
+    def parsed_data(self):
+        return parse_data(self.raw_data)
