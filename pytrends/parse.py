@@ -35,6 +35,7 @@ def parse_data(data):
                 parsed_data['info'] = {'source': source, 'query': query,
                                        'geo': geo, 'period': period}
         else:
+            chunk = _clean_subtable(chunk)
             rows = [row for row in csv.reader(StringIO(chunk)) if row]
             if not rows:
                 continue
@@ -46,6 +47,62 @@ def parse_data(data):
                 parsed_data[label] = parsed_rows
 
     return parsed_data
+
+
+def _clean_subtable(chunk):
+    """
+    The data output by Google Trends is human-friendly, not machine-friendly;
+    this function fixes a couple egregious data problems.
+
+    1. Google replaces rising search percentages with "Breakout" if the increase
+    is greater than 5000%: https://support.google.com/trends/answer/4355000 .
+    For parsing's sake, we set it equal to that high threshold value.
+
+    2. Rising search percentages between 1000 and 5000 have a comma separating
+    the thousands, which is terrible for CSV data. We strip it out.
+    """
+    chunk = re.sub(r',Breakout\n', ',5000%\n', chunk)
+    chunk = re.sub(r'(,[+-]?[1-4]),(\d{3}%\n)', r'\1\2', chunk)
+    return chunk
+
+
+def _parse_rows(rows, header='infer'):
+    """
+    Parse sub-table `rows` into JSON form and convert str values into appropriate
+    Python types; if `header` == `infer`, will attempt to infer if header row
+    in rows, otherwise pass True/False.
+    """
+    rows = copy.copy(rows)
+    label = rows[0][0].replace(' ', '_').lower()
+
+    if header == 'infer':
+        if len(rows) >= 3:
+            if _infer_dtype(rows[1][-1]) != _infer_dtype(rows[2][-1]):
+                header = True
+            else:
+                header = False
+        else:
+            header = False
+    if header is True:
+        colnames = rows[1]
+        data_idx = 2
+    else:
+        colnames = None
+        data_idx = 1
+
+    data_dtypes = [_infer_dtype(val) for val in rows[data_idx]]
+    if any(dd == 'pct' for dd in data_dtypes):
+        label += '_pct'
+
+    parsed_rows = []
+    for row in rows[data_idx:]:
+        vals = [_convert_val(val, dtype) for val, dtype in zip(row, data_dtypes)]
+        if colnames:
+            parsed_rows.append({colname:val for colname, val in zip(colnames, vals)})
+        else:
+            parsed_rows.append(vals)
+
+    return label, parsed_rows
 
 
 def _infer_dtype(val):
@@ -86,52 +143,3 @@ def _convert_val(val, dtype):
         return int(val[:-1])
     else:
         return val
-
-
-def _parse_rows(rows, header='infer'):
-    """
-    Parse sub-table `rows` into JSON form and convert str values into appropriate
-    Python types; if `header` == `infer`, will attempt to infer if header row
-    in rows, otherwise pass True/False.
-    """
-    if not rows:
-        raise ValueError('rows={0} is invalid'.format(rows))
-    rows = copy.copy(rows)
-    label = rows[0][0].replace(' ', '_').lower()
-
-    # HACK: Google replaces rising search percentages with "Breakout" if
-    # the increase is greater than 5000: https://support.google.com/trends/answer/4355000
-    # for parsing's sake, let's just set it equal to that high threshold value
-    for i, row in enumerate(rows):
-        for j, val in enumerate(row[1:]):
-            if val == 'Breakout':
-                rows[i][j+1] = '5000%'
-
-    if header == 'infer':
-        if len(rows) >= 3:
-            if _infer_dtype(rows[1][-1]) != _infer_dtype(rows[2][-1]):
-                header = True
-            else:
-                header = False
-        else:
-            header = False
-    if header is True:
-        colnames = rows[1]
-        data_idx = 2
-    else:
-        colnames = None
-        data_idx = 1
-
-    data_dtypes = [_infer_dtype(val) for val in rows[data_idx]]
-    if any(dd == 'pct' for dd in data_dtypes):
-        label += '_pct'
-
-    parsed_rows = []
-    for row in rows[data_idx:]:
-        vals = [_convert_val(val, dtype) for val, dtype in zip(row, data_dtypes)]
-        if colnames:
-            parsed_rows.append({colname:val for colname, val in zip(colnames, vals)})
-        else:
-            parsed_rows.append(vals)
-
-    return label, parsed_rows
