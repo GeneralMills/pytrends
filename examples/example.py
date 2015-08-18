@@ -2,7 +2,7 @@ from pytrends.pyGTrends import pyGTrends
 import time
 from random import randint
 
-google_username = "an_account@gmail.com"
+google_username = "an_email@gmail.com"
 google_password = "password"
 path = ""
 
