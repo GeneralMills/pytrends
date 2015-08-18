@@ -17,7 +17,7 @@ setup(
     author_email='dreyco676@gmail.com', #TODO add burton's email
     license='MIT',
     classifiers=[
-        'Development Status :: 4 - Release',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
