@@ -23,6 +23,7 @@ class pyGTrends(object):
     Google Trends API
     """
     def __init__(self, username, password):
+        # TODO switch to updating fake user agent https://github.com/hellysmile/fake-useragent
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -32,6 +33,7 @@ class pyGTrends(object):
             'PersistentCookie': 'yes',
             'Email': username,
             'Passwd': password}
+        # fake user agent
         self.headers = [
             ('Referrer', 'https://www.google.com/accounts/ServiceLoginBoxAuth'),
             ('Content-type', 'application/x-www-form-urlencoded'),
@@ -66,14 +68,15 @@ class pyGTrends(object):
 
     def request_report(self, keywords, hl='en-US', cat=None, geo=None,
                         date=None, use_topic=False):
-        #use_topic prevents re-urlencoding of topic id's.
+        # use_topic prevents re-urlencoding of topic id's.
         if use_topic:
             query_param = 'q=' + keywords
         else:
             query_param = str(urllib.parse.urlencode({'q':keywords}))
 
-        #This logic handles the default of skipping parameters
-        #Parameters that are set to '' will not filter the data requested.
+        # This logic handles the default of skipping parameters
+        # Parameters that are set to '' will not filter the data requested.
+        # See Readme.md for more information
         if cat is not None:
             cat_param = '&cat=' + cat
         else:
@@ -88,7 +91,7 @@ class pyGTrends(object):
             geo_param = ''
         hl_param = '&hl=' + hl
 
-        #These are the default parameters and shouldn't be changed.
+        # These are the default parameters and shouldn't be changed.
         cmpt_param = "&cmpt=q"
         content_param = "&content=1"
         export_param = "&export=1"
