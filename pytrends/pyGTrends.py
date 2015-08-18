@@ -6,6 +6,7 @@ from datetime import datetime
 from io import open
 import re
 import sys
+from fake_useragent import UserAgent
 if sys.version_info[0] == 2:  # Python 2
     from cookielib import CookieJar
     from cStringIO import StringIO
@@ -32,10 +33,12 @@ class pyGTrends(object):
             'PersistentCookie': 'yes',
             'Email': username,
             'Passwd': password}
+        # provide fake user agent to look like a desktop brower
+        self.fake_ua = UserAgent()
         self.headers = [
             ('Referrer', 'https://www.google.com/accounts/ServiceLoginBoxAuth'),
             ('Content-type', 'application/x-www-form-urlencoded'),
-            ('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21'),
+            ('User-Agent', self.fake_ua.chrome),
             ('Accept', 'text/plain')]
         self.url_ServiceLoginBoxAuth = 'https://accounts.google.com/ServiceLoginBoxAuth'
         self.url_Export = 'http://www.google.com/trends/trendsReport'
@@ -66,20 +69,21 @@ class pyGTrends(object):
 
     def request_report(self, keywords, hl='en-US', cat=None, geo=None,
                         date=None, use_topic=False):
-        #use_topic prevents re-urlencoding of topic id's.
+        # use_topic prevents re-urlencoding of topic id's.
         if use_topic:
             query_param = 'q=' + keywords
         else:
-            query_param = str(urllib.parse.urlencode({'q':keywords}))
+            query_param = str(urlencode({'q':keywords}))
 
-        #This logic handles the default of skipping parameters
-        #Parameters that are set to '' will not filter the data requested.
+        # This logic handles the default of skipping parameters
+        # Parameters that are set to '' will not filter the data requested.
+        # See Readme.md for more information
         if cat is not None:
             cat_param = '&cat=' + cat
         else:
             cat_param = ''
         if date is not None:
-            date_param = '&' + str(urllib.parse.urlencode({'date':date}))
+            date_param = '&' + str(urlencode({'date':date}))
         else:
             date_param = ''
         if geo is not None:
@@ -88,7 +92,7 @@ class pyGTrends(object):
             geo_param = ''
         hl_param = '&hl=' + hl
 
-        #These are the default parameters and shouldn't be changed.
+        # These are the default parameters and shouldn't be changed.
         cmpt_param = "&cmpt=q"
         content_param = "&content=1"
         export_param = "&export=1"
@@ -99,19 +103,20 @@ class pyGTrends(object):
         print("Now downloading information for:")
         print("http://www.google.com/trends/trendsReport?" + combined_params)
 
-        self.raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
+        raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
+        self.decode_data = raw_data.decode('utf-8')
 
-        if self.raw_data in ["You must be signed in to export data from Google Trends"]:
+        if self.decode_data in ["You must be signed in to export data from Google Trends"]:
             print("You must be signed in to export data from Google Trends")
-            raise Exception(self.raw_data)
+            raise Exception(self.decode_data)
 
     def save_csv(self, path, trend_name):
         fileName = path + trend_name + ".csv"
-        with open(fileName, mode='wb') as f:
-            f.write(self.raw_data)
+        with open(fileName, mode='w') as f:
+            f.write(self.decode_data)
 
     def get_data(self):
-        return self.raw_data.decode(encoding='utf-8')
+        return self.decode_data
 
 
 def parse_data(data):
