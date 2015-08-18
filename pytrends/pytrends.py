@@ -143,7 +143,6 @@ class GoogleTrends(object):
                 f.write(self.raw_data)
         elif fname.endswith('.json'):
             with io.open(fname, mode='w', encoding='utf-8') as f:
-                #json.dump(self.parsed_data, f, ensure_ascii=False, indent=4)
                 json.dump(self.parsed_data, f,
                           ensure_ascii=False, sort_keys=True, indent=4,
                           default=self._date_handler_for_json)
@@ -151,7 +150,14 @@ class GoogleTrends(object):
             raise Exception('Data can only be saved as .csv or .json')
 
     def _date_handler_for_json(self, obj):
-        return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+        # Python 2's `date.isoformat()` returns str, not unicode
+        # but json module apparently requires unicode. srsly.
+        try:
+            return obj.isoformat().decode('utf-8') if hasattr(obj, 'isoformat') else obj
+        # Python 3's `date.isoformat()` returns (unicode) str
+        # which doesn't have a `decode()` attribute, so catch it here
+        except AttributeError:
+            return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
     def get_data(self, parsed=False):
         if parsed is False:

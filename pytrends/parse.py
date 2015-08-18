@@ -1,11 +1,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import copy
-import csv
 from datetime import datetime
 import re
 
-from .compat import StringIO
+from .compat import csv_reader, StringIO
 
 
 def parse_data(data):
@@ -36,7 +35,7 @@ def parse_data(data):
                                        'geo': geo, 'period': period}
         else:
             chunk = _clean_subtable(chunk)
-            rows = [row for row in csv.reader(StringIO(chunk)) if row]
+            rows = [row for row in csv_reader(StringIO(chunk)) if row]
             if not rows:
                 continue
             label, parsed_rows = _parse_rows(rows)
