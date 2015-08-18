@@ -13,16 +13,17 @@ setup(
     description='Pseudo API for Google Trends',
     long_description=long_description,
     url='https://github.com/dreyco676/pytrends',
-    author='John Hogue',
-    author_email='dreyco676@gmail.com',
-    license='MIT',  # TODO
+    author=['John Hogue', 'Burton DeWilde'],
+    author_email='dreyco676@gmail.com', #TODO add burton's email
+    license='MIT',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License'  # TODO
+        'License :: OSI Approved :: MIT License'
         ],
+    install_requires=["fake_useragent"],
     keywords='google trends pseudo-API',
     packages=['pytrends'],
 )

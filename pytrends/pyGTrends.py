@@ -6,6 +6,7 @@ from datetime import datetime
 from io import open
 import re
 import sys
+from fake_useragent import UserAgent
 if sys.version_info[0] == 2:  # Python 2
     from cookielib import CookieJar
     from cStringIO import StringIO
@@ -23,7 +24,6 @@ class pyGTrends(object):
     Google Trends API
     """
     def __init__(self, username, password):
-        # TODO switch to updating fake user agent https://github.com/hellysmile/fake-useragent
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -33,11 +33,12 @@ class pyGTrends(object):
             'PersistentCookie': 'yes',
             'Email': username,
             'Passwd': password}
-        # fake user agent
+        # provide fake user agent to look like a desktop brower
+        self.fake_ua = UserAgent()
         self.headers = [
             ('Referrer', 'https://www.google.com/accounts/ServiceLoginBoxAuth'),
             ('Content-type', 'application/x-www-form-urlencoded'),
-            ('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21'),
+            ('User-Agent', ua.chrome),
             ('Accept', 'text/plain')]
         self.url_ServiceLoginBoxAuth = 'https://accounts.google.com/ServiceLoginBoxAuth'
         self.url_Export = 'http://www.google.com/trends/trendsReport'
