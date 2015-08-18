@@ -1,14 +1,17 @@
+from __future__ import print_function, unicode_literals
+
 from getpass import getpass
 from pprint import pprint
 from random import random
 from time import sleep
 import sys
-if sys.version_info[0] == 2:  # Python 2
-    import raw_input as input
 
 from pytrends import pytrends
 
-google_username = input('Google username: ')
+if sys.version_info[0] == 2:  # Python 2
+    google_username = raw_input('Google username: ')
+else:  # Python 3
+    google_username = input('Google username: ')
 google_password = getpass('Google password: ')
 
 # connect to google
