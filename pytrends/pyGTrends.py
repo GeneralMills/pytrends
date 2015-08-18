@@ -38,7 +38,7 @@ class pyGTrends(object):
         self.headers = [
             ('Referrer', 'https://www.google.com/accounts/ServiceLoginBoxAuth'),
             ('Content-type', 'application/x-www-form-urlencoded'),
-            ('User-Agent', ua.chrome),
+            ('User-Agent', self.fake_ua.chrome),
             ('Accept', 'text/plain')]
         self.url_ServiceLoginBoxAuth = 'https://accounts.google.com/ServiceLoginBoxAuth'
         self.url_Export = 'http://www.google.com/trends/trendsReport'
@@ -73,7 +73,7 @@ class pyGTrends(object):
         if use_topic:
             query_param = 'q=' + keywords
         else:
-            query_param = str(urllib.parse.urlencode({'q':keywords}))
+            query_param = str(urlencode({'q':keywords}))
 
         # This logic handles the default of skipping parameters
         # Parameters that are set to '' will not filter the data requested.
@@ -83,7 +83,7 @@ class pyGTrends(object):
         else:
             cat_param = ''
         if date is not None:
-            date_param = '&' + str(urllib.parse.urlencode({'date':date}))
+            date_param = '&' + str(urlencode({'date':date}))
         else:
             date_param = ''
         if geo is not None:
