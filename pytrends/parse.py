@@ -4,10 +4,8 @@ import copy
 import csv
 from datetime import datetime
 import re
-try:  # Python 3
-    from io import StringIO
-except ImportError:  # Python 2
-    from cString import StringIO
+
+from .compat import StringIO
 
 
 def parse_data(data):

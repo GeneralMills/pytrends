@@ -3,12 +3,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 from datetime import date, datetime
 import io
 import json
-import sys
-if sys.version_info[0] == 2:  # Python 2
-    from urllib import quote, urlencode
-else:  # Python 3
-    from urllib.parse import quote, urlencode
 
+from .compat import quote
 from .connect import GoogleConnection
 from .parse import parse_data
 

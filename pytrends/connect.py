@@ -1,15 +1,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import re
-import sys
-if sys.version_info[0] == 2:  # Python 2
-    from cookielib import CookieJar
-    from urllib import urlencode
-    from urllib2 import build_opener, HTTPCookieProcessor
-else:  # Python 3
-    from http.cookiejar import CookieJar
-    from urllib.parse import urlencode
-    from urllib.request import build_opener, HTTPCookieProcessor
+
+from .compat import build_opener, CookieJar, urlencode, HTTPCookieProcessor
 
 # TODO: add a simple cache to minimize unnecessary calls?
 # TODO: add rate-limiting to avoid angering the Google gods?
