@@ -1,13 +1,15 @@
-
+import os
 import io
 from setuptools import setup
 
-with io.open('README.md', encoding='utf-8') as f:
+dir = os.path.dirname(__file__)
+
+with io.open(os.path.join(dir, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name='pytrends',
-    version='1.0.2',
+    version='1.0.3',
     description='Pseudo API for Google Trends',
     long_description=long_description,
     url='https://github.com/dreyco676/pytrends',
