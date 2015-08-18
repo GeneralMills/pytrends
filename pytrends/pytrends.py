@@ -89,7 +89,7 @@ class GoogleTrends(object):
                   cmpt_param, content_param, export_param]
         params = '&'.join(param for param in params if param)
         query_url = self.base_url + params
-        print('Downloading data for:\n{}'.format(query_url))
+        print('\nDownloading data for:\n{}'.format(query_url))
 
         self.raw_data = self.connection.download_data(query_url)
 
@@ -132,7 +132,7 @@ class GoogleTrends(object):
                 start_date = min_start_date
         return start_date, end_date
 
-    def save_data(fname):
+    def save_data(self, fname):
         """
         Save data to disk at `fname`, which includes the full /path/to/file.
         Allowed extensions are .csv and .json; if the latter, raw Google Trends
@@ -143,9 +143,15 @@ class GoogleTrends(object):
                 f.write(self.raw_data)
         elif fname.endswith('.json'):
             with io.open(fname, mode='w', encoding='utf-8') as f:
-                json.dump(parse_data(self.raw_data), f, ensure_ascii=False, indent=4)
+                #json.dump(self.parsed_data, f, ensure_ascii=False, indent=4)
+                json.dump(self.parsed_data, f,
+                          ensure_ascii=False, sort_keys=True, indent=4,
+                          default=self._date_handler_for_json)
         else:
             raise Exception('Data can only be saved as .csv or .json')
+
+    def _date_handler_for_json(self, obj):
+        return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
     def get_data(self, parsed=False):
         if parsed is False:
