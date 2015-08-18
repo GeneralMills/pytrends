@@ -11,9 +11,13 @@ pytrends
 
 * Only good until Google changes their backend again :-P
 
+**Installation**
+```pip install pytrends``
+
 **Requirements**
 * Written for both Python 2.7+ and Python 3.3+
 * Requires a google account to use.
+* Requires fake-useragent python library (installed automatically with pip)
 
 ## Connect to Google
 **pyGTrends(google_username, google_password)**
