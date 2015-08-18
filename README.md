@@ -12,7 +12,7 @@ pytrends
 * Only good until Google changes their backend again :-P
 
 **Installation**
-```pip install pytrends``
+```pip install pytrends```
 
 **Requirements**
 * Written for both Python 2.7+ and Python 3.3+
