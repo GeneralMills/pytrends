@@ -12,6 +12,7 @@ pytrends
 * Only good until Google changes their backend again :-P
 
 **Installation**
+
 ```pip install pytrends```
 
 **Requirements**
