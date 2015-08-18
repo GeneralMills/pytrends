@@ -103,19 +103,20 @@ class pyGTrends(object):
         print("Now downloading information for:")
         print("http://www.google.com/trends/trendsReport?" + combined_params)
 
-        self.raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
+        raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
+        self.decode_data = raw_data.decode('utf-8')
 
-        if self.raw_data in ["You must be signed in to export data from Google Trends"]:
+        if self.decode_data in ["You must be signed in to export data from Google Trends"]:
             print("You must be signed in to export data from Google Trends")
-            raise Exception(self.raw_data)
+            raise Exception(self.decode_data)
 
     def save_csv(self, path, trend_name):
         fileName = path + trend_name + ".csv"
-        with open(fileName, mode='wb') as f:
-            f.write(self.raw_data)
+        with open(fileName, mode='w') as f:
+            f.write(self.decode_data)
 
     def get_data(self):
-        return self.raw_data.decode(encoding='utf-8')
+        return self.decode_data
 
 
 def parse_data(data):
