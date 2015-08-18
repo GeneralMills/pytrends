@@ -13,8 +13,8 @@ setup(
     description='Pseudo API for Google Trends',
     long_description=long_description,
     url='https://github.com/dreyco676/pytrends',
-    author=['John Hogue', 'Burton DeWilde'],
-    author_email='dreyco676@gmail.com', #TODO add burton's email
+    author='John Hogue, Burton DeWilde',
+    author_email='dreyco676@gmail.com, burtdewilde@gmail.com'
     license='MIT',
     classifiers=[
         'Development Status :: 4 - Beta',
