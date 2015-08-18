@@ -12,7 +12,7 @@ pytrends
 * Only good until Google changes their backend again :-P
 
 **Requirements**
-* Written for Python 3.3, probably works for 3.x.
+* Written for both Python 2.7+ and Python 3.3+
 * Requires a google account to use.
 
 ## Connect to Google
@@ -66,5 +66,5 @@ pytrends
 
 * Connecting to google code heavily based off Sal Uryasev's pyGTrends
 
-* With some ideas pulled from Matt Reid's Google Trends API for python 2.x
+* With some ideas pulled from Matt Reid's Google Trends API
   - https://bitbucket.org/mattreid9956/google-trend-api/overview
