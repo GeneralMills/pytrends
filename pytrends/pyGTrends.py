@@ -146,6 +146,7 @@ def parse_data(data):
                 parsed_data['info'] = {'source': source, 'query': query,
                                        'geo': geo, 'period': period}
         else:
+            chunk = _clean_subtable(chunk)
             rows = [row for row in csv.reader(StringIO(chunk)) if row]
             if not rows:
                 continue
@@ -157,6 +158,21 @@ def parse_data(data):
                 parsed_data[label] = parsed_rows
 
     return parsed_data
+
+
+def _clean_subtable(chunk):
+    """
+    The data output by Google Trends is human-friendly, not machine-friendly;
+    this function fixes a couple egregious data problems.
+    1. Google replaces rising search percentages with "Breakout" if the increase
+    is greater than 5000%: https://support.google.com/trends/answer/4355000 .
+    For parsing's sake, we set it equal to that high threshold value.
+    2. Rising search percentages between 1000 and 5000 have a comma separating
+    the thousands, which is terrible for CSV data. We strip it out.
+    """
+    chunk = re.sub(r',Breakout\n', ',5000%\n', chunk)
+    chunk = re.sub(r'(,[+-]?[1-4]),(\d{3}%\n)', r'\1\2', chunk)
+    return chunk
 
 
 def _infer_dtype(val):
