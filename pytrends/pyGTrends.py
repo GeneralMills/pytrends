@@ -226,14 +226,6 @@ def _parse_rows(rows, header='infer'):
     rows = copy.copy(rows)
     label = rows[0][0].replace(' ', '_').lower()
 
-    # HACK: Google replaces rising search percentages with "Breakout" if
-    # the increase is greater than 5000: https://support.google.com/trends/answer/4355000
-    # for parsing's sake, let's just set it equal to that high threshold value
-    for i, row in enumerate(rows):
-        for j, val in enumerate(row[1:]):
-            if val == 'Breakout':
-                rows[i][j+1] = '5000%'
-
     if header == 'infer':
         if len(rows) >= 3:
             if _infer_dtype(rows[1][-1]) != _infer_dtype(rows[2][-1]):
