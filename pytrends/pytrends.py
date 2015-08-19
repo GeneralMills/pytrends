@@ -150,14 +150,10 @@ class GoogleTrends(object):
             raise Exception('Data can only be saved as .csv or .json')
 
     def _date_handler_for_json(self, obj):
-        # Python 2's `date.isoformat()` returns str, not unicode
-        # but json module apparently requires unicode. srsly.
-        try:
-            return obj.isoformat().decode('utf-8') if hasattr(obj, 'isoformat') else obj
-        # Python 3's `date.isoformat()` returns (unicode) str
-        # which doesn't have a `decode()` attribute, so catch it here
-        except AttributeError:
-            return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+        # Python 2's `date.isoformat()` returns str, not _unicode_
+        # but json module apparently requires unicode. WUT.
+        # so I don't think this works for Python 2.
+        return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
     def get_data(self, parsed=False):
         if parsed is False:
