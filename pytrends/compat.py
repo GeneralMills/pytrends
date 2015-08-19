@@ -2,6 +2,7 @@ import sys
 
 # Python 3
 if sys.version_info[0] == 3:
+    string_type = str
     from csv import reader as csv_reader
     from http.cookiejar import CookieJar
     from io import StringIO
@@ -10,6 +11,7 @@ if sys.version_info[0] == 3:
 
 # Python 2
 else:
+    string_type = basestring
     from cookielib import CookieJar
     from StringIO import StringIO
     from urllib import quote, urlencode

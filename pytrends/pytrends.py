@@ -4,10 +4,13 @@ from datetime import date, datetime
 import io
 import json
 
-from .compat import quote
+from .compat import quote, string_type
 from .connect import GoogleConnection
 from .parse import parse_data
 
+# TODO: specify granularity for timeseries data (daily, weekly, monthly)
+# automatically handle searching over multiple time sub-periods and scaling
+# periods to match each other over the full time period
 
 class GoogleTrends(object):
     """
@@ -27,9 +30,9 @@ class GoogleTrends(object):
 
         Parameters
         ----------
-        terms : list of str
-            list of search terms for which to get google trends data;
-            may be either raw "search terms" or (Freebase-based) "topics"
+        terms : str or list of str
+            single search term or list of search terms for which to get trends data
+            may be either raw "search terms" or (Freebase) "topics"
         is_topic : bool or list of bool, optional
             a list of boolean values matched to corresponding items in `terms`,
             where `True` indicates that the term is to be treated as a topic,
@@ -51,6 +54,14 @@ class GoogleTrends(object):
             if None (default), results from 'worldwide' searches are returned
         search_filter : str {'web', 'images', 'news', 'froogle', 'youtube'}, optional
             if None (default), only results from 'web' searches are returned
+
+        Notes
+        -----
+        Google Trends data over time can come in daily, weekly, or monthly frequencies.
+        To get daily data, queries must be over a timespan of 3 months or less.
+        Otherwise, weekly data is usually returned, unless the query is low popularity,
+        in which case monthly data is returned. Lastly, if multiple terms are queried
+        and some don't return enough data, the csv will automatically exclude them.
         """
         query_param = self._process_query_terms(terms, is_topic)
         if search_filter:
@@ -94,7 +105,9 @@ class GoogleTrends(object):
         self.raw_data = self.connection.download_data(query_url)
 
     def _process_query_terms(self, terms, is_topic):
-        if len(terms) > 5:
+        if isinstance(terms, string_type):
+            terms = [terms]
+        elif len(terms) > 5:
             raise ValueError('Google Trends allows 5 or fewer terms at at time')
         if isinstance(is_topic, bool):
             is_topic = [is_topic for _ in range(len(terms))]

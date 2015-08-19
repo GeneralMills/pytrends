@@ -26,7 +26,8 @@ def parse_data(data):
         '10' => 10, '10%' => 10, '2015-08-06' => `datetime.datetime(2015, 8, 6, 0, 0)`
     """
     parsed_data = {}
-    for i, chunk in enumerate(re.split(r'\n{2,}', data)):
+    clean_data = clean_raw_data(data)
+    for i, chunk in enumerate(re.split(r'\n{2,}', clean_data)):
         if i == 0:
             match = re.search(r'^(.*?) interest: (.*)\n(.*?); (.*?)$', chunk)
             if match:
@@ -34,7 +35,6 @@ def parse_data(data):
                 parsed_data['info'] = {'source': source, 'query': query,
                                        'geo': geo, 'period': period}
         else:
-            chunk = _clean_subtable(chunk)
             rows = [row for row in csv_reader(StringIO(chunk)) if row]
             if not rows:
                 continue
@@ -48,7 +48,7 @@ def parse_data(data):
     return parsed_data
 
 
-def _clean_subtable(chunk):
+def clean_raw_data(data):
     """
     The data output by Google Trends is human-friendly, not machine-friendly;
     this function fixes a couple egregious data problems.
@@ -60,9 +60,9 @@ def _clean_subtable(chunk):
     2. Rising search percentages between 1000 and 5000 have a comma separating
     the thousands, which is terrible for CSV data. We strip it out.
     """
-    chunk = re.sub(r',Breakout\n', ',5000%\n', chunk)
-    chunk = re.sub(r'(,[+-]?[1-4]),(\d{3}%\n)', r'\1\2', chunk)
-    return chunk
+    clean_data = re.sub(r',Breakout\n', ',5000%\n', data)
+    clean_data = re.sub(r'(,[+-]?[1-4]),(\d{3}%\n)', r'\1\2', clean_data)
+    return clean_data
 
 
 def _parse_rows(rows, header='infer'):
