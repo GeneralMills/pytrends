@@ -18,10 +18,19 @@ class GoogleTrends(object):
     """
     Class to fetch and save data from Google Trends.
     """
-    def __init__(self, username, password):
+    def __init__(self, username, password, wait=3.0):
+        """
+        Parameters
+        ----------
+        username : str
+        password : str
+        wait : int or float, optional
+            number of seconds (on average) to wait between queries;
+            minimum recommended value is 1 -- don't provoke Google with rapid-fire requests
+        """
         self.search_filters = {'web', 'images', 'news', 'froogle', 'youtube'}
         self.base_url = 'http://www.google.com/trends/trendsReport?&'
-        self.connection = GoogleConnection(username, password)
+        self.connection = GoogleConnection(username, password, wait=wait)
 
     def query(self, terms, is_topic=False,
               start_date=None, end_date=None, granularity='auto',
@@ -125,7 +134,7 @@ class GoogleTrends(object):
                        for term, topic in zip(terms, is_topic)))
         return query_param
 
-    def _process_gprop_param(self, search_filter):
+    def _process_search_filter(self, search_filter):
         if search_filter:
             if search_filter not in self.search_filters:
                 msg = '`search_filter` {0} not valid; options are {1}'.format(

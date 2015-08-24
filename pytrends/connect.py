@@ -1,6 +1,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
+from random import random
 import re
+import time
 
 from fake_useragent import UserAgent
 
@@ -14,11 +16,12 @@ class GoogleConnection(object):
     Class to connect to Google Trends by logging in with a valid
     Google username and password.
     """
-    def __init__(self, username, password):
+    def __init__(self, username, password, wait=3.0):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
         """
+        self.avg_wait = wait
         self.login_params = {
             'continue': 'http://www.google.com/trends',
             'PersistentCookie': 'yes',
@@ -35,6 +38,7 @@ class GoogleConnection(object):
         self.url_CookieCheck = 'https://www.google.com/accounts/CheckCookie?chtml=LoginDoneHtml'
         self.url_PrefCookie = 'http://www.google.com'
         self._connect()
+        self._set_last_call_time(time.time())
 
     def _connect(self):
         """
@@ -57,6 +61,17 @@ class GoogleConnection(object):
         self.opener.open(self.url_CookieCheck)
         self.opener.open(self.url_PrefCookie)
 
+    def _set_last_call_time(self, timestamp):
+        self.last_call_time = timestamp
+
+    def _wait_for_rate_limit(self):
+        wait_time = (2 * self.avg_wait * random()) + 0.1  # add small safety factor
+        time_since_last_call = time.time() - self.last_call_time
+        if time_since_last_call < wait_time:
+            sleep_time = wait_time - time_since_last_call
+            # print('Rate limit (sleeping {} seconds ...)'.format(sleep_time))
+            time.sleep(sleep_time)
+
     def _randomize_header_ua(self):
         """
         Set a randomized User Agent in headers, update opener's headers list.
@@ -69,7 +84,9 @@ class GoogleConnection(object):
         Download raw CSV file matching Google Trends `query` as a single string.
         """
         self._randomize_header_ua()
+        self._wait_for_rate_limit()
         data = self.opener.open(query).read()
+        self._set_last_call_time(time.time())
         data = data.decode(encoding='utf-8')
         # TODO: is there a better way to handle this error? (how to provoke it?)
         if data in ['You must be signed in to export data from Google Trends']:
