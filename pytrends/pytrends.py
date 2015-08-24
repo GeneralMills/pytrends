@@ -114,8 +114,6 @@ class GoogleTrends(object):
                   cmpt_param, content_param, export_param]
         params = '&'.join(param for param in params if param)
         query_url = self.base_url + params
-        print('\nDownloading data for:\n{}'.format(query_url))
-
         self.raw_data = self.connection.download_data(query_url)
 
     def _process_query_terms(self, terms, is_topic):
