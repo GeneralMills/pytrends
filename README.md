@@ -36,7 +36,7 @@ pytrends
 * keywords
   - the words to get data for
   - Example "Pizza"
-  - Alternately: "Pizza + Italian"
+  - Alternately multiple terms with a comma and space: "Pizza, Italian"
   - Alternately: "iron - chemical element" topic name is "%2Fm%2F025rw19" and needs use_topics=True
 * hl
   - language
