@@ -43,7 +43,7 @@ pytrends
   - To automate future downloads run it once manually to find the encoded topic. The topic is in the url, it starts after q= and ends before the &. 
   - For example:
   - ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
-  - "%2Fm%2F025rw19" is the topic "Iron Chemical Element" to use this with pytrends set use_topics=True
+  - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends set use_topics=True
 * hl
   - language
   - find available parameters by inspecting the url when manually using Google Trends
