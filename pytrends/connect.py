@@ -96,16 +96,20 @@ class GoogleConnection(object):
         if query in self._CACHE:
             print('\nFetching cached data for:\n{}'.format(query))
             return self._CACHE[query]
+
         self._randomize_header_ua()
         self._wait_for_rate_limit()
         print('\nDownloading data for:\n{}'.format(query))
         data = self.opener.open(query).read()
         self._set_last_call_time(time.time())
         data = data.decode(encoding='utf-8')
+
         # TODO: is there a better way to handle this error? (how to provoke it?)
+        # is it even needed??
         if data in ['You must be signed in to export data from Google Trends']:
             print('You must be signed in to export data from Google Trends!')
             raise Exception(data)
+
         # cache the data for this call
         self._CACHE[query] = data
 

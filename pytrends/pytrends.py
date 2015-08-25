@@ -34,7 +34,8 @@ class GoogleTrends(object):
 
     def query(self, terms, is_topic=False,
               start_date=None, end_date=None, granularity='auto',
-              category_filter=None, geo_filter=None, search_filter=None):
+              category_filter=None, geo_filter=None, search_filter=None,
+              language=None):
         """
         Query Google Trends for `terms`, optionally filtering by date,
         category, geography, and search type.
@@ -73,6 +74,11 @@ class GoogleTrends(object):
             otherwise, manually extract valid values from the web GUI's URLs
         search_filter : str {'web', 'images', 'news', 'froogle', 'youtube'}, optional
             if None (default), only results from 'web' searches are returned
+        language : str, optional
+            if None (default), data headers are in English ('en');
+            otherwise, specify the desired 2-letter language code; see
+            https://sites.google.com/site/tomihasa/google-language-codes
+            for a list of available google web interface language codes
 
         Notes
         -----
@@ -82,23 +88,22 @@ class GoogleTrends(object):
         in which case monthly data is returned. Lastly, if multiple terms are queried
         and some don't return enough data, the csv will automatically exclude them.
         """
+        # set optional params
         query_param = self._process_query_terms(terms, is_topic)
         gprop_param = self._process_search_filter(search_filter)
-        if category_filter:
-            cat_param = 'cat={}'.format(category_filter)
-        else:
-            cat_param = None
-        if geo_filter:
-            geo_param = 'geo={}'.format(geo_filter)
-        else:
-            geo_param = None
-        # these three are default params -- not to be changed!
+        cat_param = 'cat={}'.format(category_filter) if category_filter else None
+        geo_param = 'geo={}'.format(geo_filter) if geo_filter else None
+        hl_param = 'hl={}'.format(language) if language else None
+
+        # set default params
         cmpt_param = 'cmpt=q'
         content_param = 'content=1'
         export_param = 'export=1'
 
-        start_date, end_date = self._process_date_filter(start_date, end_date,
-                                                         search_filter)
+        # get processed start and end dates for query
+        # which depend on search filter and granularity arguments
+        start_date, end_date = self._process_date_filter(
+            start_date, end_date, search_filter, granularity)
         if start_date and end_date:
             if granularity == 'auto':
                 date_param = '{0} {1}m'.format(
@@ -111,7 +116,7 @@ class GoogleTrends(object):
             date_param = None
 
         params = [query_param, cat_param, date_param, gprop_param, geo_param,
-                  cmpt_param, content_param, export_param]
+                  hl_param, cmpt_param, content_param, export_param]
         params = '&'.join(param for param in params if param)
         query_url = self.base_url + params
         self.raw_data = self.connection.download_data(query_url)
@@ -144,12 +149,16 @@ class GoogleTrends(object):
             gprop_param = None
         return gprop_param
 
-    def _process_date_filter(self, start_date, end_date, search_filter=None):
+    def _process_date_filter(self, start_date, end_date,
+                             search_filter, granularity):
         if not search_filter or search_filter == 'web':
             min_start_date = arrow.get('2004-01-01')
         else:
             min_start_date = arrow.get('2008-01-01')
         max_end_date = arrow.now()
+        # handle special case: "daily" granularity for full (unspecified) time span
+        if granularity == 'daily' and not start_date and not end_date:
+            return min_start_date, max_end_date
         if start_date:
             start_date = arrow.get(start_date)
             if start_date < min_start_date:
