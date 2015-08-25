@@ -44,7 +44,7 @@ pytrends
   - For example: ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
   - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends set use_topics=True
 * hl
-  - Language to narrow results
+  - Language to return result headers in
   - Two letter language abbreviation
   - For example English is ```"en"```
   - Defaults to english
