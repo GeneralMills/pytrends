@@ -61,13 +61,13 @@ pytrends
 * date
   - Date to start from
   - Defaults to all available data, 2004 - present.
-  - * Custom Timeframe Pattern:
+  - Custom Timeframe Pattern:
     - By Month: ```"MM/YYYY #m"``` where # is the number of months from that date to pull data for
       - For example: ``"10/2009 61m"`` would get data from October 2009 to October 2014
       - Less than 4 months will return Daily level data
       - More than 36 months will return monthly level data
       - 4-36 months will return weekly level data
-  - * Current Time Minus Time Pattern:
+  - Current Time Minus Time Pattern:
     - By Month: ```"today-#m"``` where # is the number of months from that date to pull data for
       - For example: ``"today-61m"`` would get data from today to 61months ago
       - 1-3 months will return daily intervals of data
