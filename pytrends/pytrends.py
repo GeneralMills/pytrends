@@ -104,14 +104,41 @@ class GoogleTrends(object):
         # which depend on search filter and granularity arguments
         start_date, end_date = self._process_date_filter(
             start_date, end_date, search_filter, granularity)
-        if start_date and end_date:
-            if granularity == 'auto':
-                date_param = '{0} {1}m'.format(
-                    start_date.format('MM/YYYY'),
-                    1 + 12*(end_date.year-start_date.year) + (end_date.month-start_date.month))
-                date_param = 'date={}'.format(quote(date_param, safe=''))
-            else:
-                raise NotImplementedError('still working on daily granularity')
+
+        # handle complicated case where multiple calls need to be made
+        # then concatenated and re-normalized
+        if granularity == 'daily':
+            queries = []
+            while start_date < end_date:
+                n_months = min(int((end_date - start_date).days / 30), 3)
+                date_param = 'date={}'.format(quote(
+                    '{0} {1}m'.format(start_date.format('MM/YYYY'), n_months), safe=''))
+                print(start_date.format('MM/YYYY'), n_months)
+                params = [query_param, cat_param, date_param, gprop_param, geo_param,
+                          hl_param, cmpt_param, content_param, export_param]
+                params = '&'.join(param for param in params if param)
+                query_url = self.base_url + params
+                self.raw_data = self.connection.download_data(query_url)
+
+                # save queries, access corresponding data in connection's cache
+                # the cache does double-duty here: this is more memory-efficient
+                # than saving *two* copies, one in connection the other here
+                queries.append(query_url)
+                # 3-month timespans are queried, but the start date is only
+                # increased by 2 months; this ensures overlap, for re-normalization
+                start_date = start_date.replace(months=+2)
+
+            # TODO: implement code to concatenate results across 3-month spans
+            # and re-scale them to match based on overlapping month's values
+
+            return
+
+        # otherwise, a single call is needed, with or without date param
+        elif start_date and end_date:
+            n_months = (1 + 12*(end_date.year - start_date.year)
+                        + (end_date.month - start_date.month))
+            date_param = 'date={}'.format(quote(
+                '{0} {1}m'.format(start_date.format('MM/YYYY'), n_months), safe=''))
         else:
             date_param = None
 
@@ -151,6 +178,9 @@ class GoogleTrends(object):
 
     def _process_date_filter(self, start_date, end_date,
                              search_filter, granularity):
+        if granularity not in {'daily', 'auto'}:
+            msg = "Invalid `granularity` parameter; must be 'daily' or 'auto'"
+            raise ValueError(msg)
         if not search_filter or search_filter == 'web':
             min_start_date = arrow.get('2004-01-01')
         else:
@@ -160,7 +190,7 @@ class GoogleTrends(object):
         if granularity == 'daily' and not start_date and not end_date:
             return min_start_date, max_end_date
         if start_date:
-            start_date = arrow.get(start_date)
+            start_date = arrow.get(start_date).replace(day=1)
             if start_date < min_start_date:
                 msg = 'Earliest available Google Trends data is for {}'.format(
                     min_start_date)
@@ -168,7 +198,7 @@ class GoogleTrends(object):
             if not end_date:
                 end_date = max_end_date
         if end_date:
-            end_date = arrow.get(end_date)
+            end_date = arrow.get(end_date).replace(day=1)
             if end_date > max_end_date:
                 msg = 'Last available Google Trends data is for {} (today)'.format(
                     max_end_date)
