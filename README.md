@@ -61,8 +61,28 @@ pytrends
 * date
   - Date to start from
   - Defaults to all available data, 2004 - present.
-  - ```"MM/YYYY #m"``` where # is the number of months from that date to pull data for
-  - For example: ``"10/2009 61m"`` would get data from October 2009 to October 2014
+  - * Custom Timeframe Pattern:
+    - By Month: ```"MM/YYYY #m"``` where # is the number of months from that date to pull data for
+      - For example: ``"10/2009 61m"`` would get data from October 2009 to October 2014
+      - Less than 4 months will return Daily level data
+      - More than 36 months will return monthly level data
+      - 4-36 months will return weekly level data
+  - * Current Time Minus Time Pattern:
+    - By Month: ```"today-#m"``` where # is the number of months from that date to pull data for
+      - For example: ``"today-61m"`` would get data from today to 61months ago
+      - 1-3 months will return daily intervals of data
+      - 4-36 months will return weekly intervals of data
+      - 36+ months will return monthly intervals of data
+    - Daily: ```"today-#d"``` where # is the number of days from that date to pull data for
+      - For example: ``"today-7d"`` would get data from the last week
+      - 1 day will return 8min intervals of data
+      - 2-8 days will return Hourly intervals of data
+      - 8-90 days will return Daily level data
+    - Hourly: ```"now-#H"``` where # is the number of hours from that date to pull data for
+      - For example: ``"now-1H"`` would get data from the last hour
+      - 1-3 hours will return 1min intervals of data
+      - 4-26 hours will return 8min intervals of data
+      - 27-34 hours will return 16min intervals of data
 * use_topic
   - Used for Advanced Keywords
   - Set to ```True``` to avoid URLencoding the keywords
