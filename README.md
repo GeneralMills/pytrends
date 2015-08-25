@@ -51,7 +51,7 @@ pytrends
 * cat
   - category
   - find available parameters by inspecting the url when manually using Google Trends
-  - defaults to none
+  - defaults to no category
 * geo
   - geographical area
   - find available parameters by inspecting the url when manually using Google Trends
@@ -59,10 +59,10 @@ pytrends
 * date
   - date to start from
   - defaults to all available data
-  - "MM/YYYY #m" where # is the number of months from that date to pull data for
-  - "10/2009 61m" would get data from October 2009 to October 2014
+  - ```"MM/YYYY #m"``` where # is the number of months from that date to pull data for
+  - For example ``"10/2009 61m"`` would get data from October 2009 to October 2014
 * use_topic
-  - set to true to avoid URLencoding the keywords
+  - set to ```True``` to avoid URLencoding the keywords
 
 ### Save a Report to file
 **save_csv(path, trend_name)**
