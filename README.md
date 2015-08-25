@@ -40,38 +40,41 @@ pytrends
 * Advanced Keywords
   - When using Google Trends dashboard Google may provide suggested narrowed search terms. 
   - For example "iron" will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```. 
-  - To automate future downloads run it once manually to find the encoded topic. The topic is in the url, it starts after q= and ends before the &. 
-  - For example:
-  - ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
+  - To automate future downloads run it once manually to find the encoded topic. Find the encoded topic by inspecting the url. The topic starts after ```q=``` and ends before the next ```&```. 
+  - For example: ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
   - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends set use_topics=True
 * hl
-  - language
-  - find available parameters by inspecting the url when manually using Google Trends
-  - defaults to US english
+  - Language to narrow results
+  - Two letter language abbreviation
+  - For example English is ```"en"```
+  - Defaults to english
 * cat
-  - category
-  - find available parameters by inspecting the url when manually using Google Trends
-  - defaults to no category
+  - Category to narrow results
+  - Find available cateogies by inspecting the url when manually using Google Trends. The category starts after ```cat=``` and ends before the next ```&```
+  - For example: ```"https://www.google.com/trends/explore#q=pizza&cat=0-71"```
+  - ```"0-71"``` is the category
+  - Defaults to no category
 * geo
-  - geographical area
-  - find available parameters by inspecting the url when manually using Google Trends
-  - defaults to world
+  - Two letter country abbreviation
+  - For example United States is ```"US"```
+  - Defaults to World
 * date
-  - date to start from
-  - defaults to all available data
+  - Date to start from
+  - Defaults to all available data, 2004 - present.
   - ```"MM/YYYY #m"``` where # is the number of months from that date to pull data for
-  - For example ``"10/2009 61m"`` would get data from October 2009 to October 2014
+  - For example: ``"10/2009 61m"`` would get data from October 2009 to October 2014
 * use_topic
-  - set to ```True``` to avoid URLencoding the keywords
+  - Used for Advanced Keywords
+  - Set to ```True``` to avoid URLencoding the keywords
 
 ### Save a Report to file
 **save_csv(path, trend_name)**
 
 **Parameters**
 * path
-  - output path
+  - Output path
 * trend_name
-  - human readable name for file
+  - Human readable name for file
 
 ### Credits
 
