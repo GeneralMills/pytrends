@@ -15,7 +15,7 @@ def parse_data(data):
     Parameters
     ----------
     data : str
-        CSV data as text, output by `pyGTrends.get_data()`
+        CSV data as text, output by `pytrends.GoogleTrends().get_data()`
 
     Returns
     -------
@@ -29,11 +29,11 @@ def parse_data(data):
     clean_data = clean_raw_data(data)
     for i, chunk in enumerate(re.split(r'\n{2,}', clean_data)):
         if i == 0:
-            match = re.search(r'^(.*?) interest: (.*)\n(.*?); (.*?)$', chunk)
+            match = re.search(r'^(.*?):\s*(.*)\n(.*?);\s*(.*?)$', chunk)
             if match:
-                source, query, geo, period = match.groups()
-                parsed_data['info'] = {'source': source, 'query': query,
-                                       'geo': geo, 'period': period}
+                search, query, geo, timespan = match.groups()
+                parsed_data['info'] = {'search': search, 'query': query,
+                                       'geo': geo, 'timespan': timespan}
         else:
             rows = [row for row in csv_reader(StringIO(chunk)) if row]
             if not rows:
