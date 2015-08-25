@@ -35,8 +35,8 @@ pytrends
 **Parameters**
 * Keywords
   - the words to get data for
-  - Example "Pizza"
-  - Up to five terms with a comma and space: "Pizza, Italian, Spaghetti, Breadsticks, Sausage"
+  - Example ```"Pizza"```
+  - Up to five terms with a comma and space: ```"Pizza, Italian, Spaghetti, Breadsticks, Sausage"```
 * Advanced Keywords
   - When using Google Trends dashboard Google may provide suggested narrowed search terms. 
   - For example "iron" will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```. 
