@@ -39,7 +39,7 @@ pytrends
   - Up to five terms with a comma and space: ```"Pizza, Italian, Spaghetti, Breadsticks, Sausage"```
 * Advanced Keywords
   - When using Google Trends dashboard Google may provide suggested narrowed search terms. 
-  - For example "iron" will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```. 
+  - For example ```"iron"``` will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```. 
   - To automate future downloads run it once manually to find the encoded topic. Find the encoded topic by inspecting the url. The topic starts after ```q=``` and ends before the next ```&```. 
   - For example: ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
   - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends set use_topics=True
