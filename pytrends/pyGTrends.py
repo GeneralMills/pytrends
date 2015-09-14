@@ -78,7 +78,7 @@ class pyGTrends(object):
         if use_topic:
             query_param = 'q=' + keywords
         else:
-            query_param = quote(keywords)
+            query_param = 'q=' + quote(keywords)
 
         # This logic handles the default of skipping parameters
         # Parameters that are set to '' will not filter the data requested.
@@ -88,7 +88,7 @@ class pyGTrends(object):
         else:
             cat_param = ''
         if date is not None:
-            date_param = '&' + quote(date)
+            date_param = '&date=' + quote(date)
         else:
             date_param = ''
         if geo is not None:
