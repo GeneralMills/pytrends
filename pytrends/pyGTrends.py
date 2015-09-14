@@ -6,16 +6,20 @@ from datetime import datetime
 from io import open
 import re
 import sys
+import requests
+import json
 from fake_useragent import UserAgent
 if sys.version_info[0] == 2:  # Python 2
     from cookielib import CookieJar
     from cStringIO import StringIO
     from urllib import urlencode
+    from urllib import quote
     from urllib2 import build_opener, HTTPCookieProcessor
 else:  # Python 3
     from http.cookiejar import CookieJar
     from io import StringIO
     from urllib.parse import urlencode
+    from urllib.parse import quote
     from urllib.request import build_opener, HTTPCookieProcessor
 
 
@@ -34,11 +38,12 @@ class pyGTrends(object):
             'Email': username,
             'Passwd': password}
         # provide fake user agent to look like a desktop brower
-        self.fake_ua = UserAgent()
+        #self.fake_ua = UserAgent()
         self.headers = [
             ('Referrer', 'https://www.google.com/accounts/ServiceLoginBoxAuth'),
             ('Content-type', 'application/x-www-form-urlencoded'),
-            ('User-Agent', self.fake_ua.chrome),
+            ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'),
+            #self.fake_ua.chrome),
             ('Accept', 'text/plain')]
         self.url_ServiceLoginBoxAuth = 'https://accounts.google.com/ServiceLoginBoxAuth'
         self.url_Export = 'http://www.google.com/trends/trendsReport'
@@ -73,7 +78,7 @@ class pyGTrends(object):
         if use_topic:
             query_param = 'q=' + keywords
         else:
-            query_param = str(urlencode({'q':keywords}))
+            query_param = quote(keywords)
 
         # This logic handles the default of skipping parameters
         # Parameters that are set to '' will not filter the data requested.
@@ -83,7 +88,7 @@ class pyGTrends(object):
         else:
             cat_param = ''
         if date is not None:
-            date_param = '&' + str(urlencode({'date':date}))
+            date_param = '&' + quote(date)
         else:
             date_param = ''
         if geo is not None:
@@ -117,6 +122,14 @@ class pyGTrends(object):
 
     def get_data(self):
         return self.decode_data
+
+    def get_suggestions(self, keyword):
+        kw_param = quote(keyword)
+        print(kw_param)
+        raw_data = self.opener.open("https://www.google.com/trends/api/autocomplete/" + kw_param).read()
+        # response is invalid json but if you strip off ")]}'," from the front it is then valid
+        json_data = json.loads(raw_data[5:].decode())
+        return json_data
 
 
 def parse_data(data):
