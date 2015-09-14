@@ -125,7 +125,6 @@ class pyGTrends(object):
 
     def get_suggestions(self, keyword):
         kw_param = quote(keyword)
-        print(kw_param)
         raw_data = self.opener.open("https://www.google.com/trends/api/autocomplete/" + kw_param).read()
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
         json_data = json.loads(raw_data[5:].decode())
