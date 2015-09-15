@@ -73,13 +73,13 @@ pytrends
       - 1-3 months will return daily intervals of data
       - 4-36 months will return weekly intervals of data
       - 36+ months will return monthly intervals of data
-    - Daily: ```"today #d"``` where # is the number of days from that date to pull data for
-      - For example: ``"today-7d"`` would get data from the last week
+    - Daily: ```"today #-d"``` where # is the number of days from that date to pull data for
+      - For example: ``"today 7-d"`` would get data from the last week
       - 1 day will return 8min intervals of data
       - 2-8 days will return Hourly intervals of data
       - 8-90 days will return Daily level data
-    - Hourly: ```"now #H"``` where # is the number of hours from that date to pull data for
-      - For example: ``"now-1H"`` would get data from the last hour
+    - Hourly: ```"now #-H"``` where # is the number of hours from that date to pull data for
+      - For example: ``"now 1-H"`` would get data from the last hour
       - 1-3 hours will return 1min intervals of data
       - 4-26 hours will return 8min intervals of data
       - 27-34 hours will return 16min intervals of data
