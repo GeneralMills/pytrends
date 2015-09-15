@@ -101,39 +101,8 @@ pytrends
   - keyword to get suggestions for
   
 **Returns JSON**
-```{
-    "default": {
-        "topics": [
-            {
-                "mid": "/m/0663v",
-                "title": "Pizza",
-                "type": "Dish"
-            },
-            {
-                "mid": "/m/09cfq",
-                "title": "Pizza Hut",
-                "type": "Restaurant company"
-            },
-            {
-                "mid": "/m/03clwm",
-                "title": "Domino's Pizza",
-                "type": "Restaurant company"
-            },
-            {
-                "mid": "/m/05m1lt",
-                "title": "Pizza delivery",
-                "type": "Accommodation feature"
-            },
-            {
-                "mid": "/m/049jd2",
-                "title": "Pizza",
-                "type": "Australian television series"
-            }
-        ]
-    }
-}
-```
-
+```{"default": {"topics": [{"mid": "/m/0663v","title": "Pizza","type": "Dish"}]}}```
+* Use the ```mid``` value for the keyword in future searches for a more refined trend set
 ### Credits
 
 * Connecting to google code heavily based off Sal Uryasev's pyGTrends
