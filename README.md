@@ -58,6 +58,9 @@ pytrends
   - Two letter country abbreviation
   - For example United States is ```"US"```
   - Defaults to World
+* tz
+  - Timezone using Etc/GMT
+  - For example US CST is ```"Etc/GMT+5"```
 * date
   - Date to start from
   - Defaults to all available data, 2004 - present.
