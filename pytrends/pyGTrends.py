@@ -71,13 +71,8 @@ class pyGTrends(object):
         self.opener.open(self.url_CookieCheck)
         self.opener.open(self.url_PrefCookie)
 
-    def request_report(self, keywords, hl='en-US', cat=None, geo=None,
-                        date=None, use_topic=False):
-        # use_topic prevents re-urlencoding of topic id's.
-        if use_topic:
-            query_param = 'q=' + keywords
-        else:
-            query_param = 'q=' + quote(keywords)
+    def request_report(self, keywords, hl='en-US', cat=None, geo=None, date=None):
+        query_param = 'q=' + quote(keywords)
 
         # This logic handles the default of skipping parameters
         # Parameters that are set to '' will not filter the data requested.
