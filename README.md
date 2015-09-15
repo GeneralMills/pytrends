@@ -30,7 +30,7 @@ pytrends
   - password for the gmail account
 
 ### Request a Report
-**request_report(keywords, hl='en-US', cat=None, geo=None, date=None, use_topic=False)**
+**request_report(keywords, hl='en-US', cat=None, geo=None, date=None)**
 
 **Parameters**
 * Keywords
@@ -40,9 +40,9 @@ pytrends
 * Advanced Keywords
   - When using Google Trends dashboard Google may provide suggested narrowed search terms. 
   - For example ```"iron"``` will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```. 
-  - To automate future downloads run it once manually to find the encoded topic. Find the encoded topic by inspecting the url. The topic starts after ```q=``` and ends before the next ```&```. 
+  - Find the encoded topic by using the get_suggestions() function and choose the most relevant one for you. 
   - For example: ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
-  - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends set use_topics=True
+  - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends
 * hl
   - Language to return result headers in
   - Two letter language abbreviation
@@ -73,19 +73,16 @@ pytrends
       - 1-3 months will return daily intervals of data
       - 4-36 months will return weekly intervals of data
       - 36+ months will return monthly intervals of data
-    - Daily: ```"today-#d"``` where # is the number of days from that date to pull data for
-      - For example: ``"today-7d"`` would get data from the last week
+    - Daily: ```"today #-d"``` where # is the number of days from that date to pull data for
+      - For example: ``"today 7-d"`` would get data from the last week
       - 1 day will return 8min intervals of data
       - 2-8 days will return Hourly intervals of data
       - 8-90 days will return Daily level data
-    - Hourly: ```"now-#H"``` where # is the number of hours from that date to pull data for
-      - For example: ``"now-1H"`` would get data from the last hour
+    - Hourly: ```"now #-H"``` where # is the number of hours from that date to pull data for
+      - For example: ``"now 1-H"`` would get data from the last hour
       - 1-3 hours will return 1min intervals of data
       - 4-26 hours will return 8min intervals of data
       - 27-34 hours will return 16min intervals of data
-* use_topic
-  - Used for Advanced Keywords
-  - Set to ```True``` to avoid URLencoding the keywords
 
 ### Save a Report to file
 **save_csv(path, trend_name)**
@@ -94,8 +91,18 @@ pytrends
 * path
   - Output path
 * trend_name
-  - Human readable name for file
+  - Human readable name for fil
 
+### Get Google Term Suggestions
+**get_suggestions(keyword)**
+
+**Parameters**
+* keyword
+  - keyword to get suggestions for
+  
+**Returns JSON**
+```{"default": {"topics": [{"mid": "/m/0663v","title": "Pizza","type": "Dish"}]}}```
+* Use the ```mid``` value for the keyword in future searches for a more refined trend set
 ### Credits
 
 * Connecting to google code heavily based off Sal Uryasev's pyGTrends
