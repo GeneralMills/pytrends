@@ -38,12 +38,11 @@ class pyGTrends(object):
             'Email': username,
             'Passwd': password}
         # provide fake user agent to look like a desktop brower
-        #self.fake_ua = UserAgent()
+        self.fake_ua = UserAgent()
         self.headers = [
             ('Referrer', 'https://www.google.com/accounts/ServiceLoginBoxAuth'),
             ('Content-type', 'application/x-www-form-urlencoded'),
-            ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'),
-            #self.fake_ua.chrome),
+            ('User-Agent', self.fake_ua.chrome),
             ('Accept', 'text/plain')]
         self.url_ServiceLoginBoxAuth = 'https://accounts.google.com/ServiceLoginBoxAuth'
         self.url_Export = 'http://www.google.com/trends/trendsReport'
@@ -117,8 +116,8 @@ class pyGTrends(object):
 
     def save_csv(self, path, trend_name):
         fileName = path + trend_name + ".csv"
-        with open(fileName, mode='w') as f:
-            f.write(self.decode_data)
+        with open(fileName, mode='wb') as f:
+            f.write(self.decode_data.encode('utf8'))
 
     def get_data(self):
         return self.decode_data
