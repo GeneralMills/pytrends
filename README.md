@@ -71,8 +71,8 @@ pytrends
       - More than 36 months will return monthly level data
       - 4-36 months will return weekly level data
   - Current Time Minus Time Pattern:
-    - By Month: ```"today-#m"``` where # is the number of months from that date to pull data for
-      - For example: ``"today-61m"`` would get data from today to 61months ago
+    - By Month: ```"today #-m"``` where # is the number of months from that date to pull data for
+      - For example: ``"today 61-m"`` would get data from today to 61months ago
       - 1-3 months will return daily intervals of data
       - 4-36 months will return weekly intervals of data
       - 36+ months will return monthly intervals of data
