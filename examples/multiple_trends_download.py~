@@ -9,7 +9,7 @@ path = ""
 # connect to Google
 connector = pyGTrends(google_username, google_password)
 
-# Put all of your wordlist here as many as you want
+# Put your wordlist here
 
 list = ['Ohio', 'washington', 'New york', 'California', 'florida' , 'georgia', 'north carolina']
 
