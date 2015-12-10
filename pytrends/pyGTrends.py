@@ -64,7 +64,11 @@ class pyGTrends(object):
         galx = re.compile('<input name="GALX"[\s]+type="hidden"[\s]+value="(?P<galx>[a-zA-Z0-9_-]+)">')
         m = galx.search(resp)
         if not m:
-            raise Exception('Cannot parse GALX out of login page')
+            galx = re.compile('<input type="hidden"[\s]+name="GALX"[\s]+value="(?P<galx>[a-zA-Z0-9_-]+)">')
+            m = galx.search(resp)
+            if not m:
+                raise Exception('Cannot parse GALX out of login page')
+
         self.login_params['GALX'] = m.group('galx')
         params = urlencode(self.login_params).encode('utf-8')
         self.opener.open(self.url_ServiceLoginBoxAuth, params)
