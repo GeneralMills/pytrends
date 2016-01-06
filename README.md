@@ -94,7 +94,7 @@ pytrends
 * path
   - Output path
 * trend_name
-  - Human readable name for fil
+  - Human readable name for file
 
 ### Get Google Term Suggestions
 **get_suggestions(keyword)**
