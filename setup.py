@@ -24,7 +24,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'License :: OSI Approved :: MIT License'
         ],
-    install_requires=["fake_useragent"],
+    install_requires=["fake_useragent", "requests"],
     keywords='google trends api search',
     packages=['pytrends'],
 )
