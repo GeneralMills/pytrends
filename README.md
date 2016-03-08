@@ -20,6 +20,10 @@ pytrends
 * Requires a google account to use.
 * Requires fake-useragent python library (installed automatically with pip)
 
+**Caveats**
+* This is not an official or supported API
+* Google may change aggregation level for items with very large or very small search volume
+
 ## Connect to Google
 **pyGTrends(google_username, google_password)**
 
@@ -76,6 +80,7 @@ pytrends
       - 1-3 months will return daily intervals of data
       - 4-36 months will return weekly intervals of data
       - 36+ months will return monthly intervals of data
+      - **NOTE** Google uses UTC date as *'today'*
     - Daily: ```"today #-d"``` where # is the number of days from that date to pull data for
       - For example: ``"today 7-d"`` would get data from the last week
       - 1 day will return 8min intervals of data
