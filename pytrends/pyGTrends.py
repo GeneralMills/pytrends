@@ -184,7 +184,7 @@ def _clean_subtable(chunk):
     2. Rising search percentages between 1000 and 5000 have a comma separating
     the thousands, which is terrible for CSV data. We strip it out.
     """
-    chunk = re.sub(r',Breakout\n', ',5000%\n', chunk)
+    chunk = re.sub(r',Breakout', ',5000%', chunk)
     chunk = re.sub(r'(,[+-]?[1-4]),(\d{3}%\n)', r'\1\2', chunk)
     return chunk
 
