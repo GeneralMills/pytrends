@@ -64,7 +64,7 @@ pytrends
   - Defaults to World
   - More detail available for States/Provinces by specifying additonal abbreviations
   - For example: Alabama would be ```US-AL```
-  - For example: England would be ```UK-ENG```
+  - For example: England would be ```GB-ENG```
 * tz
   - Timezone using Etc/GMT
   - For example US CST is ```"Etc/GMT+5"```
