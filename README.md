@@ -62,6 +62,9 @@ pytrends
   - Two letter country abbreviation
   - For example United States is ```"US"```
   - Defaults to World
+  - More detail available for States/Provinces by specifying additonal abbreviations
+  - For example: Alabama would be ```US-AL```
+  - For example: England would be ```UK-ENG```
 * tz
   - Timezone using Etc/GMT
   - For example US CST is ```"Etc/GMT+5"```
