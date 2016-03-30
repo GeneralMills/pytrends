@@ -75,7 +75,7 @@ class pyGTrends(object):
         self.opener.open(self.url_CookieCheck)
         self.opener.open(self.url_PrefCookie)
 
-    def request_report(self, keywords, hl='en-US', cat=None, geo=None, date=None, tz=None):
+    def request_report(self, keywords, hl='en-US', cat=None, geo=None, date=None, tz=None, gprop=None):
         query_param = 'q=' + quote(keywords)
 
         # This logic handles the default of skipping parameters
@@ -97,6 +97,10 @@ class pyGTrends(object):
             tz_param = '&tz=' + tz
         else:
             tz_param = ''
+        if gprop is not None:
+            gprop_param = '&gprop=' + gprop
+        else:
+            gprop_param = ''
         hl_param = '&hl=' + hl
 
         # These are the default parameters and shouldn't be changed.
@@ -105,7 +109,7 @@ class pyGTrends(object):
         export_param = "&export=1"
 
         combined_params = query_param + cat_param + date_param + geo_param + hl_param + tz_param + cmpt_param \
-                          + content_param + export_param
+                          + content_param + export_param + gprop_param
 
         print("Now downloading information for:")
         print("http://www.google.com/trends/trendsReport?" + combined_params)
