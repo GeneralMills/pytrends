@@ -1,0 +1,1 @@
+from .pytrends import GoogleTrends
