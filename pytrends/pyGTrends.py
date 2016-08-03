@@ -204,7 +204,7 @@ def _infer_dtype(val):
         return 'int'
     elif re.match(r'[+-]?\d+%$', val):
         return 'pct'
-    elif re.match(r'[a-zA-Z ]+', val):
+    elif re.match(r'[\w\s\.]+', val):
         return 'text'
     else:
         msg = "val={0} dtype not recognized".format(val)
