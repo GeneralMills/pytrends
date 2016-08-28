@@ -3,3 +3,4 @@
 build/
 dist/
 pytrends.egg-info/
+jhogue_test.py
