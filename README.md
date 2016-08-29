@@ -29,9 +29,13 @@ pytrends
 
 **Parameters**
 * username
+  - **Required**
   - a valid gmail address
 * password
+  - **Required**
   - password for the gmail account
+* custom_useragenet
+  - name to identify requests coming from your script
 
 ### Request a Report
 **`request_report(payload)`**
@@ -119,6 +123,7 @@ pytrends
 
 **Parameters**
 * keyword
+  - **Required**
   - keyword to get suggestions for
   
 **Returns JSON**
