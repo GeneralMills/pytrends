@@ -18,7 +18,7 @@ pytrends
 **Requirements**
 * Written for both Python 2.7+ and Python 3.3+
 * Requires a google account to use.
-* Requires fake-useragent python library (installed automatically with pip)
+* Requires BeautifulSoup4, Requests, lxml
 
 **Caveats**
 * This is not an official or supported API
