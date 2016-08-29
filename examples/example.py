@@ -10,7 +10,8 @@ path = ""
 connector = pyGTrends(google_username, google_password)
 
 # make request
-connector.request_report("Pizza")
+payload = {'q': ['Pizza, Italian, Spaghetti, Breadsticks, Sausage'], 'cat': '0-71'}
+connector.request_report(payload)
 
 # wait a random amount of time between requests to avoid bot detection
 time.sleep(randint(5, 10))

@@ -30,6 +30,10 @@ class pyGTrends(object):
         self.password = password
         self.url_login = "https://accounts.google.com/ServiceLogin"
         self.url_auth = "https://accounts.google.com/ServiceLoginAuth"
+        # self.custom_headers = {
+        #     'User-Agent': 'My User Agent 1.0',
+        #     'From': 'youremail@domain.com'  # This is another valid field
+        # }
         # TODO add custom user agent so users know what "new account signin for Google" is
         self._connect()
 
@@ -52,47 +56,15 @@ class pyGTrends(object):
         dico['Passwd'] = self.password
         self.ses.post(self.url_auth, data=dico)
 
+    def request_report(self, payload):
+        payload['cmpt'] = 'q'
+        payload['content'] = 1
+        payload['export'] = 1
+        if 'hl' not in payload:
+            payload['hl'] = 'en-US'
 
-
-    def request_report(self, keywords, hl='en-US', cat=None, geo=None, date=None, tz=None, gprop=None):
-        query_param = 'q=' + quote(keywords)
-        # TODO now that we are using BS4, convert to use dictionary payload
-
-        # This logic handles the default of skipping parameters
-        # Parameters that are set to '' will not filter the data requested.
-        # See Readme.md for more information
-        if cat is not None:
-            cat_param = '&cat=' + cat
-        else:
-            cat_param = ''
-        if date is not None:
-            date_param = '&date=' + quote(date)
-        else:
-            date_param = ''
-        if geo is not None:
-            geo_param = '&geo=' + geo
-        else:
-            geo_param = ''
-        if tz is not None:
-            tz_param = '&tz=' + tz
-        else:
-            tz_param = ''
-        if gprop is not None:
-            gprop_param = '&gprop=' + gprop
-        else:
-            gprop_param = ''
-        hl_param = '&hl=' + hl
-
-        # These are the default parameters and shouldn't be changed.
-        cmpt_param = "&cmpt=q"
-        content_param = "&content=1"
-        export_param = "&export=1"
-
-        combined_params = query_param + cat_param + date_param + geo_param + hl_param + tz_param + cmpt_param \
-                          + content_param + export_param + gprop_param
-        req_url = "http://www.google.com/trends/trendsReport?" + combined_params
-
-        req = self.ses.get(req_url)
+        req_url = "http://www.google.com/trends/trendsReport"
+        req = self.ses.get(req_url, params=payload)
         print("Now downloading information for:")
         print(req.url)
         self.data = req.text
