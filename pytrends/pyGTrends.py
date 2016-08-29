@@ -21,7 +21,7 @@ class pyGTrends(object):
     """
     Google Trends API
     """
-    def __init__(self, username, password):
+    def __init__(self, username, password, custom_useragent=None):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -30,11 +30,11 @@ class pyGTrends(object):
         self.password = password
         self.url_login = "https://accounts.google.com/ServiceLogin"
         self.url_auth = "https://accounts.google.com/ServiceLoginAuth"
-        # self.custom_headers = {
-        #     'User-Agent': 'My User Agent 1.0',
-        #     'From': 'youremail@domain.com'  # This is another valid field
-        # }
-        # TODO add custom user agent so users know what "new account signin for Google" is
+        # custom user agent so users know what "new account signin for Google" is
+        if custom_useragent is None:
+            self.custom_useragent = {'User-Agent': 'Pytrends'}
+        else:
+            self.custom_useragent = custom_useragent
         self._connect()
 
     def _connect(self):
@@ -43,9 +43,8 @@ class pyGTrends(object):
         Go to login page GALX hidden input value and send it back to google + login and password.
         http://stackoverflow.com/questions/6754709/logging-in-to-google-using-python
         """
-        # TODO make it so you only get warned of a new login once...
         self.ses = requests.session()
-        login_html = self.ses.get(self.url_login)
+        login_html = self.ses.get(self.url_login, headers=self.custom_useragent)
         soup_login = BeautifulSoup(login_html.content, "lxml").find('form').find_all('input')
         dico = {}
         for u in soup_login:

@@ -7,7 +7,9 @@ google_password = "password"
 path = ""
 
 # connect to Google
-connector = pyGTrends(google_username, google_password)
+custom_useragent = {'User-Agent': 'My Pytrends Script'}
+connector = pyGTrends(google_username, google_password, custom_useragent)
+
 
 # make request
 payload = {'q': ['Pizza, Italian, Spaghetti, Breadsticks, Sausage'], 'cat': '0-71'}
