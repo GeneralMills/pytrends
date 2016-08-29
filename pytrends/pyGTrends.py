@@ -8,19 +8,13 @@ import re
 import sys
 import requests
 import json
-from fake_useragent import UserAgent
+from bs4 import BeautifulSoup
 if sys.version_info[0] == 2:  # Python 2
-    from cookielib import CookieJar
     from cStringIO import StringIO
-    from urllib import urlencode
     from urllib import quote
-    from urllib2 import build_opener, HTTPCookieProcessor
 else:  # Python 3
-    from http.cookiejar import CookieJar
     from io import StringIO
-    from urllib.parse import urlencode
     from urllib.parse import quote
-    from urllib.request import build_opener, HTTPCookieProcessor
 
 
 class pyGTrends(object):
@@ -32,51 +26,37 @@ class pyGTrends(object):
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
         """
-        self.login_params = {
-            'continue': 'http://www.google.com/trends',
-            'PersistentCookie': 'yes',
-            'Email': username,
-            'Passwd': password}
-        # provide fake user agent to look like a desktop brower
-        self.fake_ua = UserAgent()
-        self.headers = [
-            ('Referrer', 'https://www.google.com/accounts/ServiceLoginBoxAuth'),
-            ('Content-type', 'application/x-www-form-urlencoded'),
-            ('User-Agent', self.fake_ua.chrome),
-            ('Accept', 'text/plain')]
-        self.url_ServiceLoginBoxAuth = 'https://accounts.google.com/ServiceLoginBoxAuth'
-        self.url_Export = 'http://www.google.com/trends/trendsReport'
-        self.url_CookieCheck = 'https://www.google.com/accounts/CheckCookie?chtml=LoginDoneHtml'
-        self.url_PrefCookie = 'http://www.google.com'
+        self.username = username
+        self.password = password
+        self.url_login = "https://accounts.google.com/ServiceLogin"
+        self.url_auth = "https://accounts.google.com/ServiceLoginAuth"
+        # TODO add custom user agent so users know what "new account signin for Google" is
         self._connect()
 
     def _connect(self):
         """
-        Connect to Google Trends. Use cookies.
+        Connect to Google.
+        Go to login page GALX hidden input value and send it back to google + login and password.
+        http://stackoverflow.com/questions/6754709/logging-in-to-google-using-python
         """
-        self.cj = CookieJar()
-        self.opener = build_opener(HTTPCookieProcessor(self.cj))
-        self.opener.addheaders = self.headers
+        # TODO make it so you only get warned of a new login once...
+        self.ses = requests.session()
+        login_html = self.ses.get(self.url_login)
+        soup_login = BeautifulSoup(login_html.content, "lxml").find('form').find_all('input')
+        dico = {}
+        for u in soup_login:
+            if u.has_attr('value'):
+                dico[u['name']] = u['value']
+        # override the inputs with out login and pwd:
+        dico['Email'] = self.username
+        dico['Passwd'] = self.password
+        self.ses.post(self.url_auth, data=dico)
 
-        resp = self.opener.open(self.url_ServiceLoginBoxAuth).read()
-        resp = re.sub(r'\s\s+', ' ', resp.decode(encoding='utf-8'))
 
-        galx = re.compile('<input name="GALX"[\s]+type="hidden"[\s]+value="(?P<galx>[a-zA-Z0-9_-]+)">')
-        m = galx.search(resp)
-        if not m:
-            galx = re.compile('<input type="hidden"[\s]+name="GALX"[\s]+value="(?P<galx>[a-zA-Z0-9_-]+)">')
-            m = galx.search(resp)
-            if not m:
-                raise Exception('Cannot parse GALX out of login page')
-
-        self.login_params['GALX'] = m.group('galx')
-        params = urlencode(self.login_params).encode('utf-8')
-        self.opener.open(self.url_ServiceLoginBoxAuth, params)
-        self.opener.open(self.url_CookieCheck)
-        self.opener.open(self.url_PrefCookie)
 
     def request_report(self, keywords, hl='en-US', cat=None, geo=None, date=None, tz=None, gprop=None):
         query_param = 'q=' + quote(keywords)
+        # TODO now that we are using BS4, convert to use dictionary payload
 
         # This logic handles the default of skipping parameters
         # Parameters that are set to '' will not filter the data requested.
@@ -110,30 +90,32 @@ class pyGTrends(object):
 
         combined_params = query_param + cat_param + date_param + geo_param + hl_param + tz_param + cmpt_param \
                           + content_param + export_param + gprop_param
+        req_url = "http://www.google.com/trends/trendsReport?" + combined_params
 
+        req = self.ses.get(req_url)
         print("Now downloading information for:")
-        print("http://www.google.com/trends/trendsReport?" + combined_params)
+        print(req.url)
+        self.data = req.text
 
-        raw_data = self.opener.open("http://www.google.com/trends/trendsReport?" + combined_params).read()
-        self.decode_data = raw_data.decode('utf-8')
-
-        if self.decode_data in ["You must be signed in to export data from Google Trends"]:
+        if self.data in ["You must be signed in to export data from Google Trends"]:
             print("You must be signed in to export data from Google Trends")
-            raise Exception(self.decode_data)
+            raise Exception(self.data)
 
     def save_csv(self, path, trend_name):
-        fileName = path + trend_name + ".csv"
-        with open(fileName, mode='wb') as f:
-            f.write(self.decode_data.encode('utf8'))
+        file_name = path + trend_name + ".csv"
+        with open(file_name, mode='wb') as f:
+            f.write(self.data.encode('utf8'))
 
     def get_data(self):
-        return self.decode_data
+        return self.data
 
     def get_suggestions(self, keyword):
         kw_param = quote(keyword)
-        raw_data = self.opener.open("https://www.google.com/trends/api/autocomplete/" + kw_param).read()
+        req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
+        print("Now requesting keyword suggestions using:")
+        print(req.url)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
-        json_data = json.loads(raw_data[5:].decode())
+        json_data = json.loads(req.text[5:])
         return json_data
 
 
