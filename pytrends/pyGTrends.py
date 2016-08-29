@@ -21,7 +21,7 @@ class pyGTrends(object):
     """
     Google Trends API
     """
-    def __init__(self, username, password):
+    def __init__(self, username, password, custom_useragent=None):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -30,7 +30,11 @@ class pyGTrends(object):
         self.password = password
         self.url_login = "https://accounts.google.com/ServiceLogin"
         self.url_auth = "https://accounts.google.com/ServiceLoginAuth"
-        # TODO add custom user agent so users know what "new account signin for Google" is
+        # custom user agent so users know what "new account signin for Google" is
+        if custom_useragent is None:
+            self.custom_useragent = {'User-Agent': 'Pytrends'}
+        else:
+            self.custom_useragent = custom_useragent
         self._connect()
 
     def _connect(self):
@@ -39,9 +43,8 @@ class pyGTrends(object):
         Go to login page GALX hidden input value and send it back to google + login and password.
         http://stackoverflow.com/questions/6754709/logging-in-to-google-using-python
         """
-        # TODO make it so you only get warned of a new login once...
         self.ses = requests.session()
-        login_html = self.ses.get(self.url_login)
+        login_html = self.ses.get(self.url_login, headers=self.custom_useragent)
         soup_login = BeautifulSoup(login_html.content, "lxml").find('form').find_all('input')
         dico = {}
         for u in soup_login:
@@ -52,47 +55,15 @@ class pyGTrends(object):
         dico['Passwd'] = self.password
         self.ses.post(self.url_auth, data=dico)
 
+    def request_report(self, payload):
+        payload['cmpt'] = 'q'
+        payload['content'] = 1
+        payload['export'] = 1
+        if 'hl' not in payload:
+            payload['hl'] = 'en-US'
 
-
-    def request_report(self, keywords, hl='en-US', cat=None, geo=None, date=None, tz=None, gprop=None):
-        query_param = 'q=' + quote(keywords)
-        # TODO now that we are using BS4, convert to use dictionary payload
-
-        # This logic handles the default of skipping parameters
-        # Parameters that are set to '' will not filter the data requested.
-        # See Readme.md for more information
-        if cat is not None:
-            cat_param = '&cat=' + cat
-        else:
-            cat_param = ''
-        if date is not None:
-            date_param = '&date=' + quote(date)
-        else:
-            date_param = ''
-        if geo is not None:
-            geo_param = '&geo=' + geo
-        else:
-            geo_param = ''
-        if tz is not None:
-            tz_param = '&tz=' + tz
-        else:
-            tz_param = ''
-        if gprop is not None:
-            gprop_param = '&gprop=' + gprop
-        else:
-            gprop_param = ''
-        hl_param = '&hl=' + hl
-
-        # These are the default parameters and shouldn't be changed.
-        cmpt_param = "&cmpt=q"
-        content_param = "&content=1"
-        export_param = "&export=1"
-
-        combined_params = query_param + cat_param + date_param + geo_param + hl_param + tz_param + cmpt_param \
-                          + content_param + export_param + gprop_param
-        req_url = "http://www.google.com/trends/trendsReport?" + combined_params
-
-        req = self.ses.get(req_url)
+        req_url = "http://www.google.com/trends/trendsReport"
+        req = self.ses.get(req_url, params=payload)
         print("Now downloading information for:")
         print(req.url)
         self.data = req.text
