@@ -102,8 +102,8 @@ class pyGTrends(object):
             raise Exception(self.data)
 
     def save_csv(self, path, trend_name):
-        fileName = path + trend_name + ".csv"
-        with open(fileName, mode='wb') as f:
+        file_name = path + trend_name + ".csv"
+        with open(file_name, mode='wb') as f:
             f.write(self.data.encode('utf8'))
 
     def get_data(self):
