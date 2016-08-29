@@ -23,6 +23,7 @@ pytrends
 **Caveats**
 * This is not an official or supported API
 * Google may change aggregation level for items with very large or very small search volume
+* Google will send you an email saying that you had a new login after running this.
 
 ## Connect to Google
 **pyGTrends(google_username, google_password)**
