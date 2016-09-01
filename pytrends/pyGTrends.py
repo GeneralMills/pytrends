@@ -60,3 +60,6 @@ class pyGTrends(object):
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
         json_data = json.loads(req.text[5:])
         self.results = json_data
+
+    def get_json(self):
+        return self.results
