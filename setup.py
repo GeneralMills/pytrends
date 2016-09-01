@@ -15,8 +15,7 @@ setup(
     url='https://github.com/dreyco676/pytrends',
     author=['John Hogue', 'Burton DeWilde'],
     author_email='dreyco676@gmail.com',
-    # TODO add burton's email
-    license='MIT',
+    license='Apache 2.0',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
