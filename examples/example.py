@@ -22,4 +22,8 @@ hottrendsdetail = pytrends.hottrendsdetail(country_payload)
 
 chart_form = {'date': '201601', 'geo': 'US'}
 # alltopcharts
-alltopcharts = pytrends.alltopcharts(chart_form)
+alltopcharts = pytrends.topcharts(chart_form)
+
+keyword = 'pizza'
+# suggestions
+suggestions = pytrends.suggestions(keyword)
