@@ -51,20 +51,19 @@ class TrendReq(object):
         dico['Passwd'] = self.password
         self.ses.post(self.url_auth, data=dico)
 
-    def trend(self, payload, return_type='json'):
+    def trend(self, payload, return_type=None):
         payload['cid'] = 'TIMESERIES_GRAPH_0'
         payload['export'] = 3
         req_url = "http://www.google.com/trends/fetchComponent"
         req = self.ses.get(req_url, params=payload)
         self.results = req.text
-        self.results = self._trend_helper
-        if return_type == 'json':
+        self._trend_helper()
+        if return_type == 'json' or return_type is None:
             return self.results
         if return_type == 'dataframe':
-            self.results = self._trend_dataframe
+            self._trend_dataframe()
             return self.results
 
-    @property
     def _trend_helper(self):
         # strip off js function call 'google.visualization.Query.setResponse();
         text = self.results[62:-2]
@@ -84,7 +83,6 @@ class TrendReq(object):
                 str_dt = '"' + year + '-' + month + '-01"'
                 text = text.replace(match.group(0), str_dt)
         self.results = json.loads(text)
-        return self.results
 
     def toprelated(self, payload):
         payload['cid'] = 'RISING_QUERIES_0_0'
@@ -143,5 +141,7 @@ class TrendReq(object):
             for i, value in enumerate(row['c']):
                 row_dict[headers[i]] = value['v']
             df = df.append(row_dict, ignore_index=True)
+        df['Date'] = pd.to_datetime(df['Date'])
+        df.set_index('Date', inplace=True)
         self.results = df
         return self.results
