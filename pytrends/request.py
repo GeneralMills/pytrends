@@ -3,19 +3,20 @@ import sys
 import requests
 import json
 import re
+import pandas as pd
 from bs4 import BeautifulSoup
-from pandas.io.json import json_normalize
 if sys.version_info[0] == 2:  # Python 2
     from urllib import quote
 else:  # Python 3
     from urllib.parse import quote
 
 
-class trendReq(object):
+class TrendReq(object):
     """
     Google Trends API
     """
     def __init__(self, username, password, custom_useragent=None):
+        # TODO rate limiting, error handling
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -30,8 +31,6 @@ class trendReq(object):
         else:
             self.custom_useragent = custom_useragent
         self._connect()
-        self.results = None
-        self.result_df = None
 
     def _connect(self):
         """
@@ -56,7 +55,8 @@ class trendReq(object):
         payload['export'] = 3
         req_url = "http://www.google.com/trends/fetchComponent"
         req = self.ses.get(req_url, params=payload)
-        self._trend_helper(req.text)
+        results = self._trend_helper(req.text)
+        return results
 
     def _trend_helper(self, raw_text):
         # strip off js function call 'google.visualization.Query.setResponse();
@@ -64,16 +64,20 @@ class trendReq(object):
         # replace series of commas ',,,,'
         text = text.replace(',,,,', '')
         # replace js new Date(YYYY, M, 1) calls with ISO 8601 date as string
-        pattern = re.compile(r'new Date\(\d{4},\d{1,2},1\)')
-        for match in re.finditer(pattern, text):
-            # slice off 'new Date(' and ')' and split by comma
-            csv_date = match.group(0)[9:-1].split(',')
-            year = csv_date[0]
-            month = csv_date[1].zfill(2)
-            # covert into "YYYY-MM-DD" including quotes
-            str_dt = '"' + year + '-' + month + '-01"'
-            text = text.replace(match.group(0), str_dt)
-        self.results = json.loads(text)
+        # replace double digit months first
+        patterns = [re.compile(r'new Date\(\d{4},\d{2},1\)'), re.compile(r'new Date\(\d{4},\d{1},1\)')]
+        for pattern in patterns:
+            for match in re.finditer(pattern, text):
+                # slice off 'new Date(' and ')' and split by comma
+                csv_date = match.group(0)[9:-1].split(',')
+                year = csv_date[0]
+                # js date function is 0 based... why...
+                month = str(int(csv_date[1]) + 1).zfill(2)
+                # covert into "YYYY-MM-DD" including quotes
+                str_dt = '"' + year + '-' + month + '-01"'
+                text = text.replace(match.group(0), str_dt)
+        results = json.loads(text)
+        return results
 
     def toprelated(self, payload):
         payload['cid'] = 'RISING_QUERIES_0_0'
@@ -84,43 +88,52 @@ class trendReq(object):
         req = self.ses.get(req_url, params=payload)
         # strip off google.visualization.Query.setResponse();
         raw_text = req.text[62:-2]
-        self.results = json.loads(raw_text)
+        results = json.loads(raw_text)
+        return results
 
     def top30in30(self):
         form = {'ajax': '1', 'pn': 'p1', 'htv': 'm'}
         req_url = "http://www.google.com/trends/hottrends/hotItems"
         req = self.ses.post(req_url, data=form)
-        self.results = req.json()
+        results = req.json()
+        return results
 
     def hottrends(self, payload):
         req_url = "http://hawttrends.appspot.com/api/terms/"
         req = self.ses.get(req_url, params=payload)
-        self.results = req.json()
+        results = req.json()
+        return results
 
     def hottrendsdetail(self, payload):
         req_url = "http://www.google.com/trends/hottrends/atom/feed"
         req = self.ses.get(req_url, params=payload)
-        # TODO need to convert rss feed to json
-        self.results = req.json()
+        # returns XML rss feed!
+        results = req.text
+        return results
 
     def topcharts(self, form):
         form['ajax'] = '1'
         req_url = "http://www.google.com/trends/topcharts/category"
         req = self.ses.post(req_url, data=form)
-        self.results = req.json()
+        results = req.json()
+        return results
 
     def suggestions(self, keyword):
         kw_param = quote(keyword)
         req = requests.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
-        json_data = json.loads(req.text[5:])
-        self.results = json_data
+        results = json.loads(req.text[5:])
+        return results
 
-    def get_json(self):
-        return self.results
-
-    def get_trend_dataframe(self):
-        # TODO only for trends
+    def get_trend_dataframe(self, json_data):
+        # Only for trends
+        df = pd.DataFrame()
         headers = []
-        self.result_df = json_normalize(self.results, meta=headers)
-        return self.result_df
+        for col in json_data['table']['cols']:
+            headers.append(col['label'])
+        for row in json_data['table']['rows']:
+            row_dict = {}
+            for i, value in enumerate(row['c']):
+                row_dict[headers[i]] = value['v']
+            df = df.append(row_dict, ignore_index=True)
+        return df

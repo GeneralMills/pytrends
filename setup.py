@@ -25,7 +25,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'License :: OSI Approved :: MIT License'
         ],
-    install_requires=["requests"],
+    install_requires=["requests", "BeautifulSoup4", "pandas", 'lxml'],
     keywords='google trends api search',
     packages=['pytrends'],
 )
