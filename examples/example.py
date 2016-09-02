@@ -1,7 +1,7 @@
 from pytrends.request import trendReq
 
-google_username = "XXX@gmail.com"
-google_password = "XXXX"
+google_username = "xxx@gmail.com"
+google_password = "xxx"
 path = ""
 
 # connect to Google
@@ -13,23 +13,29 @@ trend_payload = {'q': ['Pizza, Italian, Spaghetti, Breadsticks, Sausage'], 'cat'
 pytrend.trend(trend_payload)
 print(pytrend.get_json())
 
-# # toprelated
-# toprelated = pytrends.toprelated(trend_payload).get_json()
-#
-# # top30in30
-# top30in30 = pytrends.top30in30().get_json()
-#
-# country_payload = {'geo': 'US'}
-# # hottrends
-# hottrends = pytrends.hottrends(country_payload).get_json()
-#
-# # hottrendsdetail
-# hottrendsdetail = pytrends.hottrendsdetail(country_payload).get_json()
-#
-# chart_form = {'date': '201601', 'geo': 'US'}
-# # alltopcharts
-# alltopcharts = pytrends.topcharts(chart_form).get_json()
-#
-# keyword = 'pizza'
-# # suggestions
-# suggestions = pytrends.suggestions(keyword).get_json()
+# toprelated
+toprelated = pytrend.toprelated(trend_payload)
+print(pytrend.get_json())
+
+# top30in30
+top30in30 = pytrend.top30in30()
+print(pytrend.get_json())
+
+country_payload = {'geo': 'US'}
+# hottrends
+hottrends = pytrend.hottrends(country_payload)
+print(pytrend.get_json())
+
+# hottrendsdetail
+hottrendsdetail = pytrend.hottrendsdetail(country_payload)
+print(pytrend.get_json())
+
+chart_form = {'date': '201601', 'geo': 'US'}
+# alltopcharts
+alltopcharts = pytrend.topcharts(chart_form)
+print(pytrend.get_json())
+
+keyword = 'pizza'
+# suggestions
+suggestions = trendReq.suggestions(keyword)
+print(pytrend.get_json())

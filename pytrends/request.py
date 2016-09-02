@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import sys
 import requests
 import json
+import re
 from bs4 import BeautifulSoup
 from pandas.io.json import json_normalize
 if sys.version_info[0] == 2:  # Python 2
@@ -55,9 +56,24 @@ class trendReq(object):
         payload['export'] = 3
         req_url = "http://www.google.com/trends/fetchComponent"
         req = self.ses.get(req_url, params=payload)
+        self._trend_helper(req.text)
+
+    def _trend_helper(self, raw_text):
         # strip off js function call 'google.visualization.Query.setResponse();
-        print(req.text)
-        #self.results = json_data
+        text = raw_text[62:-2]
+        # replace series of commas ',,,,'
+        text = text.replace(',,,,', '')
+        # replace js new Date(YYYY, M, 1) calls with ISO 8601 date as string
+        pattern = re.compile(r'new Date\(\d{4},\d{1,2},1\)')
+        for match in re.finditer(pattern, text):
+            # slice off 'new Date(' and ')' and split by comma
+            csv_date = match.group(0)[9:-1].split(',')
+            year = csv_date[0]
+            month = csv_date[1].zfill(2)
+            # covert into "YYYY-MM-DD" including quotes
+            str_dt = '"' + year + '-' + month + '-01"'
+            text = text.replace(match.group(0), str_dt)
+        self.results = json.loads(text)
 
     def toprelated(self, payload):
         payload['cid'] = 'RISING_QUERIES_0_0'
