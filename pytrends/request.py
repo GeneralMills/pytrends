@@ -70,18 +70,16 @@ class TrendReq(object):
         # replace series of commas ',,,,'
         text = text.replace(',,,,', '')
         # replace js new Date(YYYY, M, 1) calls with ISO 8601 date as string
-        # replace double digit months first
-        patterns = [re.compile(r'new Date\(\d{4},\d{2},1\)'), re.compile(r'new Date\(\d{4},\d{1},1\)')]
-        for pattern in patterns:
-            for match in re.finditer(pattern, text):
-                # slice off 'new Date(' and ')' and split by comma
-                csv_date = match.group(0)[9:-1].split(',')
-                year = csv_date[0]
-                # js date function is 0 based... why...
-                month = str(int(csv_date[1]) + 1).zfill(2)
-                # covert into "YYYY-MM-DD" including quotes
-                str_dt = '"' + year + '-' + month + '-01"'
-                text = text.replace(match.group(0), str_dt)
+        pattern = re.compile(r'new Date\(\d{4},\d{1,2},1\)')
+        for match in re.finditer(pattern, text):
+            # slice off 'new Date(' and ')' and split by comma
+            csv_date = match.group(0)[9:-1].split(',')
+            year = csv_date[0]
+            # js date function is 0 based... why...
+            month = str(int(csv_date[1]) + 1).zfill(2)
+            # covert into "YYYY-MM-DD" including quotes
+            str_dt = '"' + year + '-' + month + '-01"'
+            text = text.replace(match.group(0), str_dt)
         self.results = json.loads(text)
 
     def toprelated(self, payload):
