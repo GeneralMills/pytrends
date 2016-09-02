@@ -82,7 +82,9 @@ class trendReq(object):
             payload['hl'] = 'en-US'
         req_url = "http://www.google.com/trends/fetchComponent"
         req = self.ses.get(req_url, params=payload)
-        self.results = req.json()
+        # strip off google.visualization.Query.setResponse();
+        raw_text = req.text[62:-2]
+        self.results = json.loads(raw_text)
 
     def top30in30(self):
         form = {'ajax': '1', 'pn': 'p1', 'htv': 'm'}
