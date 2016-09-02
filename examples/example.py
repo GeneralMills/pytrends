@@ -12,7 +12,7 @@ trend_payload = {'q': ['Pizza, Italian, Spaghetti, Breadsticks, Sausage'], 'cat'
 # trend
 trend = pytrend.trend(trend_payload)
 print(trend)
-df = pytrend.get_trend_dataframe(trend)
+df = pytrend.trend(trend_payload, return_type='dataframe')
 print(df)
 
 # toprelated

@@ -31,6 +31,7 @@ class TrendReq(object):
         else:
             self.custom_useragent = custom_useragent
         self._connect()
+        self.results = None
 
     def _connect(self):
         """
@@ -50,17 +51,23 @@ class TrendReq(object):
         dico['Passwd'] = self.password
         self.ses.post(self.url_auth, data=dico)
 
-    def trend(self, payload):
+    def trend(self, payload, return_type='json'):
         payload['cid'] = 'TIMESERIES_GRAPH_0'
         payload['export'] = 3
         req_url = "http://www.google.com/trends/fetchComponent"
         req = self.ses.get(req_url, params=payload)
-        results = self._trend_helper(req.text)
-        return results
+        self.results = req.text
+        self.results = self._trend_helper
+        if return_type == 'json':
+            return self.results
+        if return_type == 'dataframe':
+            self.results = self._trend_dataframe
+            return self.results
 
-    def _trend_helper(self, raw_text):
+    @property
+    def _trend_helper(self):
         # strip off js function call 'google.visualization.Query.setResponse();
-        text = raw_text[62:-2]
+        text = self.results[62:-2]
         # replace series of commas ',,,,'
         text = text.replace(',,,,', '')
         # replace js new Date(YYYY, M, 1) calls with ISO 8601 date as string
@@ -76,8 +83,8 @@ class TrendReq(object):
                 # covert into "YYYY-MM-DD" including quotes
                 str_dt = '"' + year + '-' + month + '-01"'
                 text = text.replace(match.group(0), str_dt)
-        results = json.loads(text)
-        return results
+        self.results = json.loads(text)
+        return self.results
 
     def toprelated(self, payload):
         payload['cid'] = 'RISING_QUERIES_0_0'
@@ -88,8 +95,8 @@ class TrendReq(object):
         req = self.ses.get(req_url, params=payload)
         # strip off google.visualization.Query.setResponse();
         raw_text = req.text[62:-2]
-        results = json.loads(raw_text)
-        return results
+        self.results = json.loads(raw_text)
+        return self.results
 
     def top30in30(self):
         form = {'ajax': '1', 'pn': 'p1', 'htv': 'm'}
@@ -101,39 +108,40 @@ class TrendReq(object):
     def hottrends(self, payload):
         req_url = "http://hawttrends.appspot.com/api/terms/"
         req = self.ses.get(req_url, params=payload)
-        results = req.json()
-        return results
+        self.results = req.json()
+        return self.results
 
     def hottrendsdetail(self, payload):
         req_url = "http://www.google.com/trends/hottrends/atom/feed"
         req = self.ses.get(req_url, params=payload)
         # returns XML rss feed!
-        results = req.text
-        return results
+        self.results = req.text
+        return self.results
 
     def topcharts(self, form):
         form['ajax'] = '1'
         req_url = "http://www.google.com/trends/topcharts/category"
         req = self.ses.post(req_url, data=form)
-        results = req.json()
-        return results
+        self.results = req.json()
+        return self.results
 
     def suggestions(self, keyword):
         kw_param = quote(keyword)
-        req = requests.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
+        req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
-        results = json.loads(req.text[5:])
-        return results
+        self.results = json.loads(req.text[5:])
+        return self.results
 
-    def get_trend_dataframe(self, json_data):
+    def _trend_dataframe(self):
         # Only for trends
         df = pd.DataFrame()
         headers = []
-        for col in json_data['table']['cols']:
+        for col in self.results['table']['cols']:
             headers.append(col['label'])
-        for row in json_data['table']['rows']:
+        for row in self.results['table']['rows']:
             row_dict = {}
             for i, value in enumerate(row['c']):
                 row_dict[headers[i]] = value['v']
             df = df.append(row_dict, ignore_index=True)
-        return df
+        self.results = df
+        return self.results
