@@ -100,6 +100,7 @@ class trendReq(object):
     def hottrendsdetail(self, payload):
         req_url = "http://www.google.com/trends/hottrends/atom/feed"
         req = self.ses.get(req_url, params=payload)
+        # TODO need to convert rss feed to json
         self.results = req.json()
 
     def topcharts(self, form):
@@ -119,7 +120,7 @@ class trendReq(object):
         return self.results
 
     def get_trend_dataframe(self):
-        # only for trends
+        # TODO only for trends
         headers = []
         self.result_df = json_normalize(self.results, meta=headers)
         return self.result_df
