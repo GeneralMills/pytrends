@@ -47,7 +47,7 @@ Parameters
 * password
   - *Required*
   - password for the gmail account
-* custom_useragenet
+* custom_useragent
   - name to identify requests coming from your script
 
 [back to top](#API)
