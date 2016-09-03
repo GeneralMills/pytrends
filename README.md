@@ -145,7 +145,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 **Parameters**
 * `payload`
   - **Required**
-  - a dictionary of key, values**
+  - a dictionary of key, values
 * `return_type`
   - 'df' returns a Pandas Dataframe
   - 'json' returns json
@@ -162,7 +162,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 **Parameters**
 * `payload`
   - **Required**
-  - a dictionary of key, values**
+  - a dictionary of key, values
   
 **Returns JSON**
 
@@ -183,7 +183,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 `pytrends.hottrends(payload)`
 * `payload`
   - **Required**
-  - a dictionary of key, values**
+  - a dictionary of key, values
 
 **Returns JSON**
 
@@ -196,7 +196,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 **Parameters**
 * `payload`
   - **Required**
-  - a dictionary of key, values**
+  - a dictionary of key, values
   
 **Returns XML RSS Feed**
 
@@ -209,7 +209,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 **Parameters**
 * `payload`
   - **Required**
-  - a dictionary of key, values**
+  - a dictionary of key, values
 
 **Returns JSON**
 
