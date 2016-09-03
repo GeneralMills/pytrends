@@ -125,10 +125,10 @@ class TrendReq(object):
         self.results = req.text
         return self.results
 
-    def topcharts(self, form):
-        form['ajax'] = '1'
+    def topcharts(self, payload):
+        form = {'ajax': '1'}
         req_url = "http://www.google.com/trends/topcharts/category"
-        req = self.ses.post(req_url, data=form)
+        req = self.ses.post(req_url, params=payload, data=form)
         try:
             self.results = req.json()
         except json.decoder.JSONDecodeError:

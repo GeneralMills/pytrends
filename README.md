@@ -1,32 +1,43 @@
-pytrends
-=========
+#pytrends
+##Introduction
+Unofficial API for Google Trends
 
-### About
-
-**Pseudo API for Google Trends**
-
-* Allows simple interface for automating downloads of csv reports from Google Trends.
-* Main feature is to help trick google into thinking the script is actually a browser.
+Allows simple interface for automating downloading of reports from Google Trends. Main feature is to allow the script to login to Google on your behalf to enable a higher rate limit. Only good until Google changes their backend again :-P. When that happens feel free to contribute!
 
 
-* Only good until Google changes their backend again :-P
+##Table of contens
+* [Installation](#installation)
+* [API](#api)
+  * [API Methods](#api-methods)
+    * [trend](#trend)
+	* [toprelated](#toprelated)
+	* [top30in30](#top30in30)
+	* [hottrends](#hottrends)
+	* [hottrendsdetail](#hottrendsdetail)
+    * [topcharts](#topcharts)
+	* [suggestions](#suggestions)
+  * [Cavets](#cavets)
+* [Credits](#credits)
+	
+<hr>
 
-**Installation**
-
+## Installation
 ```pip install pytrends```
 
 **Requirements**
 * Written for both Python 2.7+ and Python 3.3+
 * Requires a google account to use.
-* Requires BeautifulSoup4, Requests, lxml
+* Requires BeautifulSoup4, Requests, lxml, Pandas
 
-**Caveats**
-* This is not an official or supported API
-* Google may change aggregation level for items with very large or very small search volume
-* Google will send you an email saying that you had a new login after running this.
+[back to top](#introduction)
 
-## Connect to Google
-**pyGTrends(google_username, google_password)**
+<hr>
+
+## API
+
+### Connect to Google
+
+`pytrends = TrendReq(google_username, google_password, custom_useragent=None)`
 
 **Parameters**
 * username
@@ -38,16 +49,30 @@ pytrends
 * custom_useragenet
   - name to identify requests coming from your script
 
-### Request a Report
-**`request_report(payload)`**
+[back to top](#API)
 
-**Parameters**
-* payload
-  - a dictionary of key, values**
+<hr>
+
+### API Methods
+The following API methods are available:
+* [trend](#trend): returns the historical trend data to a provided keyword or an array of keywords.
+
+* [toprelated](#toprelated): returns the top related keywords to a provided keyword or an array of keywords along with it's percentage of correlation.
+
+* [hottrends](#hottrends): returns the current top 20 trending searches for a given location.
+
+* [hottrendsdetail](#hottrendsdetail): same as the [hotTrends](#hottrends) results except with more detail such as links, publication date, approximate traffic, etc.
+
+* [top30in30](#top30in30): returns the top 30 searches in the past 30 days
+
+* [topcharts](#topcharts): returns the trending charts for a given date and location.  Charts contain information such as title, description, source, a jumpFactory, etc.
+
+* [suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search
+
+Many API methods use `payload` here is a set of known keys that can be used.
 
 **Payload Keys**
 * `q`
-  - **Required**
   - keywords to get data for
   - Example ```{'q': 'Pizza'}```
   - Up to five terms in a list: ```{'q': ['Pizza', 'Italian', 'Spaghetti', 'Breadsticks', Sausage']```
@@ -110,29 +135,109 @@ pytrends
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
 
-### Save a Report to file
-**save_csv(path, trend_name)**
+[back to top](#api-methods)
+
+<hr>
+
+#### trend
+`pytrends.trend(payload, return_type=None)`
 
 **Parameters**
-* path
-  - Output path
-* trend_name
-  - Human readable name for file
+* `payload`
+  - **Required**
+  - a dictionary of key, values**
+* `return_type`
+  - 'df' returns a Pandas Dataframe
+  - 'json' returns json
+  
+**Returns JSON or Dataframe**
 
-### Get Google Term Suggestions
-**get_suggestions(keyword)**
+[back to top](#trends)
+
+<hr>
+
+#### toprelated
+`pytrends.toprelated(payload)`
 
 **Parameters**
-* keyword
+* `payload`
+  - **Required**
+  - a dictionary of key, values**
+  
+**Returns JSON**
+
+[back to top](#toprelated)
+
+<hr>
+
+#### top30in30
+`pytrends.top30in30()`
+
+**Returns JSON**
+
+[back to top](#top30in30)
+
+<hr>
+
+#### hottrends
+`pytrends.hottrends(payload)`
+* `payload`
+  - **Required**
+  - a dictionary of key, values**
+
+**Returns JSON**
+
+[back to top](#hottrends)
+
+<hr>
+
+#### hottrendsdetail
+`pytrends.hottrendsdetail(payload)`
+**Parameters**
+* `payload`
+  - **Required**
+  - a dictionary of key, values**
+  
+**Returns XML RSS Feed**
+
+[back to top](#hottrendsdetail)
+
+<hr>
+
+#### topcharts
+`pytrends.topcharts(payload)`
+**Parameters**
+* `payload`
+  - **Required**
+  - a dictionary of key, values**
+
+**Returns JSON**
+
+[back to top](#topcharts)
+
+<hr>
+
+#### suggestions
+`pytrends.suggestions(keyword)`
+**Parameters**
+* `keyword`
   - **Required**
   - keyword to get suggestions for
   
 **Returns JSON**
-```{"default": {"topics": [{"mid": "/m/0663v","title": "Pizza","type": "Dish"}]}}```
-* Use the ```mid``` value for the keyword in future searches for a more refined trend set
-### Credits
 
-* Connecting to google code heavily based off Sal Uryasev's pyGTrends
+[back to top](#suggestions)
 
+##Caveats
+* This is not an official or supported API
+* Google may change aggregation level for items with very large or very small search volume
+* Google will send you an email saying that you had a new login after running this.
+* Rate Limit is not pubically known, trail and error suggest it is around 200/hr
+
+##Credits
+* Major JSON revision ideas taken from pat310's JavaScript library
+    - https://github.com/pat310/google-trends-api
+* Connecting to google code heavily based off Stack Overflow post
+    - http://stackoverflow.com/questions/6754709/logging-in-to-google-using-python
 * With some ideas pulled from Matt Reid's Google Trends API
-  - https://bitbucket.org/mattreid9956/google-trend-api/overview
+    - https://bitbucket.org/mattreid9956/google-trend-api/overview

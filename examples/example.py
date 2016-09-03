@@ -32,10 +32,10 @@ print(hottrends)
 hottrendsdetail = pytrend.hottrendsdetail(country_payload)
 print(hottrendsdetail)
 
-chart_form = {'date': '201601', 'geo': 'US'}
+payload = {'date': '201601', 'geo': 'US'}
 # alltopcharts
-alltopcharts = pytrend.topcharts(chart_form)
-print(alltopcharts)
+topcharts = pytrend.topcharts(payload)
+print(topcharts)
 
 keyword = 'pizza'
 # suggestions
