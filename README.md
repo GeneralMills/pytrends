@@ -71,7 +71,7 @@ The following API methods are available:
 
 Many API methods use `payload` here is a set of known keys that can be used.
 
-**Payload Keys**
+Payload Keys
 
 * `q`
   - keywords to get data for
@@ -143,16 +143,16 @@ Many API methods use `payload` here is a set of known keys that can be used.
 #### trend
 `pytrends.trend(payload, return_type=None)`
 
-**Parameters**
+Parameters
 
 * `payload`
-  - **Required**
+  - *Required*
   - a dictionary of key, values
 * `return_type`
   - 'df' returns a Pandas Dataframe
   - 'json' returns json
   
-**Returns JSON or Dataframe**
+Returns JSON or Dataframe
 
 [back to top](#trend)
 
@@ -161,13 +161,13 @@ Many API methods use `payload` here is a set of known keys that can be used.
 #### toprelated
 `pytrends.toprelated(payload)`
 
-**Parameters**
+Parameters
 
 * `payload`
-  - **Required**
+  - *Required*
   - a dictionary of key, values
   
-**Returns JSON**
+Returns JSON
 
 [back to top](#toprelated)
 
@@ -176,7 +176,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 #### top30in30
 `pytrends.top30in30()`
 
-**Returns JSON**
+Returns JSON
 
 [back to top](#top30in30)
 
@@ -185,13 +185,13 @@ Many API methods use `payload` here is a set of known keys that can be used.
 #### hottrends
 `pytrends.hottrends(payload)`
 
-**Parameters**
+Parameters
 
 * `payload`
-  - **Required**
+  - *Required*
   - a dictionary of key, values
 
-**Returns JSON**
+Returns JSON
 
 [back to top](#hottrends)
 
@@ -200,13 +200,13 @@ Many API methods use `payload` here is a set of known keys that can be used.
 #### hottrendsdetail
 `pytrends.hottrendsdetail(payload)`
 
-**Parameters**
+Parameters
 
 * `payload`
-  - **Required**
+  - *Required*
   - a dictionary of key, values
   
-**Returns XML RSS Feed**
+Returns XML RSS Feed
 
 [back to top](#hottrendsdetail)
 
@@ -215,13 +215,13 @@ Many API methods use `payload` here is a set of known keys that can be used.
 #### topcharts
 `pytrends.topcharts(payload)`
 
-**Parameters**
+Parameters
 
 * `payload`
-  - **Required**
+  - *Required*
   - a dictionary of key, values
 
-**Returns JSON**
+Returns JSON
 
 [back to top](#topcharts)
 
@@ -230,13 +230,13 @@ Many API methods use `payload` here is a set of known keys that can be used.
 #### suggestions
 `pytrends.suggestions(keyword)`
 
-**Parameters**
+Parameters
 
 * `keyword`
-  - **Required**
+  - *Required*
   - keyword to get suggestions for
   
-**Returns JSON**
+Returns JSON
 
 [back to top](#suggestions)
 
