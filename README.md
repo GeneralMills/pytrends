@@ -72,6 +72,7 @@ The following API methods are available:
 Many API methods use `payload` here is a set of known keys that can be used.
 
 **Payload Keys**
+
 * `q`
   - keywords to get data for
   - Example ```{'q': 'Pizza'}```
@@ -143,6 +144,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 `pytrends.trend(payload, return_type=None)`
 
 **Parameters**
+
 * `payload`
   - **Required**
   - a dictionary of key, values
@@ -160,6 +162,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 `pytrends.toprelated(payload)`
 
 **Parameters**
+
 * `payload`
   - **Required**
   - a dictionary of key, values
@@ -181,6 +184,9 @@ Many API methods use `payload` here is a set of known keys that can be used.
 
 #### hottrends
 `pytrends.hottrends(payload)`
+
+**Parameters**
+
 * `payload`
   - **Required**
   - a dictionary of key, values
@@ -193,7 +199,9 @@ Many API methods use `payload` here is a set of known keys that can be used.
 
 #### hottrendsdetail
 `pytrends.hottrendsdetail(payload)`
+
 **Parameters**
+
 * `payload`
   - **Required**
   - a dictionary of key, values
@@ -206,7 +214,9 @@ Many API methods use `payload` here is a set of known keys that can be used.
 
 #### topcharts
 `pytrends.topcharts(payload)`
+
 **Parameters**
+
 * `payload`
   - **Required**
   - a dictionary of key, values
@@ -219,7 +229,9 @@ Many API methods use `payload` here is a set of known keys that can be used.
 
 #### suggestions
 `pytrends.suggestions(keyword)`
+
 **Parameters**
+
 * `keyword`
   - **Required**
   - keyword to get suggestions for
