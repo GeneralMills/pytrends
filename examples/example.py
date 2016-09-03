@@ -1,27 +1,44 @@
-from pytrends.pyGTrends import pyGTrends
-import time
-from random import randint
+from pytrends.request import TrendReq
 
-google_username = "an_email@gmail.com"
-google_password = "password"
+google_username = "xxx@gmail.com"
+google_password = "xxx"
 path = ""
 
 # connect to Google
-custom_useragent = {'User-Agent': 'My Pytrends Script'}
-connector = pyGTrends(google_username, google_password, custom_useragent)
+pytrend = TrendReq(google_username, google_password, custom_useragent='My Pytrends Script')
 
+trend_payload = {'q': ['Pizza, Italian, Spaghetti, Breadsticks, Sausage'], 'cat': '0-71'}
+# trend
+trend = pytrend.trend(trend_payload)
+print(trend)
+df = pytrend.trend(trend_payload, return_type='dataframe')
+print(df)
 
-# make request
-payload = {'q': ['Pizza, Italian, Spaghetti, Breadsticks, Sausage'], 'cat': '0-71'}
-connector.request_report(payload)
+# toprelated
+toprelated = pytrend.toprelated(trend_payload)
+print(toprelated)
 
-# wait a random amount of time between requests to avoid bot detection
-time.sleep(randint(5, 10))
+# top30in30
+top30in30 = pytrend.top30in30()
+print(top30in30)
 
-# download file
-connector.save_csv(path, "pizza")
+country_payload = {'geo': 'US'}
+# hottrends
+hottrends = pytrend.hottrends(country_payload)
+print(hottrends)
 
-# get suggestions for keywords
-keyword = "milk substitute"
-data = connector.get_suggestions(keyword)
-print(data)
+# hottrendsdetail
+# returns XML data
+hottrendsdetail = pytrend.hottrendsdetail(country_payload)
+print(hottrendsdetail)
+
+payload = {'date': '201601', 'geo': 'US'}
+# alltopcharts
+topcharts = pytrend.topcharts(payload)
+print(topcharts)
+
+keyword = 'pizza'
+# suggestions
+suggestions = pytrend.suggestions(keyword)
+print(suggestions)
+
