@@ -9,13 +9,14 @@ Allows simple interface for automating downloading of reports from Google Trends
 * [Installation](#installation)
 * [API](#api)
   * [API Methods](#api-methods)
+  * [API Payload Keys](#api-payload-keys)
     * [trend](#trend)
-	* [toprelated](#toprelated)
-	* [top30in30](#top30in30)
-	* [hottrends](#hottrends)
-	* [hottrendsdetail](#hottrendsdetail)
+    * [toprelated](#toprelated)
+    * [top30in30](#top30in30)
+    * [hottrends](#hottrends)
+    * [hottrendsdetail](#hottrendsdetail)
     * [topcharts](#topcharts)
-	* [suggestions](#suggestions)
+    * [suggestions](#suggestions)
   * [Cavets](#cavets)
 * [Credits](#credits)
 	
@@ -69,9 +70,13 @@ The following API methods are available:
 
 * [suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search
 
-Many API methods use `payload` here is a set of known keys that can be used.
+[back to top](#api-methods)
 
-Payload Keys
+<hr>
+
+### API Payload Keys
+
+Many API methods use `payload` here is a set of known keys that can be used.
 
 * `q`
   - keywords to get data for
@@ -136,7 +141,7 @@ Payload Keys
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
 
-[back to top](#api-methods)
+[back to top](#api-payload-keys)
 
 <hr>
 
