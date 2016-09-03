@@ -16,7 +16,6 @@ class TrendReq(object):
     Google Trends API
     """
     def __init__(self, username, password, custom_useragent=None):
-        # TODO rate limiting, error handling
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -27,9 +26,9 @@ class TrendReq(object):
         self.url_auth = "https://accounts.google.com/ServiceLoginAuth"
         # custom user agent so users know what "new account signin for Google" is
         if custom_useragent is None:
-            self.custom_useragent = {'User-Agent': 'Pytrends'}
+            self.custom_useragent = {'User-Agent': 'PyTrends'}
         else:
-            self.custom_useragent = custom_useragent
+            self.custom_useragent = {'User-Agent': custom_useragent}
         self._connect()
         self.results = None
 
@@ -56,17 +55,8 @@ class TrendReq(object):
         payload['export'] = 3
         req_url = "http://www.google.com/trends/fetchComponent"
         req = self.ses.get(req_url, params=payload)
-        self.results = req.text
-        self._trend_helper()
-        if return_type == 'json' or return_type is None:
-            return self.results
-        if return_type == 'dataframe':
-            self._trend_dataframe()
-            return self.results
-
-    def _trend_helper(self):
         # strip off js function call 'google.visualization.Query.setResponse();
-        text = self.results[62:-2]
+        text = req.text[62:-2]
         # replace series of commas ',,,,'
         text = text.replace(',,,,', '')
         # replace js new Date(YYYY, M, 1) calls with ISO 8601 date as string
@@ -80,7 +70,16 @@ class TrendReq(object):
             # covert into "YYYY-MM-DD" including quotes
             str_dt = '"' + year + '-' + month + '-01"'
             text = text.replace(match.group(0), str_dt)
-        self.results = json.loads(text)
+        try:
+            self.results = json.loads(text)
+        except json.decoder.JSONDecodeError:
+            print("JSON did not parse. See server response below for details.")
+            print(req.text)
+        if return_type == 'json' or return_type is None:
+            return self.results
+        if return_type == 'dataframe':
+            self._trend_dataframe()
+            return self.results
 
     def toprelated(self, payload):
         payload['cid'] = 'RISING_QUERIES_0_0'
@@ -90,21 +89,33 @@ class TrendReq(object):
         req_url = "http://www.google.com/trends/fetchComponent"
         req = self.ses.get(req_url, params=payload)
         # strip off google.visualization.Query.setResponse();
-        raw_text = req.text[62:-2]
-        self.results = json.loads(raw_text)
+        text = req.text[62:-2]
+        try:
+            self.results = json.loads(text)
+        except json.decoder.JSONDecodeError:
+            print("JSON did not parse. See server response below for details.")
+            print(req.text)
         return self.results
 
     def top30in30(self):
         form = {'ajax': '1', 'pn': 'p1', 'htv': 'm'}
         req_url = "http://www.google.com/trends/hottrends/hotItems"
         req = self.ses.post(req_url, data=form)
-        results = req.json()
-        return results
+        try:
+            self.results = req.json()
+        except json.decoder.JSONDecodeError:
+            print("JSON did not parse. See server response below for details.")
+            print(req.text)
+        return self.results
 
     def hottrends(self, payload):
         req_url = "http://hawttrends.appspot.com/api/terms/"
         req = self.ses.get(req_url, params=payload)
-        self.results = req.json()
+        try:
+            self.results = req.json()
+        except json.decoder.JSONDecodeError:
+            print("JSON did not parse. See server response below for details.")
+            print(req.text)
         return self.results
 
     def hottrendsdetail(self, payload):
@@ -118,14 +129,22 @@ class TrendReq(object):
         form['ajax'] = '1'
         req_url = "http://www.google.com/trends/topcharts/category"
         req = self.ses.post(req_url, data=form)
-        self.results = req.json()
+        try:
+            self.results = req.json()
+        except json.decoder.JSONDecodeError:
+            print("JSON did not parse. See server response below for details.")
+            print(req.text)
         return self.results
 
     def suggestions(self, keyword):
         kw_param = quote(keyword)
         req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
-        self.results = json.loads(req.text[5:])
+        try:
+            self.results = json.loads(req.text[5:])
+        except json.decoder.JSONDecodeError:
+            print("JSON did not parse. See server response below for details.")
+            print(req.text)
         return self.results
 
     def _trend_dataframe(self):
