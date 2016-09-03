@@ -152,7 +152,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
   
 **Returns JSON or Dataframe**
 
-[back to top](#trends)
+[back to top](#trend)
 
 <hr>
 
