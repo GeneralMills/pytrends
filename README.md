@@ -24,7 +24,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 ## Installation
 ```pip install pytrends```
 
-**Requirements**
+Requirements
 * Written for both Python 2.7+ and Python 3.3+
 * Requires a google account to use.
 * Requires BeautifulSoup4, Requests, lxml, Pandas
@@ -39,12 +39,12 @@ Allows simple interface for automating downloading of reports from Google Trends
 
 `pytrends = TrendReq(google_username, google_password, custom_useragent=None)`
 
-**Parameters**
+Parameters
 * username
-  - **Required**
+  - *Required*
   - a valid gmail address
 * password
-  - **Required**
+  - *Required*
   - password for the gmail account
 * custom_useragenet
   - name to identify requests coming from your script
