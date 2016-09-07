@@ -154,7 +154,7 @@ Parameters
   - *Required*
   - a dictionary of key, values
 * `return_type`
-  - 'df' returns a Pandas Dataframe
+  - 'dataframe' returns a Pandas Dataframe
   - 'json' returns json
   
 Returns JSON or Dataframe
