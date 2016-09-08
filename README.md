@@ -57,7 +57,7 @@ Parameters
 The following API methods are available:
 * [trend](#trend): returns the historical trend data to a provided keyword or an array of keywords.
 
-* [toprelated](#toprelated): returns the top related keywords to a provided keyword or an array of keywords along with it's percentage of correlation.
+* [related](#related): returns the related keywords to a provided keyword or an array of keywords along with it's percentage of correlation.
 
 * [hottrends](#hottrends): returns the current top 20 trending searches for a given location.
 
@@ -158,18 +158,22 @@ Returns JSON or Dataframe
 
 <hr>
 
-#### toprelated
-`pytrends.toprelated(payload)`
+#### related
+`pytrends.related(payload)`
 
 Parameters
 
 * `payload`
   - *Required*
   - a dictionary of key, values
+* `related_type`
+  - *Required*
+  - 'top' returns top related data
+  - 'rising' returns rising related data
   
 Returns JSON
 
-[back to top](#toprelated)
+[back to top](#related)
 
 <hr>
 
