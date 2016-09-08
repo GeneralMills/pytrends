@@ -11,7 +11,7 @@ Allows simple interface for automating downloading of reports from Google Trends
   * [API Methods](#api-methods)
   * [API Payload Keys](#api-payload-keys)
     * [trend](#trend)
-    * [toprelated](#toprelated)
+    * [related](#related)
     * [top30in30](#top30in30)
     * [hottrends](#hottrends)
     * [hottrendsdetail](#hottrendsdetail)
