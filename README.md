@@ -81,7 +81,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
 * `q`
   - keywords to get data for
   - Example ```{'q': 'Pizza'}```
-  - Up to five terms in a list: ```{'q': ['Pizza', 'Italian', 'Spaghetti', 'Breadsticks', Sausage']```
+  - Up to five terms in a comma seperated string: ```{'q': 'Pizza, Italian, Spaghetti, Breadsticks, Sausage'}```
     * Advanced Keywords
       - When using Google Trends dashboard Google may provide suggested narrowed search terms. 
       - For example ```"iron"``` will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```. 
