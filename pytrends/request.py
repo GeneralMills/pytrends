@@ -82,8 +82,9 @@ class TrendReq(object):
             self._trend_dataframe()
             return self.results
 
-    def toprelated(self, payload):
-        payload['cid'] = 'RISING_QUERIES_0_0'
+    def related(self, payload, related_type):
+        endpoint = related_type.upper() + '_QUERIES_0_0'
+        payload['cid'] = endpoint
         payload['export'] = 3
         if 'hl' not in payload:
             payload['hl'] = 'en-US'
