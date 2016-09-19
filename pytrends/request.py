@@ -58,7 +58,7 @@ class TrendReq(object):
         # strip off js function call 'google.visualization.Query.setResponse();
         text = req.text[62:-2]
         # replace series of commas ',,,,'
-        text = text.replace(',,,,', '')
+        text = re.sub(',+', ',', text)
         # replace js new Date(YYYY, M, 1) calls with ISO 8601 date as string
         pattern = re.compile(r'new Date\(\d{4},\d{1,2},\d{1,2}\)')
         for match in re.finditer(pattern, text):
