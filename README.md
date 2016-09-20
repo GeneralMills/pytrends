@@ -253,7 +253,7 @@ Returns JSON
 * This is not an official or supported API
 * Google may change aggregation level for items with very large or very small search volume
 * Google will send you an email saying that you had a new login after running this.
-* Rate Limit is not pubically known, trail and error suggest it is around 200/hr
+* Rate Limit is not pubically known, trail and error suggest it is around 10/min
 
 ##Credits
 * Major JSON revision ideas taken from pat310's JavaScript library
