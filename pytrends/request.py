@@ -45,7 +45,7 @@ class TrendReq(object):
         soup_login = BeautifulSoup(login_html.content, "lxml").find('form').find_all('input')
         dico = {}
         for u in soup_login:
-            if u.has_attr('value'):
+            if u.has_attr('value') and u.has_attr('name'):
                 dico[u['name']] = u['value']
         # override the inputs with out login and pwd:
         dico['Email'] = self.username
