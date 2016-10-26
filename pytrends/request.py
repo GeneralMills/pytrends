@@ -46,7 +46,10 @@ class TrendReq(object):
         dico = {}
         for u in soup_login:
             if u.has_attr('value'):
-                dico[u['name']] = u['value']
+                try:
+                    dico[u['name']] = u['value']
+                except KeyError:
+                    pass
         # override the inputs with out login and pwd:
         dico['Email'] = self.username
         dico['Passwd'] = self.password
