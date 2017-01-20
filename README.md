@@ -28,7 +28,7 @@ Table of contens
     * [topcharts](#topcharts)
     * [suggestions](#suggestions)
 
-  * [Cavets](#cavets)
+  * [Caveats](#caveats)
 
 * [Credits](#credits)
 	
