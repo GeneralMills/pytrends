@@ -37,8 +37,6 @@ Table of contens
 Installation
 ------------
 
-::
-
     pip install pytrends
 
 Requirements
@@ -55,9 +53,6 @@ API
 ---
 
 Connect to Google
-^^^^^^^^^^^^^^^^^
-
-::
 
     pytrends = TrendReq(google_username, google_password, custom_useragent=None)
 
@@ -82,7 +77,6 @@ Parameters
 <hr>
 
 API Methods
-^^^^^^^^^^^
 
 The following API methods are available:
 
@@ -105,7 +99,6 @@ The following API methods are available:
 <hr>
 
 API Payload Keys
-^^^^^^^^^^^^^^^^
 
 Many API methods use `payload` here is a set of known keys that can be used.
 
@@ -195,12 +188,9 @@ Many API methods use `payload` here is a set of known keys that can be used.
 
 <hr>
 
-trend
-^^^^^
+Interest Over Time
 
-::
-
-    pytrends.trend(payload, return_type=None)
+    pytrends.interest_over_time(payload, return_type=None)
 
 Parameters
 
@@ -220,12 +210,33 @@ Returns JSON or Dataframe
 
 <hr>
 
-related
-^^^^^^^
+<hr>
 
-::
+Interest by Region
 
-    pytrends.related(payload)
+    pytrends.interest_by_region(payload, return_type=None)
+
+Parameters
+
+* `payload`
+
+  - *Required*
+  - a dictionary of key, values
+
+* `resolution`
+
+  - 'CITY' returns city level data
+  - 'REGION' returns country level data
+
+Returns JSON
+
+[back to top](#trend)
+
+<hr>
+
+Related Queries
+
+    pytrends.related_queries(payload)
 
 Parameters
 
@@ -239,7 +250,7 @@ Parameters
   - *Required*
   - 'top' returns top related data
   - 'rising' returns rising related data
-  
+
 Returns JSON
 
 [back to top](#related)
@@ -247,9 +258,6 @@ Returns JSON
 <hr>
 
 top30in30
-^^^^^^^^^
-
-::
 
     pytrends.top30in30()
 
@@ -260,9 +268,6 @@ Returns JSON
 <hr>
 
 hottrends
-^^^^^^^^^
-
-::
 
     pytrends.hottrends(payload)
 
@@ -280,9 +285,6 @@ Returns JSON
 <hr>
 
 hottrendsdetail
-^^^^^^^^^^^^^^^
-
-::
 
     pytrends.hottrendsdetail(payload)
 
@@ -300,9 +302,6 @@ Returns XML RSS Feed
 <hr>
 
 topcharts
-^^^^^^^^^
-
-::
 
     pytrends.topcharts(payload)
 
@@ -320,9 +319,6 @@ Returns JSON
 <hr>
 
 suggestions
-^^^^^^^^^^^
-
-::
 
     pytrends.suggestions(keyword)
 

@@ -2,13 +2,12 @@ from __future__ import absolute_import, print_function, unicode_literals
 import sys
 import requests
 import json
-import re
 import pandas as pd
 from bs4 import BeautifulSoup
 if sys.version_info[0] == 2:  # Python 2
-    from urllib import quote_plus, quote
+    from urllib import quote
 else:  # Python 3
-    from urllib.parse import quote_plus, quote
+    from urllib.parse import quote
 
 
 class TrendReq(object):
@@ -111,6 +110,8 @@ class TrendReq(object):
         req_url = "https://www.google.com/trends/api/widgetdata/comparedgeo"
         region_payload = dict()
         # convert to string as requests will mangle
+        # TODO need to handle this if not filled in
+        self.interest_by_region_widget['request']['resolution'] = self.payload['resolution']
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
         region_payload['tz'] = self.payload['tz']
@@ -127,30 +128,35 @@ class TrendReq(object):
         req = self.ses.get(req_url, params=related_payload)
         return req.text
 
-    def top30in30(self):
-        # TODO verify
-        form = {'ajax': '1', 'pn': 'p1', 'htv': 'm'}
-        req_url = "http://www.google.com/trends/hottrends/hotItems"
-        req = self.ses.post(req_url, data=form)
-        try:
-            if self.google_rl in req.text:
-                raise RateLimitError
-            self.results = req.json()
-        except ValueError:
-            raise ResponseError(req.content)
-        return self.results
+    def search_topics(self):
+        req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
+        #https://www.google.com/trends/api/widgetdata/relatedsearches?hl=en-US&tz=360&req=%7B%22restriction%22:%7B%22geo%22:%7B%7D,%22time%22:%222012-01-25+2017-01-25%22%7D,%22keywordType%22:%22ENTITY%22,%22metric%22:%5B%22TOP%22,%22RISING%22%5D,%22trendinessSettings%22:%7B%22compareTime%22:%222007-01-23+2012-01-24%22%7D,%22requestOptions%22:%7B%22property%22:%22%22,%22backend%22:%22IZG%22,%22category%22:0%7D,%22language%22:%22en%22%7D&token=APP6_UEAAAAAWIpBfUrqpmfyXpLvhy1-PNqC9yU7prWF
+        # TODO add rising vs TOP
+        searchtopics_payload = dict()
+        # convert to string as requests will mangle
+        searchtopics_payload['req'] = json.dumps(self.related_queries_widget['request'])
+        searchtopics_payload['token'] = self.related_queries_widget['token']
+        searchtopics_payload['tz'] = self.payload['tz']
+        req = self.ses.get(req_url, params=searchtopics_payload)
+        return req.text
 
-    def hottrends(self, payload):
-        # TODO verify
-        req_url = "http://hawttrends.appspot.com/api/terms/"
-        req = self.ses.get(req_url, params=payload)
-        try:
-            if self.google_rl in req.text:
-                raise RateLimitError
-            self.results = req.json()
-        except ValueError:
-            raise ResponseError(req.content)
-        return self.results
+    def search_queries(self):
+        # TODO add rising vs TOP
+        req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
+        # https://www.google.com/trends/api/widgetdata/relatedsearches?hl=en-US&tz=360&req=%7B%22restriction%22:%7B%22geo%22:%7B%7D,%22time%22:%222012-01-25+2017-01-25%22%7D,%22keywordType%22:%22QUERY%22,%22metric%22:%5B%22TOP%22,%22RISING%22%5D,%22trendinessSettings%22:%7B%22compareTime%22:%222007-01-23+2012-01-24%22%7D,%22requestOptions%22:%7B%22property%22:%22%22,%22backend%22:%22IZG%22,%22category%22:0%7D,%22language%22:%22en%22%7D&token=APP6_UEAAAAAWIpBfTA9jnC5PimqZEoZ4shRwCFi1cm4
+        searchqueries_payload = dict()
+        # convert to string as requests will mangle
+        searchqueries_payload['req'] = json.dumps(self.related_queries_widget['request'])
+        searchqueries_payload['token'] = self.related_queries_widget['token']
+        searchqueries_payload['tz'] = self.payload['tz']
+        req = self.ses.get(req_url, params=searchqueries_payload)
+        return req.text
+
+    def trending_searches(self):
+
+        req_url = "https://www.google.com/trends/hottrends/widget?pn=p1&tn=10&h=413"
+        req = self.ses.get(req_url)
+        return req.text
 
     def hottrendsdetail(self, payload):
         # TODO verify
@@ -189,22 +195,6 @@ class TrendReq(object):
             self.results = json.loads(req.text[5:])
         except ValueError:
             raise ResponseError(req.content)
-        return self.results
-
-    def _trend_dataframe(self):
-        # Only for trends
-        df = pd.DataFrame()
-        headers = []
-        for col in self.results['table']['cols']:
-            headers.append(col['label'])
-        for row in self.results['table']['rows']:
-            row_dict = {}
-            for i, value in enumerate(row['c']):
-                row_dict[headers[i]] = value['v']
-            df = df.append(row_dict, ignore_index=True)
-        df['Date'] = pd.to_datetime(df['Date'])
-        df.set_index('Date', inplace=True)
-        self.results = df
         return self.results
 
 
