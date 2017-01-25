@@ -105,23 +105,30 @@ class TrendReq(object):
         overtime_payload['token'] = self.interest_overtime_widget['token']
         overtime_payload['tz'] = self.payload['tz']
         req = self.ses.get(req_url, params=overtime_payload)
-        print(req.text)
+        return req.text
 
-    def related(self, related_type):
-        endpoint = related_type.upper() + '_QUERIES_0_0'
-        req_url = "http://www.google.com/trends/fetchComponent"
-        req = self.ses.get(req_url, params=self.related_queries_payload)
-        try:
-            if self.google_rl in req.text:
-                raise RateLimitError
-            # strip off google.visualization.Query.setResponse();
-            text = req.text[62:-2]
-            self.results = json.loads(text)
-        except ValueError:
-            raise ResponseError(req.content)
-        return self.results
+    def interest_by_region(self):
+        req_url = "https://www.google.com/trends/api/widgetdata/comparedgeo"
+        region_payload = dict()
+        # convert to string as requests will mangle
+        region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
+        region_payload['token'] = self.interest_by_region_widget['token']
+        region_payload['tz'] = self.payload['tz']
+        req = self.ses.get(req_url, params=region_payload)
+        return req.text
+
+    def related_queries(self):
+        req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
+        related_payload = dict()
+        # convert to string as requests will mangle
+        related_payload['req'] = json.dumps(self.related_queries_widget['request'])
+        related_payload['token'] = self.related_queries_widget['token']
+        related_payload['tz'] = self.payload['tz']
+        req = self.ses.get(req_url, params=related_payload)
+        return req.text
 
     def top30in30(self):
+        # TODO verify
         form = {'ajax': '1', 'pn': 'p1', 'htv': 'm'}
         req_url = "http://www.google.com/trends/hottrends/hotItems"
         req = self.ses.post(req_url, data=form)
@@ -134,6 +141,7 @@ class TrendReq(object):
         return self.results
 
     def hottrends(self, payload):
+        # TODO verify
         req_url = "http://hawttrends.appspot.com/api/terms/"
         req = self.ses.get(req_url, params=payload)
         try:
@@ -145,6 +153,7 @@ class TrendReq(object):
         return self.results
 
     def hottrendsdetail(self, payload):
+        # TODO verify
         req_url = "http://www.google.com/trends/hottrends/atom/feed"
         req = self.ses.get(req_url, params=payload)
         try:
@@ -157,6 +166,7 @@ class TrendReq(object):
         return self.results
 
     def topcharts(self, payload):
+        # TODO verify
         form = {'ajax': '1'}
         req_url = "http://www.google.com/trends/topcharts/category"
         req = self.ses.post(req_url, params=payload, data=form)
@@ -169,6 +179,7 @@ class TrendReq(object):
         return self.results
 
     def suggestions(self, keyword):
+        # TODO verify
         kw_param = quote(keyword)
         req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
