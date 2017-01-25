@@ -52,15 +52,27 @@ class TrendReq(object):
         dico['Passwd'] = self.password
         self.ses.post(self.url_auth, data=dico)
 
-    def tokens(self):
-        req_url = "https://www.google.com/trends/api/explore"
-        # need to manually build out the payload as a string so it doesnt get double encoded
-        #req_json = json.dumps(
-        payload = 'tz=360&hl=en-US&req={"comparisonItem":[{"keyword":"pizza","geo":"","time":"today 5-y"},{"keyword":"bagel","geo":"","time":"today 5-y"}],"category":0,"property":""}'
+    def _build_payload(self, payload):
+        # TODO set default values, and check if new ones added
+        trends_payload = dict()
+        trends_payload['hl'] = payload['hl']
+        trends_payload['tz'] = payload['tz']
+        trends_payload['req'] = {'comparisonItem': [], 'category': payload['cat']}
+        kw_list = payload['kw_list']
+        kw_time = payload['timeframe']
+        geo = payload['geo']
+        for kw in kw_list:
+            keyword_payload = {'keyword': kw, 'time': kw_time, 'geo': geo}
+            trends_payload['req']['comparisonItem'].append(keyword_payload)
 
-        json_encode = quote_plus(payload, safe=':,')
-        print(json_encode)
-        req = self.ses.get(req_url, params=payload)
+        # requests will mangle this if it is not a string
+        trends_payload['req'] = json.dumps(trends_payload['req'])
+        return trends_payload
+
+    def tokens(self, payload):
+        trends_payload = self._build_payload(payload)
+        req_url = "https://www.google.com/trends/api/explore"
+        req = self.ses.get(req_url, params=trends_payload)
         return req.text
 
     def trend(self, payload, return_type=None):

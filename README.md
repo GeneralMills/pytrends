@@ -109,11 +109,11 @@ API Payload Keys
 
 Many API methods use `payload` here is a set of known keys that can be used.
 
-* `q`
+* `kw_list`
 
   - keywords to get data for
-  - Example ```{'q': 'Pizza'}```
-  - Up to five terms in a comma seperated string: ```{'q': 'Pizza, Italian, Spaghetti, Breadsticks, Sausage'}```
+  - Example ```{'kw_list': ['Pizza']}```
+  - Up to five terms in a list: ```{'kw_list': ['Pizza, Italian, Spaghetti, Breadsticks, Sausage']}```
 
     * Advanced Keywords
 
@@ -135,7 +135,7 @@ Many API methods use `payload` here is a set of known keys that can be used.
   - Category to narrow results
   - Find available cateogies by inspecting the url when manually using Google Trends. The category starts after ```cat=``` and ends before the next ```&```
   - For example: ```"https://www.google.com/trends/explore#q=pizza&cat=0-71"```
-  - ```{'cat': '0-71'}``` is the category
+  - ```{'cat': '71'}``` is the category
   - Defaults to no category
 
 * `geo`
@@ -149,21 +149,16 @@ Many API methods use `payload` here is a set of known keys that can be used.
 
 * `tz`
 
-  - Timezone using Etc/GMT
-  - For example US CST is ```{'tz': 'Etc/GMT+5'}```
+  - Timezone Offset
+  - For example US CST is ```{'tz': '360'}```
 
-* `date`
+* `timeframe`
 
   - Date to start from
-  - Defaults to all available data, 2004 - present.
-  - Custom Timeframe Pattern:
-
-    - By Month: ```{'date': 'MM/YYYY #m'}``` where # is the number of months from that date to pull data for
-
-      - For example: ``{'date': '10/2009 61m'}`` would get data from October 2009 to October 2014
-      - Less than 4 months will return Daily level data
-      - More than 36 months will return monthly level data
-      - 4-36 months will return weekly level data
+  - Defaults to last 5yrs, 'today 5-y'.
+  - Everything 'all'
+  - Single year, 'all_2008'
+  - Specific dates, 'YYYY-MM-DD YYYY-MM-DD' example '2016-12-14 2017-01-25'
 
   - Current Time Minus Time Pattern:
 
@@ -189,10 +184,10 @@ Many API methods use `payload` here is a set of known keys that can be used.
       - 4-26 hours will return 8min intervals of data
       - 27-34 hours will return 16min intervals of data
 
-* `gprop`
+* `property`
 
   - What search data we want
-  - Example ```{'gprop': 'images'}```
+  - Example ```{'property': 'images'}```
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
 
