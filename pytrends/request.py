@@ -34,6 +34,14 @@ class TrendReq(object):
         self._connect()
         self.results = None
 
+        # intialize user defined payload
+        self.payload = dict()
+
+        # intialize widget payloads
+        self.interest_overtime_widget = dict()
+        self.interest_by_region_widget = dict()
+        self.related_queries_widget = dict()
+
     def _connect(self):
         """
         Connect to Google.
@@ -53,69 +61,56 @@ class TrendReq(object):
         self.ses.post(self.url_auth, data=dico)
 
     def _build_payload(self, payload):
+        self.payload = payload
         # TODO set default values, and check if new ones added
-        trends_payload = dict()
-        trends_payload['hl'] = payload['hl']
-        trends_payload['tz'] = payload['tz']
-        trends_payload['req'] = {'comparisonItem': [], 'category': payload['cat']}
+        token_payload = dict()
+        token_payload['hl'] = self.payload['hl']
+        token_payload['tz'] = payload['tz']
+        token_payload['property'] = payload['property']
+        token_payload['req'] = {'comparisonItem': [], 'category': payload['cat']}
         kw_list = payload['kw_list']
         kw_time = payload['timeframe']
         geo = payload['geo']
         for kw in kw_list:
             keyword_payload = {'keyword': kw, 'time': kw_time, 'geo': geo}
-            trends_payload['req']['comparisonItem'].append(keyword_payload)
+            token_payload['req']['comparisonItem'].append(keyword_payload)
 
         # requests will mangle this if it is not a string
-        trends_payload['req'] = json.dumps(trends_payload['req'])
-        return trends_payload
+        token_payload['req'] = json.dumps(token_payload['req'])
+        self.token_payload = token_payload
+        return
 
     def tokens(self, payload):
-        trends_payload = self._build_payload(payload)
+        self._build_payload(payload)
         req_url = "https://www.google.com/trends/api/explore"
-        req = self.ses.get(req_url, params=trends_payload)
-        return req.text
+        req = self.ses.get(req_url, params=self.token_payload)
+        # strip off garbage characters that break json parser
+        widget_json = req.text[4:]
+        widget_dict = json.loads(widget_json)['widgets']
+        # assign requests
+        for widget in widget_dict:
+            if widget['title'] == 'Interest over time':
+                self.interest_overtime_widget = widget
+            if widget['title'] == 'Interest by region':
+                self.interest_by_region_widget = widget
+            if widget['title'] == 'Related queries':
+                self.related_queries_widget = widget
+        return
 
-    def trend(self, payload, return_type=None):
-        payload['cid'] = 'TIMESERIES_GRAPH_0'
-        payload['export'] = 3
-        req_url = "http://www.google.com/trends/fetchComponent"
-        req = self.ses.get(req_url, params=payload)
-        try:
-            if self.google_rl in req.text:
-                raise RateLimitError
-            # strip off js function call 'google.visualization.Query.setResponse();
-            text = req.text[62:-2]
-            # replace series of commas ',,,,'
-            text = re.sub(',+', ',', text)
-            # replace js new Date(YYYY, M, 1) calls with ISO 8601 date as string
-            pattern = re.compile(r'new Date\(\d{4},\d{1,2},\d{1,2}\)')
-            for match in re.finditer(pattern, text):
-                # slice off 'new Date(' and ')' and split by comma
-                csv_date = match.group(0)[9:-1].split(',')
-                year = csv_date[0]
-                # js date function is 0 based... why...
-                month = str(int(csv_date[1]) + 1).zfill(2)
-                day = csv_date[2].zfill(2)
-                # covert into "YYYY-MM-DD" including quotes
-                str_dt = '"' + year + '-' + month + '-' + day + '"'
-                text = text.replace(match.group(0), str_dt)
-            self.results = json.loads(text)
-        except ValueError:
-            raise ResponseError(req.content)
-        if return_type == 'json' or return_type is None:
-            return self.results
-        if return_type == 'dataframe':
-            self._trend_dataframe()
-            return self.results
+    def interest_over_time(self):
+        req_url = "https://www.google.com/trends/api/widgetdata/multiline/csv"
+        overtime_payload = dict()
+        # convert to string as requests will mangle
+        overtime_payload['req'] = json.dumps(self.interest_overtime_widget['request'])
+        overtime_payload['token'] = self.interest_overtime_widget['token']
+        overtime_payload['tz'] = self.payload['tz']
+        req = self.ses.get(req_url, params=overtime_payload)
+        print(req.text)
 
-    def related(self, payload, related_type):
+    def related(self, related_type):
         endpoint = related_type.upper() + '_QUERIES_0_0'
-        payload['cid'] = endpoint
-        payload['export'] = 3
-        if 'hl' not in payload:
-            payload['hl'] = 'en-US'
         req_url = "http://www.google.com/trends/fetchComponent"
-        req = self.ses.get(req_url, params=payload)
+        req = self.ses.get(req_url, params=self.related_queries_payload)
         try:
             if self.google_rl in req.text:
                 raise RateLimitError
