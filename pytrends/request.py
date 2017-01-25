@@ -6,9 +6,9 @@ import re
 import pandas as pd
 from bs4 import BeautifulSoup
 if sys.version_info[0] == 2:  # Python 2
-    from urllib import quote
+    from urllib import quote_plus, quote
 else:  # Python 3
-    from urllib.parse import quote
+    from urllib.parse import quote_plus, quote
 
 
 class TrendReq(object):
@@ -52,11 +52,21 @@ class TrendReq(object):
         dico['Passwd'] = self.password
         self.ses.post(self.url_auth, data=dico)
 
+    def tokens(self):
+        req_url = "https://www.google.com/trends/api/explore"
+        # need to manually build out the payload as a string so it doesnt get double encoded
+        #req_json = json.dumps(
+        payload = 'tz=360&hl=en-US&req={"comparisonItem":[{"keyword":"pizza","geo":"","time":"today 5-y"},{"keyword":"bagel","geo":"","time":"today 5-y"}],"category":0,"property":""}'
+
+        json_encode = quote_plus(payload, safe=':,')
+        print(json_encode)
+        req = self.ses.get(req_url, params=payload)
+        return req.text
+
     def trend(self, payload, return_type=None):
         payload['cid'] = 'TIMESERIES_GRAPH_0'
         payload['export'] = 3
-        req_url = "https://www.google.com/trends/api/widgetdata/multiline?hl=en-US&tz=360&req=%7B%22time%22:%222012-01-24+2017-01-24%22,%22resolution%22:%22WEEK%22,%22locale%22:%22en-US%22,%22comparisonItem%22:%5B%7B%22geo%22:%7B%7D,%22complexKeywordsRestriction%22:%7B%22keyword%22:%5B%7B%22type%22:%22ENTITY%22,%22value%22:%22%2Fm%2F09cfq%22%7D%5D%7D%7D%5D,%22requestOptions%22:%7B%22property%22:%22%22,%22backend%22:%22IZG%22,%22category%22:0%7D%7D&token=APP6_UEAAAAAWIkz8jJdwRodB4PjYPZqIeDRpPrBqzB0&tz=360"
-        print(self.ses.cookies.get_dict())
+        req_url = "http://www.google.com/trends/fetchComponent"
         req = self.ses.get(req_url, params=payload)
         try:
             if self.google_rl in req.text:
