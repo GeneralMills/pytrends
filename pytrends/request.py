@@ -86,14 +86,20 @@ class TrendReq(object):
         # strip off garbage characters that break json parser
         widget_json = req.text[4:]
         widget_dict = json.loads(widget_json)['widgets']
+        # order of the json matters...
+        first_region_token = True
+        first_related_token = True
         # assign requests
         for widget in widget_dict:
             if widget['title'] == 'Interest over time':
                 self.interest_overtime_widget = widget
-            if widget['title'] == 'Interest by region':
+            if widget['title'] == 'Interest by region' and first_region_token:
                 self.interest_by_region_widget = widget
-            if widget['title'] == 'Related queries':
-                self.related_queries_widget = widget
+                first_region_token = False
+            # response for each term, put into a list
+            if widget['title'] == 'Related queries' and first_related_token:
+                self.related_queries_widget =widget
+                first_related_token = False
         return
 
     def interest_over_time(self):
@@ -108,27 +114,37 @@ class TrendReq(object):
         req_json = json.loads(req.text[5:])
         df = pd.DataFrame(req_json['default']['timelineData'])
         df['date'] = pd.to_datetime(df['time'], unit='s')
+        df = df.set_index(['date']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
-        value_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
+        result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
         # rename each column with its search term
-        for idx, term in enumerate(self.input['kw_list']):
-            value_df[term] = value_df[idx]
-            del value_df[idx]
-        # merge date frame & value frame
-        result_df = pd.merge(value_df, df[['date']], left_index=True, right_index=True).set_index(['date']).sort_index()
+        for idx, kw in enumerate(self.input['kw_list']):
+            result_df[kw] = result_df[idx].astype('int')
+            del result_df[idx]
         return result_df
 
     def interest_by_region(self):
         req_url = "https://www.google.com/trends/api/widgetdata/comparedgeo"
         region_payload = dict()
-        # convert to string as requests will mangle
         # TODO need to handle this if not filled in
-        self.interest_by_region_widget['request']['resolution'] = self.payload['resolution']
+        # self.interest_by_region_widget['request']['resolution'] = self.input['resolution']
+        # convert to string as requests will mangle
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
-        region_payload['tz'] = self.payload['tz']
+        region_payload['tz'] = self.input['tz']
         req = self.ses.get(req_url, params=region_payload)
-        return req.text
+        # strip off garbage characters that break json parser
+        req_json = json.loads(req.text[5:])
+        df = pd.DataFrame(req_json['default']['geoMapData'])
+        # rename the column with the search keyword
+        df = df[['geoCode', 'geoName', 'value']].set_index(['geoCode', 'geoName']).sort_index()
+        # split list columns into seperate ones, remove brackets and split on comma
+        result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
+        # rename each column with its search term
+        for idx, kw in enumerate(self.input['kw_list']):
+            result_df[kw] = result_df[idx].astype('int')
+            del result_df[idx]
+        return result_df
 
     def related_queries(self):
         req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
@@ -136,7 +152,7 @@ class TrendReq(object):
         # convert to string as requests will mangle
         related_payload['req'] = json.dumps(self.related_queries_widget['request'])
         related_payload['token'] = self.related_queries_widget['token']
-        related_payload['tz'] = self.payload['tz']
+        related_payload['tz'] = self.input['tz']
         req = self.ses.get(req_url, params=related_payload)
         return req.text
 
