@@ -175,12 +175,11 @@ class TrendReq(object):
         results = req.text
         return results
 
-    def topcharts(self):
-        # TODO verify
-        form = {'ajax': '1'}
-        req_url = "http://www.google.com/trends/topcharts/category"
-        req = self.ses.post(req_url, params=payload, data=form)
-        results = req.json()
+    def topcharts(self, chart_payload):
+        # TODO parse to dataframe
+        req_url = "http://www.google.com/trends/topcharts/chart"
+        req = self.ses.post(req_url, params=chart_payload)
+        results = json.loads(req.text)
         return results
 
     def suggestions(self, keyword):
@@ -188,5 +187,5 @@ class TrendReq(object):
         kw_param = quote(keyword)
         req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
-        result_dict = json.loads(req.text[5:])
+        result_dict = json.loads(req.text[5:])['default']['topics']
         return result_dict
