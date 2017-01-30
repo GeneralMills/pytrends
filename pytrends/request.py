@@ -179,8 +179,9 @@ class TrendReq(object):
         # TODO parse to dataframe
         req_url = "http://www.google.com/trends/topcharts/chart"
         req = self.ses.post(req_url, params=chart_payload)
-        results = json.loads(req.text)
-        return results
+        req_json = json.loads(req.text)['data']['entityList']
+        df = pd.DataFrame(req_json)
+        return df
 
     def suggestions(self, keyword):
         # returns dictionary
