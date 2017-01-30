@@ -34,7 +34,7 @@ class TrendReq(object):
         self.results = None
 
         # intialize user defined payload
-        self.payload = dict()
+        self.input = dict()
 
         # intialize widget payloads
         self.interest_overtime_widget = dict()
@@ -59,17 +59,16 @@ class TrendReq(object):
         dico['Passwd'] = self.password
         self.ses.post(self.url_auth, data=dico)
 
-    def _build_payload(self, payload):
-        self.payload = payload
+    def _build_payload(self):
         # TODO set default values, and check if new ones added
         token_payload = dict()
-        token_payload['hl'] = self.payload['hl']
-        token_payload['tz'] = payload['tz']
-        token_payload['property'] = payload['property']
-        token_payload['req'] = {'comparisonItem': [], 'category': payload['cat']}
-        kw_list = payload['kw_list']
-        kw_time = payload['timeframe']
-        geo = payload['geo']
+        token_payload['hl'] = self.input['hl']
+        token_payload['tz'] = self.input['tz']
+        token_payload['property'] = self.input['property']
+        token_payload['req'] = {'comparisonItem': [], 'category': self.input['cat']}
+        kw_list = self.input['kw_list']
+        kw_time = self.input['timeframe']
+        geo = self.input['geo']
         for kw in kw_list:
             keyword_payload = {'keyword': kw, 'time': kw_time, 'geo': geo}
             token_payload['req']['comparisonItem'].append(keyword_payload)
@@ -80,7 +79,8 @@ class TrendReq(object):
         return
 
     def tokens(self, payload):
-        self._build_payload(payload)
+        self.input = payload
+        self._build_payload()
         req_url = "https://www.google.com/trends/api/explore"
         req = self.ses.get(req_url, params=self.token_payload)
         # strip off garbage characters that break json parser
@@ -97,14 +97,26 @@ class TrendReq(object):
         return
 
     def interest_over_time(self):
-        req_url = "https://www.google.com/trends/api/widgetdata/multiline/csv"
+        req_url = "https://www.google.com/trends/api/widgetdata/multiline"
         overtime_payload = dict()
         # convert to string as requests will mangle
         overtime_payload['req'] = json.dumps(self.interest_overtime_widget['request'])
         overtime_payload['token'] = self.interest_overtime_widget['token']
-        overtime_payload['tz'] = self.payload['tz']
+        overtime_payload['tz'] = self.input['tz']
         req = self.ses.get(req_url, params=overtime_payload)
-        return req.text
+        # strip off garbage characters that break json parser
+        req_json = json.loads(req.text[5:])
+        df = pd.DataFrame(req_json['default']['timelineData'])
+        df['date'] = pd.to_datetime(df['time'], unit='s')
+        # split list columns into seperate ones, remove brackets and split on comma
+        value_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
+        # rename each column with its search term
+        for idx, term in enumerate(self.input['kw_list']):
+            value_df[term] = value_df[idx]
+            del value_df[idx]
+        # merge date frame & value frame
+        result_df = pd.merge(value_df, df[['date']], left_index=True, right_index=True).set_index(['date']).sort_index()
+        return result_df
 
     def interest_by_region(self):
         req_url = "https://www.google.com/trends/api/widgetdata/comparedgeo"
