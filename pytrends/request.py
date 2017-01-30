@@ -168,16 +168,21 @@ class TrendReq(object):
         return result_dict
 
     def hottrends(self):
-        # TODO parse to dataframe
-        req_url = "http://www.google.com/trends/hottrends/atom/feed"
-        req = self.ses.get(req_url)
-        # returns XML rss feed!
-        results = req.text
-        return results
+        req_url = "https://www.google.com/trends/hottrends/hotItems"
+        forms = {'ajax': 1, 'pn': 'p1', 'htd': '', 'htv': 'l'}
+        req = self.ses.post(req_url, data=forms)
+        req_json = json.loads(req.text)['trendsByDateList']
+        df = pd.DataFrame()
+        for trenddate in req_json:
+            sub_df = pd.DataFrame()
+            sub_df['date'] = trenddate['date']
+            for trend in trenddate['trendsList']:
+                sub_df = sub_df.append(trend, ignore_index=True)
+        df = pd.concat([df, sub_df])
+        return df
 
     def topcharts(self, chart_payload):
-        # TODO parse to dataframe
-        req_url = "http://www.google.com/trends/topcharts/chart"
+        req_url = "https://www.google.com/trends/topcharts/chart"
         req = self.ses.post(req_url, params=chart_payload)
         req_json = json.loads(req.text)['data']['entityList']
         df = pd.DataFrame(req_json)
@@ -188,5 +193,5 @@ class TrendReq(object):
         kw_param = quote(keyword)
         req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
-        result_dict = json.loads(req.text[5:])['default']['topics']
-        return result_dict
+        req_json = json.loads(req.text[5:])['default']['topics']
+        return req_json
