@@ -39,7 +39,7 @@ class TrendReq(object):
         # intialize widget payloads
         self.interest_overtime_widget = dict()
         self.interest_by_region_widget = dict()
-        self.related_queries_widget = dict()
+        self.related_queries_widget_list = list()
 
     def _connect(self):
         """
@@ -97,9 +97,9 @@ class TrendReq(object):
                 self.interest_by_region_widget = widget
                 first_region_token = False
             # response for each term, put into a list
-            if widget['title'] == 'Related queries' and first_related_token:
-                self.related_queries_widget =widget
-                first_related_token = False
+            if widget['title'] == 'Related queries':
+                self.related_queries_widget_list.append(widget)
+
         return
 
     def interest_over_time(self):
@@ -149,12 +149,25 @@ class TrendReq(object):
     def related_queries(self):
         req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
         related_payload = dict()
-        # convert to string as requests will mangle
-        related_payload['req'] = json.dumps(self.related_queries_widget['request'])
-        related_payload['token'] = self.related_queries_widget['token']
-        related_payload['tz'] = self.input['tz']
-        req = self.ses.get(req_url, params=related_payload)
-        return req.text
+        result_dict = dict()
+        for request_json in self.related_queries_widget_list:
+            # keyword
+            kw = request_json['request']['restriction']['complexKeywordsRestriction']['keyword'][0]['value']
+            # convert to string as requests will mangle
+            related_payload['req'] = json.dumps(request_json['request'])
+            related_payload['token'] = request_json['token']
+            related_payload['tz'] = self.input['tz']
+            req = self.ses.get(req_url, params=related_payload)
+            # strip off garbage characters that break json parser
+            req_json = json.loads(req.text[5:])
+            # top queries
+            top_df = pd.DataFrame(req_json['default']['rankedList'][0]['rankedKeyword'])
+            top_df = top_df[['query', 'value']]
+            # rising queries
+            rising_df = pd.DataFrame(req_json['default']['rankedList'][1]['rankedKeyword'])
+            rising_df = rising_df[['query', 'value']]
+            result_dict[kw] = {'top': top_df, 'rising': rising_df}
+        return result_dict
 
     def search_topics(self):
         req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
