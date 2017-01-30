@@ -72,7 +72,6 @@ class TrendReq(object):
         for kw in kw_list:
             keyword_payload = {'keyword': kw, 'time': kw_time, 'geo': geo}
             token_payload['req']['comparisonItem'].append(keyword_payload)
-
         # requests will mangle this if it is not a string
         token_payload['req'] = json.dumps(token_payload['req'])
         self.token_payload = token_payload
@@ -88,7 +87,6 @@ class TrendReq(object):
         widget_dict = json.loads(widget_json)['widgets']
         # order of the json matters...
         first_region_token = True
-        first_related_token = True
         # assign requests
         for widget in widget_dict:
             if widget['title'] == 'Interest over time':
@@ -99,7 +97,6 @@ class TrendReq(object):
             # response for each term, put into a list
             if widget['title'] == 'Related queries':
                 self.related_queries_widget_list.append(widget)
-
         return
 
     def interest_over_time(self):
@@ -151,6 +148,7 @@ class TrendReq(object):
         related_payload = dict()
         result_dict = dict()
         for request_json in self.related_queries_widget_list:
+            # TODO add "keywordType":"ENTITY", "restriction":{"geo":{},"time":"2012-01-25 2017-01-25"}
             # keyword
             kw = request_json['request']['restriction']['complexKeywordsRestriction']['keyword'][0]['value']
             # convert to string as requests will mangle
@@ -169,96 +167,26 @@ class TrendReq(object):
             result_dict[kw] = {'top': top_df, 'rising': rising_df}
         return result_dict
 
-    def search_topics(self):
-        req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
-        #https://www.google.com/trends/api/widgetdata/relatedsearches?hl=en-US&tz=360&req=%7B%22restriction%22:%7B%22geo%22:%7B%7D,%22time%22:%222012-01-25+2017-01-25%22%7D,%22keywordType%22:%22ENTITY%22,%22metric%22:%5B%22TOP%22,%22RISING%22%5D,%22trendinessSettings%22:%7B%22compareTime%22:%222007-01-23+2012-01-24%22%7D,%22requestOptions%22:%7B%22property%22:%22%22,%22backend%22:%22IZG%22,%22category%22:0%7D,%22language%22:%22en%22%7D&token=APP6_UEAAAAAWIpBfUrqpmfyXpLvhy1-PNqC9yU7prWF
-        # TODO add rising vs TOP
-        searchtopics_payload = dict()
-        # convert to string as requests will mangle
-        searchtopics_payload['req'] = json.dumps(self.related_queries_widget['request'])
-        searchtopics_payload['token'] = self.related_queries_widget['token']
-        searchtopics_payload['tz'] = self.payload['tz']
-        req = self.ses.get(req_url, params=searchtopics_payload)
-        return req.text
-
-    def search_queries(self):
-        # TODO add rising vs TOP
-        req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
-        # https://www.google.com/trends/api/widgetdata/relatedsearches?hl=en-US&tz=360&req=%7B%22restriction%22:%7B%22geo%22:%7B%7D,%22time%22:%222012-01-25+2017-01-25%22%7D,%22keywordType%22:%22QUERY%22,%22metric%22:%5B%22TOP%22,%22RISING%22%5D,%22trendinessSettings%22:%7B%22compareTime%22:%222007-01-23+2012-01-24%22%7D,%22requestOptions%22:%7B%22property%22:%22%22,%22backend%22:%22IZG%22,%22category%22:0%7D,%22language%22:%22en%22%7D&token=APP6_UEAAAAAWIpBfTA9jnC5PimqZEoZ4shRwCFi1cm4
-        searchqueries_payload = dict()
-        # convert to string as requests will mangle
-        searchqueries_payload['req'] = json.dumps(self.related_queries_widget['request'])
-        searchqueries_payload['token'] = self.related_queries_widget['token']
-        searchqueries_payload['tz'] = self.payload['tz']
-        req = self.ses.get(req_url, params=searchqueries_payload)
-        return req.text
-
-    def trending_searches(self):
-
-        req_url = "https://www.google.com/trends/hottrends/widget?pn=p1&tn=10&h=413"
-        req = self.ses.get(req_url)
-        return req.text
-
-    def hottrendsdetail(self, payload):
-        # TODO verify
+    def hottrends(self):
+        # TODO parse to dataframe
         req_url = "http://www.google.com/trends/hottrends/atom/feed"
-        req = self.ses.get(req_url, params=payload)
-        try:
-            if self.google_rl in req.text:
-                raise RateLimitError
-            # returns XML rss feed!
-            self.results = req.text
-        except ValueError:
-            raise ResponseError(req.content)
-        return self.results
+        req = self.ses.get(req_url)
+        # returns XML rss feed!
+        results = req.text
+        return results
 
-    def topcharts(self, payload):
+    def topcharts(self):
         # TODO verify
         form = {'ajax': '1'}
         req_url = "http://www.google.com/trends/topcharts/category"
         req = self.ses.post(req_url, params=payload, data=form)
-        try:
-            if self.google_rl in req.text:
-                raise RateLimitError
-            self.results = req.json()
-        except ValueError:
-            raise ResponseError(req.content)
-        return self.results
+        results = req.json()
+        return results
 
     def suggestions(self, keyword):
-        # TODO verify
+        # returns dictionary
         kw_param = quote(keyword)
         req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
-        try:
-            if self.google_rl in req.text:
-                raise RateLimitError
-            self.results = json.loads(req.text[5:])
-        except ValueError:
-            raise ResponseError(req.content)
-        return self.results
-
-
-class Error(Exception):
-    """Base class for exceptions in this module."""
-    pass
-
-
-class RateLimitError(Error):
-    """Exception raised for exceeding rate limit"""
-
-    def __init__(self):
-        self.message = "Exceeded Google's Rate Limit. Please use time.sleep() to space requests."
-        print(self.message)
-
-
-class ResponseError(Error):
-    """Exception raised for exceeding rate limit"""
-
-    def __init__(self, content):
-        self.message = "Response did not parse. See server response for details."
-        self.server_error = BeautifulSoup(content, "lxml").findAll("div", {"class": "errorSubTitle"})[0].get_text()
-        print(self.message)
-        print(self.server_error)
-
-
+        result_dict = json.loads(req.text[5:])
+        return result_dict
