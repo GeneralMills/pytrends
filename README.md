@@ -165,7 +165,7 @@ Many API methods use the following:
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
   
-* custom_useragent
+* `custom_useragent`
 
   - name to identify requests coming from your script
 
