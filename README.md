@@ -15,13 +15,13 @@ Allows simple interface for automating downloading of reports from Google Trends
 
   * [API Methods](#api-methods)
 
-  * [API Payload Keys](#api-payload-keys)
+  * [Common API parameters](#common-api-parameters)
 
-    * [interest_over_time](#interest_over_time)
-    * [interest_by_region](#interest_by_region)
-    * [related_queries](#related_queries)
-    * [trending_searches](#trending_searches)
-    * [top_charts](#top_charts)
+    * [interest_over_time](#interest-over-time)
+    * [interest_by_region](#interest-by-region)
+    * [related_queries](#related-queries)
+    * [trending_searches](#trending-searches)
+    * [top_charts](#top-charts)
     * [suggestions](#suggestions)
 
   * [Caveats](#caveats)
@@ -46,29 +46,29 @@ Allows simple interface for automating downloading of reports from Google Trends
 
     pytrends = TrendReq(google_username, google_password, hl='en-US', tz=360, custom_useragent=None)
 
-#### Parameters
+Parameters
 
-* google_username
+* `google_username`
 
   - *Required*
   - a valid gmail address
 
-* google_password
+* `google_password`
 
   - *Required*
   - password for the gmail account
-
-* hl
-
-  - Localization to return results in. Defaults to US English.
   
-* tz
+### Build Payload
 
-  - Timezone to base requests from. Defaults to CST (Central Standard Time) UTC/GMT -6 hours
+    pytrends = build_payload(kw_list, cat=0, timeframe='today 5-y', geo='', gprop='')
 
-* custom_useragent
+Parameters
 
-  - name to identify requests coming from your script
+* `kw_list`
+
+  - *Required*
+  - Keywords to get data for
+    
 
 [back to top](#API)
 
@@ -76,17 +76,17 @@ Allows simple interface for automating downloading of reports from Google Trends
 
 The following API methods are available:
 
-* [interest_over_time](#interest_over_time): returns historical, indexed data for when the keyword was searched most as shown on Google Trends' Interest Over Time section.
+* [Interest Over Time](#interest-over-time): returns historical, indexed data for when the keyword was searched most as shown on Google Trends' Interest Over Time section.
 
-* [interest_by_region](#related): returns data for where the keyword is most searched as shown on Google Trends' Interest by Region section.
+* [Interest by Region](#interest-by-region): returns data for where the keyword is most searched as shown on Google Trends' Interest by Region section.
 
-* [related_queries](#related_queries): returns data for the related keywords to a provided keyword  shown on Google Trends' Related Queries section.
+* [Related Queries](#related-queries): returns data for the related keywords to a provided keyword  shown on Google Trends' Related Queries section.
 
-* [trending_searches](#trending_searches): returns data for latest trending searches shown on Google Trends' Trending Searches section.
+* [Trending Searches](#trending-searches): returns data for latest trending searches shown on Google Trends' Trending Searches section.
 
-* [top_charts](#top_charts): returns the data for a given topic shown in Google Trends' Top Charts section.
+* [Top Charts](#top-charts): returns the data for a given topic shown in Google Trends' Top Charts section.
 
-* [suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search.
+* [Suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search.
 
 [back to top](#api-methods)
 
@@ -164,10 +164,14 @@ Many API methods use the following:
   - Example ```'images'```
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
+  
+* custom_useragent
+
+  - name to identify requests coming from your script
 
 [back to top](#api-payload-keys)
 
-## Interest Over Time
+### Interest Over Time
 
     pytrends.interest_over_time()
 
@@ -175,11 +179,11 @@ Returns pandas.Dataframe
 
 [back to top](#interest_over_time)
 
-## Interest by Region
+### Interest by Region
 
     pytrends.interest_by_region(resolution='REGION')
 
-### Parameters
+Parameters
 
 * `resolution`
 
@@ -190,7 +194,7 @@ Returns pandas.DataFrame
 
 [back to top](#interest_by_region)
 
-## Related Queries
+### Related Queries
 
     pytrends.related_queries()
 
@@ -198,7 +202,7 @@ Returns dictionary of pandas.DataFrames
 
 [back to top](#related_queries)
 
-## Trending Searches
+### Trending Searches
 
     pytrends.trending_searches()
 Returns pandas.DataFrame
@@ -227,7 +231,7 @@ Returns pandas.DataFrame
 
 [back to top](#top_charts)
 
-## Suggestions
+### Suggestions
 
     pytrends.suggestions(keyword)
 
@@ -242,16 +246,14 @@ Returns dictionary
 
 [back to top](#suggestions)
 
-Caveats
--------
+# Caveats
 
 * This is not an official or supported API
 * Google may change aggregation level for items with very large or very small search volume
 * Google will send you an email saying that you had a new login after running this.
 * Rate Limit is not pubically known, let me know if you have a consistent estimate.
 
-Credits
--------
+# Credits
 
 * Major JSON revision ideas taken from pat310's JavaScript library
 
