@@ -50,38 +50,36 @@ class TrendReq(object):
         self.ses = requests.session()
         login_html = self.ses.get(self.url_login, headers=self.custom_useragent)
         soup_login = BeautifulSoup(login_html.content, "lxml").find('form').find_all('input')
-        dico = {}
+        form_data = dict()
         for u in soup_login:
             if u.has_attr('value') and u.has_attr('name'):
-                dico[u['name']] = u['value']
+                form_data[u['name']] = u['value']
         # override the inputs with out login and pwd:
-        dico['Email'] = self.username
-        dico['Passwd'] = self.password
-        self.ses.post(self.url_auth, data=dico)
+        form_data['Email'] = self.username
+        form_data['Passwd'] = self.password
+        self.ses.post(self.url_auth, data=form_data)
 
-    def _build_payload(self):
-        # TODO set default values, and check if new ones added
+    def build_payload(self, kw_list, hl='en-US', tz=360, cat=0, timeframe='today 5-y', geo='', gprop=''):
+        """Create the payload for related queries, interest over time and interest by region"""
         token_payload = dict()
-        token_payload['hl'] = self.input['hl']
-        token_payload['tz'] = self.input['tz']
-        token_payload['property'] = self.input['property']
-        token_payload['req'] = {'comparisonItem': [], 'category': self.input['cat']}
-        kw_list = self.input['kw_list']
-        kw_time = self.input['timeframe']
-        geo = self.input['geo']
+        kw_list = kw_list
+        token_payload['hl'] = hl
+        token_payload['tz'] = tz
+        token_payload['req'] = {'comparisonItem': [], 'category': cat}
+        token_payload['property'] = gprop
+        # build out json for each keyword
         for kw in kw_list:
-            keyword_payload = {'keyword': kw, 'time': kw_time, 'geo': geo}
+            keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': geo}
             token_payload['req']['comparisonItem'].append(keyword_payload)
         # requests will mangle this if it is not a string
         token_payload['req'] = json.dumps(token_payload['req'])
-        self.token_payload = token_payload
+        # get tokens
+        self._tokens(token_payload)
         return
 
-    def tokens(self, payload):
-        self.input = payload
-        self._build_payload()
+    def _tokens(self, token_payload):
         req_url = "https://www.google.com/trends/api/explore"
-        req = self.ses.get(req_url, params=self.token_payload)
+        req = self.ses.get(req_url, params=token_payload)
         # strip off garbage characters that break json parser
         widget_json = req.text[4:]
         widget_dict = json.loads(widget_json)['widgets']
@@ -120,11 +118,10 @@ class TrendReq(object):
             del result_df[idx]
         return result_df
 
-    def interest_by_region(self):
+    def interest_by_region(self, resolution='Region'):
         req_url = "https://www.google.com/trends/api/widgetdata/comparedgeo"
         region_payload = dict()
-        # TODO need to handle this if not filled in
-        # self.interest_by_region_widget['request']['resolution'] = self.input['resolution']
+        self.interest_by_region_widget['request']['resolution'] = resolution
         # convert to string as requests will mangle
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
