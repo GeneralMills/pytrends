@@ -209,7 +209,7 @@ Returns pandas.DataFrame
 
 <sub><sup>[back to top](#trending_searches)</sub></sup>
 
-top_charts
+### Top Charts
 
     pytrends.topcharts(date, cid, geo='US', cat='')
 
