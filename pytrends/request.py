@@ -14,7 +14,7 @@ class TrendReq(object):
     """
     Google Trends API
     """
-    def __init__(self, username, password, custom_useragent=None):
+    def __init__(self, username, password, hl='en-US', tz=360, custom_useragent=None):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -33,8 +33,10 @@ class TrendReq(object):
         self._connect()
         self.results = None
 
-        # intialize user defined payload
-        self.input = dict()
+        # set user defined options used globally
+        self.tz = tz
+        self.hl = hl
+        self.kw_list = list()
 
         # intialize widget payloads
         self.interest_overtime_widget = dict()
@@ -59,16 +61,16 @@ class TrendReq(object):
         form_data['Passwd'] = self.password
         self.ses.post(self.url_auth, data=form_data)
 
-    def build_payload(self, kw_list, hl='en-US', tz=360, cat=0, timeframe='today 5-y', geo='', gprop=''):
+    def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
         token_payload = dict()
-        kw_list = kw_list
-        token_payload['hl'] = hl
-        token_payload['tz'] = tz
+        self.kw_list = kw_list
+        token_payload['hl'] = self.hl
+        token_payload['tz'] = self.tz
         token_payload['req'] = {'comparisonItem': [], 'category': cat}
         token_payload['property'] = gprop
         # build out json for each keyword
-        for kw in kw_list:
+        for kw in self.kw_list:
             keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': geo}
             token_payload['req']['comparisonItem'].append(keyword_payload)
         # requests will mangle this if it is not a string
@@ -89,7 +91,7 @@ class TrendReq(object):
         # assign requests
         for widget in widget_dict:
             if widget['title'] == 'Interest over time':
-                self.interest_overtime_widget = widget
+                self.interest_over_time_widget = widget
             if widget['title'] == 'Interest by region' and first_region_token:
                 self.interest_by_region_widget = widget
                 first_region_token = False
@@ -101,12 +103,12 @@ class TrendReq(object):
     def interest_over_time(self):
         """Request data from Google's Interest Over Time section and return a dataframe"""
         req_url = "https://www.google.com/trends/api/widgetdata/multiline"
-        overtime_payload = dict()
+        over_time_payload = dict()
         # convert to string as requests will mangle
-        overtime_payload['req'] = json.dumps(self.interest_overtime_widget['request'])
-        overtime_payload['token'] = self.interest_overtime_widget['token']
-        overtime_payload['tz'] = self.input['tz']
-        req = self.ses.get(req_url, params=overtime_payload)
+        over_time_payload['req'] = json.dumps(self.interest_over_time_widget['request'])
+        over_time_payload['token'] = self.interest_over_time_widget['token']
+        over_time_payload['tz'] = self.tz
+        req = self.ses.get(req_url, params=over_time_payload)
         # strip off garbage characters that break json parser
         req_json = json.loads(req.text[5:])
         df = pd.DataFrame(req_json['default']['timelineData'])
@@ -114,8 +116,8 @@ class TrendReq(object):
         df = df.set_index(['date']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
-        # rename each column with its search term
-        for idx, kw in enumerate(self.input['kw_list']):
+        # rename each column with its search term, relying on order that google provides...
+        for idx, kw in enumerate(self.kw_list):
             result_df[kw] = result_df[idx].astype('int')
             del result_df[idx]
         return result_df
@@ -128,7 +130,7 @@ class TrendReq(object):
         # convert to string as requests will mangle
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
-        region_payload['tz'] = self.input['tz']
+        region_payload['tz'] = self.tz
         req = self.ses.get(req_url, params=region_payload)
         # strip off garbage characters that break json parser
         req_json = json.loads(req.text[5:])
@@ -138,7 +140,7 @@ class TrendReq(object):
         # split list columns into seperate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
         # rename each column with its search term
-        for idx, kw in enumerate(self.input['kw_list']):
+        for idx, kw in enumerate(self.kw_list):
             result_df[kw] = result_df[idx].astype('int')
             del result_df[idx]
         return result_df
@@ -155,7 +157,7 @@ class TrendReq(object):
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
             related_payload['token'] = request_json['token']
-            related_payload['tz'] = self.input['tz']
+            related_payload['tz'] = self.tz
             req = self.ses.get(req_url, params=related_payload)
             # strip off garbage characters that break json parser
             req_json = json.loads(req.text[5:])
