@@ -38,7 +38,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 * Requires a google account to use.
 * Requires BeautifulSoup4, Requests, lxml, Pandas
 
-[back to top](#introduction)
+[back to top](#pytrends)
 
 ## API
 
