@@ -20,10 +20,10 @@ interest_by_region_df = pytrend.interest_by_region()
 related_queries_dict = pytrend.related_queries()
 
 # Get Google Hot Trends data
-hot_trends_df = pytrend.hot_trends()
+trending_searches_df = pytrend.trending_searches()
 
 # Get Google Top Charts
-top_chart_df = pytrend.top_charts(cid='athletes', date=201611)
+top_charts_df = pytrend.top_charts(cid='athletes', date=201611)
 
 # Get Google Keyword Suggestions
-suggestions = pytrend.suggestions(keyword='pizza')
+suggestions_dict = pytrend.suggestions(keyword='pizza')

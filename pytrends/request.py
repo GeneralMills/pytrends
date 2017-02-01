@@ -165,7 +165,6 @@ class TrendReq(object):
         related_payload = dict()
         result_dict = dict()
         for request_json in self.related_queries_widget_list:
-            # TODO add "keywordType":"ENTITY", "restriction":{"geo":{},"time":"2012-01-25 2017-01-25"}
             # ensure we know which keyword we are looking at rather than relying on order
             kw = request_json['request']['restriction']['complexKeywordsRestriction']['keyword'][0]['value']
             # convert to string as requests will mangle
@@ -186,8 +185,8 @@ class TrendReq(object):
             result_dict[kw] = {'top': top_df, 'rising': rising_df}
         return result_dict
 
-    def hot_trends(self):
-        """Request data from Google's Hot Trends section and return a dataframe"""
+    def trending_searches(self):
+        """Request data from Google's Trending Searches section and return a dataframe"""
 
         # make the request
         req_url = "https://www.google.com/trends/hottrends/hotItems"
@@ -195,6 +194,7 @@ class TrendReq(object):
         req = self.ses.post(req_url, data=forms)
         req_json = json.loads(req.text)['trendsByDateList']
         result_df = pd.DataFrame()
+
         # parse the returned json
         for trenddate in req_json:
             sub_df = pd.DataFrame()
@@ -207,15 +207,16 @@ class TrendReq(object):
     def top_charts(self, date, cid, geo='US', cat=''):
         """Request data from Google's Top Charts section and return a dataframe"""
 
+        # make the request
         # create the payload
         chart_payload = {'ajax': 1, 'lp': 1}
         chart_payload['geo'] = geo
         chart_payload['date'] = date
         chart_payload['cat'] = cat
         chart_payload['cid'] = cid
-        # make the request
         req_url = "https://www.google.com/trends/topcharts/chart"
         req = self.ses.post(req_url, params=chart_payload)
+
         # parse the returned json
         req_json = json.loads(req.text)['data']['entityList']
         df = pd.DataFrame(req_json)
@@ -223,8 +224,12 @@ class TrendReq(object):
 
     def suggestions(self, keyword):
         """Request data from Google's Keyword Suggestion dropdown and return a dictionary"""
+
+        # make the request
         kw_param = quote(keyword)
         req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
+
+        # parse the returned json
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
         req_json = json.loads(req.text[5:])['default']['topics']
         return req_json

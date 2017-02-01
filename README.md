@@ -20,12 +20,11 @@ Table of contens
 
   * [API Payload Keys](#api-payload-keys)
 
-    * [trend](#trend)
-    * [related](#related)
-    * [top30in30](#top30in30)
-    * [hottrends](#hottrends)
-    * [hottrendsdetail](#hottrendsdetail)
-    * [topcharts](#topcharts)
+    * [interest_over_time](#interest_over_time)
+    * [interest_by_region](#interest_by_region)
+    * [related_queries](#related_queries)
+    * [trending_searches](#trending_searches)
+    * [top_charts](#top_charts)
     * [suggestions](#suggestions)
 
   * [Caveats](#caveats)
@@ -80,19 +79,17 @@ API Methods
 
 The following API methods are available:
 
-* [trend](#trend): returns the historical trend data to a provided keyword or an array of keywords.
+* [interest_over_time](#interest_over_time): returns historical, indexed data for when the keyword was searched most as shown on Google Trends' Interest Over Time section.
 
-* [related](#related): returns the related keywords to a provided keyword or an array of keywords along with it's percentage of correlation.
+* [interest_by_region](#related): returns data for where the keyword is most searched as shown on Google Trends' Interest by Region section.
 
-* [hottrends](#hottrends): returns the current top 20 trending searches for a given location.
+* [related_queries](#related_queries): returns data for the related keywords to a provided keyword  shown on Google Trends' Related Queries section.
 
-* [hottrendsdetail](#hottrendsdetail): same as the [hotTrends](#hottrends) results except with more detail such as links, publication date, approximate traffic, etc.
+* [trending_searches](#trending_searches): returns data for latest trending searches shown on Google Trends' Trending Searches section.
 
-* [top30in30](#top30in30): returns the top 30 searches in the past 30 days
+* [top_charts](#top_charts): returns the data for a given topic shown in Google Trends' Top Charts section.
 
-* [topcharts](#topcharts): returns the trending charts for a given date and location.  Charts contain information such as title, description, source, a jumpFactory, etc.
-
-* [suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search
+* [suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search.
 
 [back to top](#api-methods)
 
@@ -251,19 +248,9 @@ Parameters
   - 'top' returns top related data
   - 'rising' returns rising related data
 
-Returns JSON
+Returns pandas.DataFrame
 
-[back to top](#related)
-
-<hr>
-
-top30in30
-
-    pytrends.top30in30()
-
-Returns JSON
-
-[back to top](#top30in30)
+[back to top](#related_queries)
 
 <hr>
 
@@ -278,30 +265,11 @@ Parameters
   - *Required*
   - a dictionary of key, values
 
-Returns JSON
+Returns pandas.DataFrame
 
 [back to top](#hottrends)
 
-<hr>
-
-hottrendsdetail
-
-    pytrends.hottrendsdetail(payload)
-
-Parameters
-
-* `payload`
-
-  - *Required*
-  - a dictionary of key, values
-  
-Returns XML RSS Feed
-
-[back to top](#hottrendsdetail)
-
-<hr>
-
-topcharts
+top_charts
 
     pytrends.topcharts(payload)
 
