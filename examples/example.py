@@ -4,43 +4,26 @@ google_username = "xxx@gmail.com"
 google_password = "xxx"
 path = ""
 
-# connect to Google
+# Login to Google. Only need to run this once, the rest of requests will use the same session.
 pytrend = TrendReq(google_username, google_password, custom_useragent='My Pytrends Script')
 
-trend_payload = {'q': 'Pizza, Italian, Spaghetti, Breadsticks, Sausage', 'cat': '0-71'}
+# Create payload and capture API tokens. Only needed for interest_over_time(), interest_by_region() & related_queries()
+pytrend.build_payload(kw_list=['pizza', 'bagel'])
 
-# trend
-trend = pytrend.trend(trend_payload)
-print(trend)
-df = pytrend.trend(trend_payload, return_type='dataframe')
-print(df)
+# Interest Over Time
+interest_over_time_df = pytrend.interest_over_time()
 
-# toprelated
-toprelated = pytrend.related(trend_payload, related_type='top')
-print(toprelated)
-risingrelated = pytrend.related(trend_payload, related_type='rising')
-print(risingrelated)
+# Interest by Region
+interest_by_region_df = pytrend.interest_by_region()
 
-# top30in30
-top30in30 = pytrend.top30in30()
-print(top30in30)
+# Related Queries, returns a dictionary of dataframes
+related_queries_dict = pytrend.related_queries()
 
-country_payload = {'geo': 'US'}
-# hottrends
-hottrends = pytrend.hottrends(country_payload)
-print(hottrends)
+# Get Google Hot Trends data
+trending_searches_df = pytrend.trending_searches()
 
-# hottrendsdetail
-# returns XML data
-hottrendsdetail = pytrend.hottrendsdetail(country_payload)
-print(hottrendsdetail)
+# Get Google Top Charts
+top_charts_df = pytrend.top_charts(cid='athletes', date=201611)
 
-payload = {'date': '201601', 'geo': 'US'}
-# alltopcharts
-topcharts = pytrend.topcharts(payload)
-print(topcharts)
-
-keyword = 'pizza'
-# suggestions
-suggestions = pytrend.suggestions(keyword)
-print(suggestions)
+# Get Google Keyword Suggestions
+suggestions_dict = pytrend.suggestions(keyword='pizza')

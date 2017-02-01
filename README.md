@@ -1,16 +1,13 @@
-pytrends
-========
+# pytrends
 
-Introduction
-------------
+## Introduction
 
 Unofficial API for Google Trends
 
 Allows simple interface for automating downloading of reports from Google Trends. Main feature is to allow the script to login to Google on your behalf to enable a higher rate limit. Only good until Google changes their backend again :-P. When that happens feel free to contribute!
 
 
-Table of contens
-----------------
+## Table of contens
 
 * [Installation](#installation)
 
@@ -18,316 +15,223 @@ Table of contens
 
   * [API Methods](#api-methods)
 
-  * [API Payload Keys](#api-payload-keys)
+  * [Common API parameters](#common-api-parameters)
 
-    * [trend](#trend)
-    * [related](#related)
-    * [top30in30](#top30in30)
-    * [hottrends](#hottrends)
-    * [hottrendsdetail](#hottrendsdetail)
-    * [topcharts](#topcharts)
-    * [suggestions](#suggestions)
+    * [Interest Over Time](#interest-over-time)
+    * [Interest by Region](#interest-by-region)
+    * [Related Queries](#related-queries)
+    * [Trending Searches](#trending-searches)
+    * [Top Charts](#top-charts)
+    * [Suggestions](#suggestions)
 
   * [Caveats](#caveats)
 
 * [Credits](#credits)
-	
-<hr>
 
-Installation
-------------
-
-::
+## Installation
 
     pip install pytrends
 
-Requirements
+## Requirements
 
 * Written for both Python 2.7+ and Python 3.3+
 * Requires a google account to use.
 * Requires BeautifulSoup4, Requests, lxml, Pandas
 
-[back to top](#introduction)
+<sub><sup>[back to top](#pytrends)</sub></sup>
 
-<hr>
+## API
 
-API
----
+### Connect to Google
 
-Connect to Google
-^^^^^^^^^^^^^^^^^
-
-::
-
-    pytrends = TrendReq(google_username, google_password, custom_useragent=None)
+    pytrends = TrendReq(google_username, google_password, hl='en-US', tz=360, custom_useragent=None)
 
 Parameters
 
-* username
+* `google_username`
 
   - *Required*
   - a valid gmail address
 
-* password
+* `google_password`
 
   - *Required*
   - password for the gmail account
+  
+### Build Payload
 
-* custom_useragent
+    pytrends = build_payload(kw_list, cat=0, timeframe='today 5-y', geo='', gprop='')
 
-  - name to identify requests coming from your script
+Parameters
 
-[back to top](#API)
+* `kw_list`
 
-<hr>
+  - *Required*
+  - Keywords to get data for
+    
 
-API Methods
-^^^^^^^^^^^
+<sub><sup>[back to top](#API)</sub></sup>
+
+## API Methods
 
 The following API methods are available:
 
-* [trend](#trend): returns the historical trend data to a provided keyword or an array of keywords.
+* [Interest Over Time](#interest-over-time): returns historical, indexed data for when the keyword was searched most as shown on Google Trends' Interest Over Time section.
 
-* [related](#related): returns the related keywords to a provided keyword or an array of keywords along with it's percentage of correlation.
+* [Interest by Region](#interest-by-region): returns data for where the keyword is most searched as shown on Google Trends' Interest by Region section.
 
-* [hottrends](#hottrends): returns the current top 20 trending searches for a given location.
+* [Related Queries](#related-queries): returns data for the related keywords to a provided keyword  shown on Google Trends' Related Queries section.
 
-* [hottrendsdetail](#hottrendsdetail): same as the [hotTrends](#hottrends) results except with more detail such as links, publication date, approximate traffic, etc.
+* [Trending Searches](#trending-searches): returns data for latest trending searches shown on Google Trends' Trending Searches section.
 
-* [top30in30](#top30in30): returns the top 30 searches in the past 30 days
+* [Top Charts](#top-charts): returns the data for a given topic shown in Google Trends' Top Charts section.
 
-* [topcharts](#topcharts): returns the trending charts for a given date and location.  Charts contain information such as title, description, source, a jumpFactory, etc.
+* [Suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search.
 
-* [suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search
+<sub><sup>[back to top](#api-methods)</sub></sup>
 
-[back to top](#api-methods)
+## Common API parameters
 
-<hr>
+Many API methods use the following:
 
-API Payload Keys
-^^^^^^^^^^^^^^^^
-
-Many API methods use `payload` here is a set of known keys that can be used.
-
-* `q`
+* `kw_list`
 
   - keywords to get data for
-  - Example ```{'q': 'Pizza'}```
-  - Up to five terms in a comma seperated string: ```{'q': 'Pizza, Italian, Spaghetti, Breadsticks, Sausage'}```
+  - Example ```['Pizza']```
+  - Up to five terms in a list: ```['Pizza, Italian, Spaghetti, Breadsticks, Sausage']```
 
     * Advanced Keywords
 
-      - When using Google Trends dashboard Google may provide suggested narrowed search terms. 
+      - When using Google Trends dashboard Google may provide suggested narrowed search terms.
       - For example ```"iron"``` will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```. 
       - Find the encoded topic by using the get_suggestions() function and choose the most relevant one for you. 
       - For example: ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
       - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends
+      - You can also use `pytrends.suggestions()` to automate this.
 
 * `hl`
 
   - Language to return result headers in
   - Two letter language abbreviation
-  - For example US English is ```{'hl': 'en-US'}```
+  - For example US English is ```'en-US'```
   - Defaults to US english
 
 * `cat`
 
   - Category to narrow results
   - Find available cateogies by inspecting the url when manually using Google Trends. The category starts after ```cat=``` and ends before the next ```&```
-  - For example: ```"https://www.google.com/trends/explore#q=pizza&cat=0-71"```
-  - ```{'cat': '0-71'}``` is the category
+  - For example: ```"https://www.google.com/trends/explore#q=pizza&cat=71"```
+  - ```'71'``` is the category
   - Defaults to no category
 
 * `geo`
 
   - Two letter country abbreviation
-  - For example United States is ```{'geo': 'US'```
+  - For example United States is ```'US'```
   - Defaults to World
   - More detail available for States/Provinces by specifying additonal abbreviations
-  - For example: Alabama would be ```{'geo': 'US-AL'}```
-  - For example: England would be ```{'geo': 'GB-ENG'}```
+  - For example: Alabama would be ```'US-AL'```
+  - For example: England would be ```'GB-ENG'```
 
 * `tz`
 
-  - Timezone using Etc/GMT
-  - For example US CST is ```{'tz': 'Etc/GMT+5'}```
+  - Timezone Offset
+  - For example US CST is ```'360'```
 
-* `date`
+* `timeframe`
 
   - Date to start from
-  - Defaults to all available data, 2004 - present.
-  - Custom Timeframe Pattern:
-
-    - By Month: ```{'date': 'MM/YYYY #m'}``` where # is the number of months from that date to pull data for
-
-      - For example: ``{'date': '10/2009 61m'}`` would get data from October 2009 to October 2014
-      - Less than 4 months will return Daily level data
-      - More than 36 months will return monthly level data
-      - 4-36 months will return weekly level data
+  - Defaults to last 5yrs, `'today 5-y'`.
+  - Everything `'all'`
+  - Single year, `'all_2008'`
+  - Specific dates, 'YYYY-MM-DD YYYY-MM-DD' example `'2016-12-14 2017-01-25'`
 
   - Current Time Minus Time Pattern:
 
-    - By Month: ```{'date': 'today #-m'}``` where # is the number of months from that date to pull data for
-
+    - By Month: ```'today #-m'``` where # is the number of months from that date to pull data for
       - For example: ``{'date': 'today 61-m'}`` would get data from today to 61months ago
-      - 1-3 months will return daily intervals of data
-      - 4-36 months will return weekly intervals of data
-      - 36+ months will return monthly intervals of data
       - **NOTE** Google uses UTC date as *'today'*
 
-    - Daily: ```{'date': 'today #-d'}``` where # is the number of days from that date to pull data for
-
+    - Daily: ```'today #-d'``` where # is the number of days from that date to pull data for
       - For example: ``{'date': 'today 7-d'}`` would get data from the last week
-      - 1 day will return 8min intervals of data
-      - 2-8 days will return Hourly intervals of data
-      - 8-90 days will return Daily level data
 
-    - Hourly: ```{'date': 'now #-H'}``` where # is the number of hours from that date to pull data for
-
+    - Hourly: ```'now #-H'``` where # is the number of hours from that date to pull data for
       - For example: ``{'date': 'now 1-H'}`` would get data from the last hour
-      - 1-3 hours will return 1min intervals of data
-      - 4-26 hours will return 8min intervals of data
-      - 27-34 hours will return 16min intervals of data
 
 * `gprop`
 
   - What search data we want
-  - Example ```{'gprop': 'images'}```
+  - Example ```'images'```
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
-
-[back to top](#api-payload-keys)
-
-<hr>
-
-trend
-^^^^^
-
-::
-
-    pytrends.trend(payload, return_type=None)
-
-Parameters
-
-* `payload`
-
-  - *Required*
-  - a dictionary of key, values
-
-* `return_type`
-
-  - 'dataframe' returns a Pandas Dataframe
-  - 'json' returns json
   
-Returns JSON or Dataframe
+* `custom_useragent`
 
-[back to top](#trend)
+  - name to identify requests coming from your script
 
-<hr>
+<sub><sup>[back to top](#api-payload-keys)</sub></sup>
 
-related
-^^^^^^^
+### Interest Over Time
 
-::
+    pytrends.interest_over_time()
 
-    pytrends.related(payload)
+Returns pandas.Dataframe
+
+<sub><sup>[back to top](#interest_over_time)</sub></sup>
+
+### Interest by Region
+
+    pytrends.interest_by_region(resolution='REGION')
 
 Parameters
 
-* `payload`
+* `resolution`
+
+  - 'CITY' returns city level data
+  - 'REGION' returns country level data
+
+Returns pandas.DataFrame
+
+<sub><sup>[back to top](#interest_by_region)</sub></sup>
+
+### Related Queries
+
+    pytrends.related_queries()
+
+Returns dictionary of pandas.DataFrames
+
+<sub><sup>[back to top](#related_queries)</sub></sup>
+
+### Trending Searches
+
+    pytrends.trending_searches()
+Returns pandas.DataFrame
+
+<sub><sup>[back to top](#trending_searches)</sub></sup>
+
+top_charts
+
+    pytrends.topcharts(date, cid, geo='US', cat='')
+
+Parameters
+
+* `date`
 
   - *Required*
-  - a dictionary of key, values
-
-* `related_type`
-
-  - *Required*
-  - 'top' returns top related data
-  - 'rising' returns rising related data
+  - YYYYMM integer or string value
+  - Example `'201611'` for November 2016 Top Chart data
   
-Returns JSON
-
-[back to top](#related)
-
-<hr>
-
-top30in30
-^^^^^^^^^
-
-::
-
-    pytrends.top30in30()
-
-Returns JSON
-
-[back to top](#top30in30)
-
-<hr>
-
-hottrends
-^^^^^^^^^
-
-::
-
-    pytrends.hottrends(payload)
-
-Parameters
-
-* `payload`
+* `cid`
 
   - *Required*
-  - a dictionary of key, values
+  - Topic to get data for
+  - Example `'athletes'`
 
-Returns JSON
+Returns pandas.DataFrame
 
-[back to top](#hottrends)
+<sub><sup>[back to top](#top_charts)</sub></sup>
 
-<hr>
-
-hottrendsdetail
-^^^^^^^^^^^^^^^
-
-::
-
-    pytrends.hottrendsdetail(payload)
-
-Parameters
-
-* `payload`
-
-  - *Required*
-  - a dictionary of key, values
-  
-Returns XML RSS Feed
-
-[back to top](#hottrendsdetail)
-
-<hr>
-
-topcharts
-^^^^^^^^^
-
-::
-
-    pytrends.topcharts(payload)
-
-Parameters
-
-* `payload`
-
-  - *Required*
-  - a dictionary of key, values
-
-Returns JSON
-
-[back to top](#topcharts)
-
-<hr>
-
-suggestions
-^^^^^^^^^^^
-
-::
+### Suggestions
 
     pytrends.suggestions(keyword)
 
@@ -338,20 +242,18 @@ Parameters
   - *Required*
   - keyword to get suggestions for
   
-Returns JSON
+Returns dictionary
 
-[back to top](#suggestions)
+<sub><sup>[back to top](#suggestions)</sub></sup>
 
-Caveats
--------
+# Caveats
 
 * This is not an official or supported API
 * Google may change aggregation level for items with very large or very small search volume
 * Google will send you an email saying that you had a new login after running this.
-* Rate Limit is not pubically known, trail and error suggest it is around 10/min
+* Rate Limit is not pubically known, let me know if you have a consistent estimate.
 
-Credits
--------
+# Credits
 
 * Major JSON revision ideas taken from pat310's JavaScript library
 
