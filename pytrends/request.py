@@ -78,6 +78,7 @@ class TrendReq(object):
         return
 
     def _tokens(self, token_payload):
+        """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
         req_url = "https://www.google.com/trends/api/explore"
         req = self.ses.get(req_url, params=token_payload)
         # strip off garbage characters that break json parser
@@ -98,6 +99,7 @@ class TrendReq(object):
         return
 
     def interest_over_time(self):
+        """Request data from Google's Interest Over Time section and return a dataframe"""
         req_url = "https://www.google.com/trends/api/widgetdata/multiline"
         overtime_payload = dict()
         # convert to string as requests will mangle
@@ -119,6 +121,7 @@ class TrendReq(object):
         return result_df
 
     def interest_by_region(self, resolution='Region'):
+        """Request data from Google's Interest by Region section and return a dataframe"""
         req_url = "https://www.google.com/trends/api/widgetdata/comparedgeo"
         region_payload = dict()
         self.interest_by_region_widget['request']['resolution'] = resolution
@@ -141,12 +144,13 @@ class TrendReq(object):
         return result_df
 
     def related_queries(self):
+        """Request data from Google's Related Queries section and return a dictionary of dataframes"""
         req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
         related_payload = dict()
         result_dict = dict()
         for request_json in self.related_queries_widget_list:
             # TODO add "keywordType":"ENTITY", "restriction":{"geo":{},"time":"2012-01-25 2017-01-25"}
-            # keyword
+            # ensure we know which keyword we are looking at rather than relying on order
             kw = request_json['request']['restriction']['complexKeywordsRestriction']['keyword'][0]['value']
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
@@ -165,6 +169,7 @@ class TrendReq(object):
         return result_dict
 
     def hottrends(self):
+        """Request data from Google's Hot Trends section and return a dataframe"""
         req_url = "https://www.google.com/trends/hottrends/hotItems"
         forms = {'ajax': 1, 'pn': 'p1', 'htd': '', 'htv': 'l'}
         req = self.ses.post(req_url, data=forms)
@@ -179,6 +184,7 @@ class TrendReq(object):
         return df
 
     def topcharts(self, chart_payload):
+        """Request data from Google's Top Charts section and return a dataframe"""
         req_url = "https://www.google.com/trends/topcharts/chart"
         req = self.ses.post(req_url, params=chart_payload)
         req_json = json.loads(req.text)['data']['entityList']
@@ -186,7 +192,7 @@ class TrendReq(object):
         return df
 
     def suggestions(self, keyword):
-        # returns dictionary
+        """Request data from Google's Keyword Suggestion dropdown and return a dictionary"""
         kw_param = quote(keyword)
         req = self.ses.get("https://www.google.com/trends/api/autocomplete/" + kw_param)
         # response is invalid json but if you strip off ")]}'," from the front it is then valid
