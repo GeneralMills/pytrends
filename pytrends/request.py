@@ -14,13 +14,13 @@ class TrendReq(object):
     """
     Google Trends API
     """
-    def __init__(self, username, password, hl='en-US', tz=360, custom_useragent=None):
+    def __init__(self, google_username, google_password, hl='en-US', tz=360, custom_useragent=None):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
         """
-        self.username = username
-        self.password = password
+        self.username = google_username
+        self.password = google_password
         # google rate limit
         self.google_rl = 'You have reached your quota limit. Please try again later.'
         self.url_login = "https://accounts.google.com/ServiceLogin"
@@ -130,7 +130,7 @@ class TrendReq(object):
             del result_df[idx]
         return result_df
 
-    def interest_by_region(self, resolution='Region'):
+    def interest_by_region(self, resolution='REGION'):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
         # make the request
