@@ -38,7 +38,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 * Requires a google account to use.
 * Requires BeautifulSoup4, Requests, lxml, Pandas
 
-[back to top](#pytrends)
+<sub><sup>[back to top](#pytrends)</sub></sup>
 
 ## API
 
@@ -70,7 +70,7 @@ Parameters
   - Keywords to get data for
     
 
-[back to top](#API)
+<sub><sup>[back to top](#API)</sub></sup>
 
 ## API Methods
 
@@ -88,7 +88,7 @@ The following API methods are available:
 
 * [Suggestions](#suggestions): returns a list of additional suggested keywords that can be used to refine a trend search.
 
-[back to top](#api-methods)
+<sub><sup>[back to top](#api-methods)</sub></sup>
 
 ## Common API parameters
 
@@ -169,7 +169,7 @@ Many API methods use the following:
 
   - name to identify requests coming from your script
 
-[back to top](#api-payload-keys)
+<sub><sup>[back to top](#api-payload-keys)</sub></sup>
 
 ### Interest Over Time
 
@@ -177,7 +177,7 @@ Many API methods use the following:
 
 Returns pandas.Dataframe
 
-[back to top](#interest_over_time)
+<sub><sup>[back to top](#interest_over_time)</sub></sup>
 
 ### Interest by Region
 
@@ -192,7 +192,7 @@ Parameters
 
 Returns pandas.DataFrame
 
-[back to top](#interest_by_region)
+<sub><sup>[back to top](#interest_by_region)</sub></sup>
 
 ### Related Queries
 
@@ -200,14 +200,14 @@ Returns pandas.DataFrame
 
 Returns dictionary of pandas.DataFrames
 
-[back to top](#related_queries)
+<sub><sup>[back to top](#related_queries)</sub></sup>
 
 ### Trending Searches
 
     pytrends.trending_searches()
 Returns pandas.DataFrame
 
-[back to top](#trending_searches)
+<sub><sup>[back to top](#trending_searches)</sub></sup>
 
 top_charts
 
@@ -229,7 +229,7 @@ Parameters
 
 Returns pandas.DataFrame
 
-[back to top](#top_charts)
+<sub><sup>[back to top](#top_charts)</sub></sup>
 
 ### Suggestions
 
@@ -244,7 +244,7 @@ Parameters
   
 Returns dictionary
 
-[back to top](#suggestions)
+<sub><sup>[back to top](#suggestions)</sub></sup>
 
 # Caveats
 
