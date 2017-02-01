@@ -17,12 +17,12 @@ Allows simple interface for automating downloading of reports from Google Trends
 
   * [Common API parameters](#common-api-parameters)
 
-    * [interest_over_time](#interest-over-time)
-    * [interest_by_region](#interest-by-region)
-    * [related_queries](#related-queries)
-    * [trending_searches](#trending-searches)
-    * [top_charts](#top-charts)
-    * [suggestions](#suggestions)
+    * [Interest Over Time](#interest-over-time)
+    * [Interest by Region](#interest-by-region)
+    * [Related Queries](#related-queries)
+    * [Trending Searches](#trending-searches)
+    * [Top Charts](#top-charts)
+    * [Suggestions](#suggestions)
 
   * [Caveats](#caveats)
 
