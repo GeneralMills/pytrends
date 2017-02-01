@@ -81,8 +81,12 @@ class TrendReq(object):
 
     def _tokens(self, token_payload):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
+
+        # make the request
         req_url = "https://www.google.com/trends/api/explore"
         req = self.ses.get(req_url, params=token_payload)
+
+        # parse the returned json
         # strip off garbage characters that break json parser
         widget_json = req.text[4:]
         widget_dict = json.loads(widget_json)['widgets']
@@ -102,6 +106,8 @@ class TrendReq(object):
 
     def interest_over_time(self):
         """Request data from Google's Interest Over Time section and return a dataframe"""
+
+        # make the request
         req_url = "https://www.google.com/trends/api/widgetdata/multiline"
         over_time_payload = dict()
         # convert to string as requests will mangle
@@ -109,6 +115,8 @@ class TrendReq(object):
         over_time_payload['token'] = self.interest_over_time_widget['token']
         over_time_payload['tz'] = self.tz
         req = self.ses.get(req_url, params=over_time_payload)
+
+        # parse the returned json
         # strip off garbage characters that break json parser
         req_json = json.loads(req.text[5:])
         df = pd.DataFrame(req_json['default']['timelineData'])
@@ -124,6 +132,8 @@ class TrendReq(object):
 
     def interest_by_region(self, resolution='Region'):
         """Request data from Google's Interest by Region section and return a dataframe"""
+
+        # make the request
         req_url = "https://www.google.com/trends/api/widgetdata/comparedgeo"
         region_payload = dict()
         self.interest_by_region_widget['request']['resolution'] = resolution
@@ -132,6 +142,8 @@ class TrendReq(object):
         region_payload['token'] = self.interest_by_region_widget['token']
         region_payload['tz'] = self.tz
         req = self.ses.get(req_url, params=region_payload)
+
+        # parse returned json
         # strip off garbage characters that break json parser
         req_json = json.loads(req.text[5:])
         df = pd.DataFrame(req_json['default']['geoMapData'])
@@ -147,6 +159,8 @@ class TrendReq(object):
 
     def related_queries(self):
         """Request data from Google's Related Queries section and return a dictionary of dataframes"""
+
+        # make the request
         req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
         related_payload = dict()
         result_dict = dict()
@@ -159,6 +173,8 @@ class TrendReq(object):
             related_payload['token'] = request_json['token']
             related_payload['tz'] = self.tz
             req = self.ses.get(req_url, params=related_payload)
+
+            # parse the returned json
             # strip off garbage characters that break json parser
             req_json = json.loads(req.text[5:])
             # top queries
@@ -170,25 +186,37 @@ class TrendReq(object):
             result_dict[kw] = {'top': top_df, 'rising': rising_df}
         return result_dict
 
-    def hottrends(self):
+    def hot_trends(self):
         """Request data from Google's Hot Trends section and return a dataframe"""
+
+        # make the request
         req_url = "https://www.google.com/trends/hottrends/hotItems"
         forms = {'ajax': 1, 'pn': 'p1', 'htd': '', 'htv': 'l'}
         req = self.ses.post(req_url, data=forms)
         req_json = json.loads(req.text)['trendsByDateList']
-        df = pd.DataFrame()
+        result_df = pd.DataFrame()
+        # parse the returned json
         for trenddate in req_json:
             sub_df = pd.DataFrame()
             sub_df['date'] = trenddate['date']
             for trend in trenddate['trendsList']:
                 sub_df = sub_df.append(trend, ignore_index=True)
-        df = pd.concat([df, sub_df])
-        return df
+        result_df = pd.concat([result_df, sub_df])
+        return result_df
 
-    def topcharts(self, chart_payload):
+    def top_charts(self, date, cid, geo='US', cat=''):
         """Request data from Google's Top Charts section and return a dataframe"""
+
+        # create the payload
+        chart_payload = {'ajax': 1, 'lp': 1}
+        chart_payload['geo'] = geo
+        chart_payload['date'] = date
+        chart_payload['cat'] = cat
+        chart_payload['cid'] = cid
+        # make the request
         req_url = "https://www.google.com/trends/topcharts/chart"
         req = self.ses.post(req_url, params=chart_payload)
+        # parse the returned json
         req_json = json.loads(req.text)['data']['entityList']
         df = pd.DataFrame(req_json)
         return df
