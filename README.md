@@ -160,7 +160,7 @@ Many API methods use the following:
 
 * `gprop`
 
-  - What search data we want
+  - What Google property to filter to
   - Example ```'images'```
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
@@ -225,7 +225,8 @@ Parameters
 
   - *Required*
   - Topic to get data for
-  - Example `'athletes'`
+  - Only able to choose from those listed on https://www.google.com/trends/topcharts
+  - Example the chart 'Baseketball players `cid` is `'basketball_players'`
 
 Returns pandas.DataFrame
 
