@@ -152,8 +152,8 @@ Many API methods use the following:
       - For example: ``'today 61-m'`` would get data from today to 61months ago
       - **NOTE** Google uses UTC date as *'today'*
 
-    - Daily: ```'today #-d'``` where # is the number of days from that date to pull data for
-      - For example: ``'today 7-d'`` would get data from the last week
+    - Daily: ```'now #-d'``` where # is the number of days from that date to pull data for
+      - For example: ``'now 7-d'`` would get data from the last week
 
     - Hourly: ```'now #-H'``` where # is the number of hours from that date to pull data for
       - For example: ``'now 1-H'`` would get data from the last hour
