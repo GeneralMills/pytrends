@@ -149,14 +149,14 @@ Many API methods use the following:
   - Current Time Minus Time Pattern:
 
     - By Month: ```'today #-m'``` where # is the number of months from that date to pull data for
-      - For example: ``{'date': 'today 61-m'}`` would get data from today to 61months ago
+      - For example: ``'today 61-m'`` would get data from today to 61months ago
       - **NOTE** Google uses UTC date as *'today'*
 
     - Daily: ```'today #-d'``` where # is the number of days from that date to pull data for
-      - For example: ``{'date': 'today 7-d'}`` would get data from the last week
+      - For example: ``'today 7-d'`` would get data from the last week
 
     - Hourly: ```'now #-H'``` where # is the number of hours from that date to pull data for
-      - For example: ``{'date': 'now 1-H'}`` would get data from the last hour
+      - For example: ``'now 1-H'`` would get data from the last hour
 
 * `gprop`
 
