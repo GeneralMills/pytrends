@@ -145,7 +145,7 @@ Many API methods use the following:
   - Everything `'all'`
   - Single year, `'all_2008'`
   - Specific dates, 'YYYY-MM-DD YYYY-MM-DD' example `'2016-12-14 2017-01-25'`
-  - Specific datetimes, 'YYYY-MM-DDT## YYYY-MM-DDT##' example `'2017-02-06T10 2017-02-12T07'`
+  - Specific datetimes, 'YYYY-MM-DDTHH YYYY-MM-DDTHH' example `'2017-02-06T10 2017-02-12T07'`
       - Note Time component is based off UTC
 
   - Current Time Minus Time Pattern:
