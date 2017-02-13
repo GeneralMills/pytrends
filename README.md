@@ -188,7 +188,7 @@ Parameters
 * `resolution`
 
   - 'CITY' returns city level data
-  - 'REGION' returns country level data
+  - 'COUNTRY' returns country level data
 
 Returns pandas.DataFrame
 

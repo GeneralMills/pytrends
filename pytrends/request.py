@@ -130,7 +130,7 @@ class TrendReq(object):
             del result_df[idx]
         return result_df
 
-    def interest_by_region(self, resolution='REGION'):
+    def interest_by_region(self, resolution='CITY'):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
         # make the request
@@ -148,7 +148,7 @@ class TrendReq(object):
         req_json = json.loads(req.text[5:])
         df = pd.DataFrame(req_json['default']['geoMapData'])
         # rename the column with the search keyword
-        df = df[['geoCode', 'geoName', 'value']].set_index(['geoCode', 'geoName']).sort_index()
+        df = df[['geoName', 'value']].set_index(['geoName']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
         # rename each column with its search term
@@ -218,6 +218,7 @@ class TrendReq(object):
         req = self.ses.post(req_url, params=chart_payload)
 
         # parse the returned json
+        print(req.text)
         req_json = json.loads(req.text)['data']['entityList']
         df = pd.DataFrame(req_json)
         return df
