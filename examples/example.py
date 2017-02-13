@@ -23,7 +23,7 @@ related_queries_dict = pytrend.related_queries()
 trending_searches_df = pytrend.trending_searches()
 
 # Get Google Top Charts
-top_charts_df = pytrend.top_charts(cid='athletes', date=201611)
+top_charts_df = pytrend.top_charts(cid='Basketball teams', date=201611)
 
 # Get Google Keyword Suggestions
 suggestions_dict = pytrend.suggestions(keyword='pizza')
