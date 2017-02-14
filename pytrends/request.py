@@ -130,7 +130,7 @@ class TrendReq(object):
             del result_df[idx]
         return result_df
 
-    def interest_by_region(self, resolution='CITY'):
+    def interest_by_region(self, resolution='COUNTRY'):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
         # make the request

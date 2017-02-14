@@ -179,7 +179,7 @@ Returns pandas.Dataframe
 
 ### Interest by Region
 
-    pytrends.interest_by_region(resolution='REGION')
+    pytrends.interest_by_region(resolution='COUNTRY')
 
 Parameters
 
