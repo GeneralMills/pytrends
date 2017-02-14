@@ -109,13 +109,6 @@ Many API methods use the following:
       - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends
       - You can also use `pytrends.suggestions()` to automate this.
 
-* `hl`
-
-  - Language to return result headers in
-  - Two letter language abbreviation
-  - For example US English is ```'en-US'```
-  - Defaults to US english
-
 * `cat`
 
   - Category to narrow results

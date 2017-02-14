@@ -1,5 +1,6 @@
 from pytrends.request import TrendReq
 
+# enter your own credentials
 google_username = "xxx@gmail.com"
 google_password = "xxx"
 path = ""
