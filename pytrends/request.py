@@ -14,7 +14,7 @@ class TrendReq(object):
     """
     Google Trends API
     """
-    def __init__(self, google_username, google_password, hl='en-US', tz=360, custom_useragent=None):
+    def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent=None):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -36,6 +36,7 @@ class TrendReq(object):
         # set user defined options used globally
         self.tz = tz
         self.hl = hl
+        self.geo = ''
         self.kw_list = list()
 
         # intialize widget payloads
@@ -65,13 +66,14 @@ class TrendReq(object):
         """Create the payload for related queries, interest over time and interest by region"""
         token_payload = dict()
         self.kw_list = kw_list
+        self.geo = geo
         token_payload['hl'] = self.hl
         token_payload['tz'] = self.tz
         token_payload['req'] = {'comparisonItem': [], 'category': cat}
         token_payload['property'] = gprop
         # build out json for each keyword
         for kw in self.kw_list:
-            keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': geo}
+            keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': self.geo}
             token_payload['req']['comparisonItem'].append(keyword_payload)
         # requests will mangle this if it is not a string
         token_payload['req'] = json.dumps(token_payload['req'])
@@ -97,6 +99,9 @@ class TrendReq(object):
             if widget['title'] == 'Interest over time':
                 self.interest_over_time_widget = widget
             if widget['title'] == 'Interest by region' and first_region_token:
+                self.interest_by_region_widget = widget
+                first_region_token = False
+            if widget['title'] == 'Interest by subregion' and first_region_token:
                 self.interest_by_region_widget = widget
                 first_region_token = False
             # response for each term, put into a list
@@ -136,7 +141,8 @@ class TrendReq(object):
         # make the request
         req_url = "https://www.google.com/trends/api/widgetdata/comparedgeo"
         region_payload = dict()
-        self.interest_by_region_widget['request']['resolution'] = resolution
+        if self.geo == '':
+            self.interest_by_region_widget['request']['resolution'] = resolution
         # convert to string as requests will mangle
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
@@ -218,7 +224,6 @@ class TrendReq(object):
         req = self.ses.post(req_url, params=chart_payload)
 
         # parse the returned json
-        print(req.text)
         req_json = json.loads(req.text)['data']['entityList']
         df = pd.DataFrame(req_json)
         return df
