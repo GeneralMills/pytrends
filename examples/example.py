@@ -1,10 +1,7 @@
 import pytrends
 
-# Login to Google. Only need to run this once, the rest of requests will use the same session.
-req = pytrends.TrendReq()
-
 # Create payload and capture API tokens. Only needed for interest_over_time(), interest_by_region() & related_queries()
-req.build_payload(kw_list=['pizza', 'bagel'], geo='IN')
+req = pytrends.TrendReq(kw_list=['pizza', 'bagel'], geo='IN')
 
 # Interest Over Time
 interest_over_time_df = req.interest_over_time()

@@ -3,7 +3,6 @@ import sys
 import requests
 import json
 import pandas as pd
-from bs4 import BeautifulSoup
 if sys.version_info[0] == 2:  # Python 2
     from urllib import quote
 else:  # Python 3
@@ -11,30 +10,15 @@ else:  # Python 3
 
 
 class TrendReq(object):
-    """
-    Google Trends API
-    """
-    def __init__(self, hl='en-US', tz=360):
-        """
-        Initialize common params
-        """
+    """Google Trends API"""
 
-        # set user defined options used globally
-        self.tz = tz
-        self.hl = hl
-        self.geo = ''
-        self.kw_list = list()
-
-        # intialize widget payloads
-        self.interest_overtime_widget = dict()
-        self.interest_by_region_widget = dict()
-        self.related_queries_widget_list = list()
-
-    def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
+    def __init__(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop='', hl='en-US', tz=360):
         """Create the payload for related queries, interest over time and interest by region"""
-        token_payload = dict()
         self.kw_list = kw_list
         self.geo = geo
+        self.hl = hl
+        self.tz = tz
+        token_payload = dict()
         token_payload['hl'] = self.hl
         token_payload['tz'] = self.tz
         token_payload['req'] = {'comparisonItem': [], 'category': cat}
@@ -45,6 +29,10 @@ class TrendReq(object):
             token_payload['req']['comparisonItem'].append(keyword_payload)
         # requests will mangle this if it is not a string
         token_payload['req'] = json.dumps(token_payload['req'])
+        # intialize widget payloads
+        self.interest_overtime_widget = dict()
+        self.interest_by_region_widget = dict()
+        self.related_queries_widget_list = list()
         # get tokens
         self._tokens(token_payload)
         return
