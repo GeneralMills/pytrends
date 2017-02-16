@@ -171,13 +171,14 @@ def trending_searches():
 def top_charts(date, cid, geo='US', cat=''):
     """Request data from Google's Top Charts section and return a dataframe"""
 
-    # make the request
     # create the payload
     chart_payload = {'ajax': 1, 'lp': 1}
     chart_payload['geo'] = geo
     chart_payload['date'] = date
     chart_payload['cat'] = cat
     chart_payload['cid'] = cid
+
+    # make the request
     req_url = "https://www.google.com/trends/topcharts/chart"
     req = requests.post(req_url, params=chart_payload)
 
