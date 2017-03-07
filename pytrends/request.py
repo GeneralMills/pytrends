@@ -195,7 +195,7 @@ class TrendReq(object):
         """Request data from Google's Trending Searches section and return a dataframe"""
 
         # make the request
-        req_url = "https://www.google.com/trends/hottrends/hotItems"
+        req_url = "https://trends.google.com/trends/hottrends/hotItems"
         forms = {'ajax': 1, 'pn': 'p1', 'htd': '', 'htv': 'l'}
         req = self.ses.post(req_url, data=forms)
         req_json = json.loads(req.text)['trendsByDateList']
@@ -220,7 +220,7 @@ class TrendReq(object):
         chart_payload['date'] = date
         chart_payload['cat'] = cat
         chart_payload['cid'] = cid
-        req_url = "https://www.google.com/trends/topcharts/chart"
+        req_url = "https://trends.google.com/trends/topcharts/chart"
         req = self.ses.post(req_url, params=chart_payload)
 
         # parse the returned json
