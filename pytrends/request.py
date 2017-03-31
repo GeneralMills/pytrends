@@ -40,7 +40,7 @@ class TrendReq(object):
         self.kw_list = list()
 
         # intialize widget payloads
-        self.interest_overtime_widget = dict()
+        self.interest_over_time_widget = dict()
         self.interest_by_region_widget = dict()
         self.related_queries_widget_list = list()
 
