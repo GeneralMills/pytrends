@@ -4,6 +4,8 @@ import requests
 import json
 import pandas as pd
 from bs4 import BeautifulSoup
+from pytrends import exceptions
+
 if sys.version_info[0] == 2:  # Python 2
     from urllib import quote
 else:  # Python 3
@@ -14,6 +16,7 @@ class TrendReq(object):
     """
     Google Trends API
     """
+
     def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent=None):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
@@ -110,8 +113,10 @@ class TrendReq(object):
                 if widget['title'] == 'Related queries':
                     self.related_queries_widget_list.append(widget)
         else:
-            # TODO: raise a more specific error
-            raise (Exception)
+            raise exceptions.ResponseError(
+                'The request failed: Google returned a response with code {0}.'.format(req.status_code),
+                response=req
+            )
         return
 
     def interest_over_time(self):
