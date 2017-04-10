@@ -88,25 +88,30 @@ class TrendReq(object):
         req_url = "https://www.google.com/trends/api/explore"
         req = self.ses.get(req_url, params=token_payload)
 
-        # parse the returned json
-        # strip off garbage characters that break json parser
-        widget_json = req.text[4:]
-        widget_dict = json.loads(widget_json)['widgets']
-        # order of the json matters...
-        first_region_token = True
-        # assign requests
-        for widget in widget_dict:
-            if widget['title'] == 'Interest over time':
-                self.interest_over_time_widget = widget
-            if widget['title'] == 'Interest by region' and first_region_token:
-                self.interest_by_region_widget = widget
-                first_region_token = False
-            if widget['title'] == 'Interest by subregion' and first_region_token:
-                self.interest_by_region_widget = widget
-                first_region_token = False
-            # response for each term, put into a list
-            if widget['title'] == 'Related queries':
-                self.related_queries_widget_list.append(widget)
+        # check if the response is indeed json and throw an exception otherwise
+        if 'application/json' in req.headers['Content-Type']:
+            # parse the returned json
+            # strip off garbage characters that break json parser
+            widget_json = req.text[4:]
+            widget_dict = json.loads(widget_json)['widgets']
+            # order of the json matters...
+            first_region_token = True
+            # assign requests
+            for widget in widget_dict:
+                if widget['title'] == 'Interest over time':
+                    self.interest_over_time_widget = widget
+                if widget['title'] == 'Interest by region' and first_region_token:
+                    self.interest_by_region_widget = widget
+                    first_region_token = False
+                if widget['title'] == 'Interest by subregion' and first_region_token:
+                    self.interest_by_region_widget = widget
+                    first_region_token = False
+                # response for each term, put into a list
+                if widget['title'] == 'Related queries':
+                    self.related_queries_widget_list.append(widget)
+        else:
+            # TODO: raise a more specific error
+            raise (Exception)
         return
 
     def interest_over_time(self):
