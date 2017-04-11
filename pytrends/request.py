@@ -164,7 +164,10 @@ class TrendReq(object):
         return result_df
 
     def related_queries(self):
-        """Request data from Google's Related Queries section and return a dictionary of dataframes"""
+        """Request data from Google's Related Queries section and return a dictionary of dataframes
+
+        If no top and/or rising related queries are found, the value for the key "top" and/or "rising" will be None
+        """
 
         # make the request
         req_url = "https://www.google.com/trends/api/widgetdata/relatedsearches"
@@ -182,12 +185,23 @@ class TrendReq(object):
             # parse the returned json
             # strip off garbage characters that break json parser
             req_json = json.loads(req.text[5:])
+
             # top queries
-            top_df = pd.DataFrame(req_json['default']['rankedList'][0]['rankedKeyword'])
-            top_df = top_df[['query', 'value']]
+            try:
+                top_df = pd.DataFrame(req_json['default']['rankedList'][0]['rankedKeyword'])
+                top_df = top_df[['query', 'value']]
+            except KeyError:
+                # in case no top queries are found, the lines above will throw a KeyError
+                top_df = None
+
             # rising queries
-            rising_df = pd.DataFrame(req_json['default']['rankedList'][1]['rankedKeyword'])
-            rising_df = rising_df[['query', 'value']]
+            try:
+                rising_df = pd.DataFrame(req_json['default']['rankedList'][1]['rankedKeyword'])
+                rising_df = rising_df[['query', 'value']]
+            except KeyError:
+                # in case no rising queries are found, the lines above will throw a KeyError
+                rising_df = None
+
             result_dict[kw] = {'top': top_df, 'rising': rising_df}
         return result_dict
 
