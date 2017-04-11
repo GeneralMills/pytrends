@@ -91,7 +91,7 @@ class TrendReq(object):
         req_url = "https://www.google.com/trends/api/explore"
         req = self.ses.get(req_url, params=token_payload)
 
-        # check if the response is indeed json and throw an exception otherwise
+        # check if the response contains json and throw an exception otherwise
         if 'application/json' in req.headers['Content-Type']:
             # parse the returned json
             # strip off garbage characters that break json parser
