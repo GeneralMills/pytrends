@@ -113,6 +113,8 @@ class TrendReq(object):
                 if widget['title'] == 'Related queries':
                     self.related_queries_widget_list.append(widget)
         else:
+            # this is often the case when the amount of keywords in the payload for the IP
+            # is not allowed by Google
             raise exceptions.ResponseError(
                 'The request failed: Google returned a response with code {0}.'.format(req.status_code),
                 response=req
