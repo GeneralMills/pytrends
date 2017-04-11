@@ -166,7 +166,7 @@ class TrendReq(object):
     def related_queries(self):
         """Request data from Google's Related Queries section and return a dictionary of dataframes
 
-        If no top and/or rising related queries are found, the value for the key "top" and/or "rising" will be null.
+        If no top and/or rising related queries are found, the value for the key "top" and/or "rising" will be None
         """
 
         # make the request
