@@ -20,7 +20,7 @@ class TrendReq(object):
     GET_METHOD = 'get'
     POST_METHOD = 'post'
 
-    def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent=None):
+    def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent='PyTrends'):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -32,17 +32,14 @@ class TrendReq(object):
         self.url_login = "https://accounts.google.com/ServiceLogin"
         self.url_auth = "https://accounts.google.com/ServiceLoginAuth"
         # custom user agent so users know what "new account signin for Google" is
-        if custom_useragent is None:
-            self.custom_useragent = {'User-Agent': 'PyTrends'}
-        else:
-            self.custom_useragent = {'User-Agent': custom_useragent}
+        self.custom_useragent = {'User-Agent': custom_useragent}
         self._connect()
         self.results = None
 
         # set user defined options used globally
         self.tz = tz
         self.hl = hl
-        self.geo = ''
+        self.geo = geo
         self.kw_list = list()
 
         # intialize widget payloads
