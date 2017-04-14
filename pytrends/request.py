@@ -149,14 +149,14 @@ class TrendReq(object):
     def interest_over_time(self):
         """Request data from Google's Interest Over Time section and return a dataframe"""
 
-        # make the request
-        over_time_payload = dict()
-        # convert to string as requests will mangle
-        over_time_payload['req'] = json.dumps(self.interest_over_time_widget['request'])
-        over_time_payload['token'] = self.interest_over_time_widget['token']
-        over_time_payload['tz'] = self.tz
+        over_time_payload = {
+            # convert to string as requests will mangle
+            'req': json.dumps(self.interest_over_time_widget['request']),
+            'token': self.interest_over_time_widget['token'],
+            'tz': self.tz
+        }
 
-        # parse the returned json
+        # make the request and parse the returned json
         req_json = self._get_data(
             url=TrendReq.INTEREST_OVER_TIME_URL,
             method=TrendReq.GET_METHOD,
