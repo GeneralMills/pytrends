@@ -20,6 +20,17 @@ class TrendReq(object):
     GET_METHOD = 'get'
     POST_METHOD = 'post'
 
+    LOGIN_URL = 'https://accounts.google.com/ServiceLogin'
+    AUTH_URL = 'https://accounts.google.com/ServiceLoginAuth'
+
+    GENERAL_URL = 'https://www.google.com/trends/api/explore'
+    INTEREST_OVER_TIME_URL = 'https://www.google.com/trends/api/widgetdata/multiline'
+    INTEREST_BY_REGION_URL = 'https://www.google.com/trends/api/widgetdata/comparedgeo'
+    RELATED_QUERIES_URL = 'https://www.google.com/trends/api/widgetdata/relatedsearches'
+    TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/hottrends/hotItems'
+    TOP_CHARTS_URL = 'https://trends.google.com/trends/topcharts/chart'
+    SUGGESTIONS_URL = 'https://www.google.com/trends/api/autocomplete/'
+
     def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent='PyTrends'):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
@@ -29,8 +40,6 @@ class TrendReq(object):
         self.password = google_password
         # google rate limit
         self.google_rl = 'You have reached your quota limit. Please try again later.'
-        self.url_login = 'https://accounts.google.com/ServiceLogin'
-        self.url_auth = 'https://accounts.google.com/ServiceLoginAuth'
         # custom user agent so users know what "new account signin for Google" is
         self.custom_useragent = {'User-Agent': custom_useragent}
         self._connect()
@@ -54,7 +63,7 @@ class TrendReq(object):
         http://stackoverflow.com/questions/6754709/logging-in-to-google-using-python
         """
         self.ses = requests.session()
-        login_html = self.ses.get(self.url_login, headers=self.custom_useragent)
+        login_html = self.ses.get(TrendReq.LOGIN_URL, headers=self.custom_useragent)
         soup_login = BeautifulSoup(login_html.content, 'lxml').find('form').find_all('input')
         form_data = dict()
         for u in soup_login:
@@ -63,7 +72,7 @@ class TrendReq(object):
         # override the inputs with out login and pwd:
         form_data['Email'] = self.username
         form_data['Passwd'] = self.password
-        self.ses.post(self.url_auth, data=form_data)
+        self.ses.post(TrendReq.AUTH_URL, data=form_data)
 
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         # make request
@@ -91,7 +100,6 @@ class TrendReq(object):
 
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
-        token_payload = dict()
         self.kw_list = kw_list
         self.geo = geo
         token_payload = {
@@ -114,12 +122,9 @@ class TrendReq(object):
     def _tokens(self, token_payload):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
 
-        # make the request
-        req_url = 'https://www.google.com/trends/api/explore'
-
-        # parse the returned json
+        # make the request and parse the returned json
         widget_dict = self._get_data(
-            url=req_url,
+            url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
             params=token_payload
         )['widgets']
@@ -145,7 +150,6 @@ class TrendReq(object):
         """Request data from Google's Interest Over Time section and return a dataframe"""
 
         # make the request
-        req_url = 'https://www.google.com/trends/api/widgetdata/multiline'
         over_time_payload = dict()
         # convert to string as requests will mangle
         over_time_payload['req'] = json.dumps(self.interest_over_time_widget['request'])
@@ -154,7 +158,7 @@ class TrendReq(object):
 
         # parse the returned json
         req_json = self._get_data(
-            url=req_url,
+            url=TrendReq.INTEREST_OVER_TIME_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=over_time_payload,
@@ -175,7 +179,6 @@ class TrendReq(object):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
         # make the request
-        req_url = 'https://www.google.com/trends/api/widgetdata/comparedgeo'
         region_payload = dict()
         if self.geo == '':
             self.interest_by_region_widget['request']['resolution'] = resolution
@@ -186,7 +189,7 @@ class TrendReq(object):
 
         # parse returned json
         req_json = self._get_data(
-            url=req_url,
+            url=TrendReq.INTEREST_BY_REGION_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=region_payload
@@ -209,7 +212,6 @@ class TrendReq(object):
         """
 
         # make the request
-        req_url = 'https://www.google.com/trends/api/widgetdata/relatedsearches'
         related_payload = dict()
         result_dict = dict()
         for request_json in self.related_queries_widget_list:
@@ -222,7 +224,7 @@ class TrendReq(object):
 
             # parse the returned json
             req_json = self._get_data(
-                url=req_url,
+                url=TrendReq.RELATED_QUERIES_URL,
                 method=TrendReq.GET_METHOD,
                 trim_chars=5,
                 params=related_payload,
@@ -251,10 +253,9 @@ class TrendReq(object):
         """Request data from Google's Trending Searches section and return a dataframe"""
 
         # make the request
-        req_url = 'https://trends.google.com/trends/hottrends/hotItems'
         forms = {'ajax': 1, 'pn': 'p1', 'htd': '', 'htv': 'l'}
         req_json = self._get_data(
-            url=req_url,
+            url=TrendReq.TRENDING_SEARCHES_URL,
             method=TrendReq.POST_METHOD,
             data=forms,
         )['trendsByDateList']
@@ -272,14 +273,12 @@ class TrendReq(object):
     def top_charts(self, date, cid, geo='US', cat=''):
         """Request data from Google's Top Charts section and return a dataframe"""
 
-        # make the request
         # create the payload
         chart_payload = {'ajax': 1, 'lp': 1, 'geo': geo, 'date': date, 'cat': cat, 'cid': cid}
-        req_url = 'https://trends.google.com/trends/topcharts/chart'
 
-        # parse the returned json
+        # make the request and parse the returned json
         req_json = self._get_data(
-            url=req_url,
+            url=TrendReq.TOP_CHARTS_URL,
             method=TrendReq.POST_METHOD,
             params=chart_payload,
         )['data']['entityList']
@@ -293,7 +292,7 @@ class TrendReq(object):
         kw_param = quote(keyword)
 
         req_json = self._get_data(
-            url='https://www.google.com/trends/api/autocomplete/' + kw_param,
+            url=TrendReq.SUGGESTIONS_URL + kw_param,
             method=TrendReq.GET_METHOD,
             trim_chars=5
         )['default']['topics']
