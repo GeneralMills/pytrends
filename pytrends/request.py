@@ -129,7 +129,8 @@ class TrendReq(object):
         widget_dict = self._get_data(
             url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
-            params=token_payload
+            params=token_payload,
+            trim_chars=4,
         )['widgets']
 
         # order of the json matters...
