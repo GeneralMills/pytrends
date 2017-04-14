@@ -82,7 +82,10 @@ class TrendReq(object):
             response = self.ses.get(url, **kwargs)
 
         # check if the response contains json and throw an exception otherwise
-        if 'application/json' in response.headers['Content-Type']:
+        # Google mostly sends 'application/json' in the Content-Type header,
+        # but occasionally it sends 'application/javascript
+        if 'application/json' in response.headers['Content-Type'] or \
+                        'application/javascript' in response.headers['Content-Type']:
             # trim initial characters
             # some responses start with garbage characters, like ")]}',"
             # these have to be cleaned before being passed to the json parser
