@@ -262,8 +262,8 @@ class TrendReq(object):
         result_df = pd.DataFrame()
 
         # parse the returned json
+        sub_df = pd.DataFrame()
         for trenddate in req_json:
-            sub_df = pd.DataFrame()
             sub_df['date'] = trenddate['date']
             for trend in trenddate['trendsList']:
                 sub_df = sub_df.append(trend, ignore_index=True)
