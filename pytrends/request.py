@@ -75,7 +75,15 @@ class TrendReq(object):
         self.ses.post(TrendReq.AUTH_URL, data=form_data)
 
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
-        # make request
+        """Send a request to Google and return the JSON response as a Python object
+
+        :param url: the url to which the request will be sent
+        :param method: the HTTP method ('get' or 'post')
+        :param trim_chars: how many characters should be trimmed off the beginning of the content of the response
+            before this is passed to the JSON parser
+        :param kwargs: any extra key arguments passed to the request builder (usually query parameters or data)
+        :return:
+        """
         if method == TrendReq.POST_METHOD:
             response = self.ses.post(url, **kwargs)
         else:
