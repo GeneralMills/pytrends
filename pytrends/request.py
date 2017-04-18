@@ -88,6 +88,7 @@ class TrendReq(object):
             response = self.ses.post(url, **kwargs)
         else:
             response = self.ses.get(url, **kwargs)
+        print(response.url)
 
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
@@ -302,9 +303,11 @@ class TrendReq(object):
 
         # make the request
         kw_param = quote(keyword)
+        parameters = {'hl': self.hl}
 
         req_json = self._get_data(
             url=TrendReq.SUGGESTIONS_URL + kw_param,
+            params=parameters,
             method=TrendReq.GET_METHOD,
             trim_chars=5
         )['default']['topics']
