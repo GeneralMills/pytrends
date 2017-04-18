@@ -88,7 +88,6 @@ class TrendReq(object):
             response = self.ses.post(url, **kwargs)
         else:
             response = self.ses.get(url, **kwargs)
-        print(response.url)
 
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
