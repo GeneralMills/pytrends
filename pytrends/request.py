@@ -31,7 +31,8 @@ class TrendReq(object):
     TOP_CHARTS_URL = 'https://trends.google.com/trends/topcharts/chart'
     SUGGESTIONS_URL = 'https://www.google.com/trends/api/autocomplete/'
 
-    def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent='PyTrends'):
+    def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent='PyTrends',
+                 proxies=None):
         """
         Initialize hard-coded URLs, HTTP headers, and login parameters
         needed to connect to Google Trends, then connect.
@@ -42,7 +43,7 @@ class TrendReq(object):
         self.google_rl = 'You have reached your quota limit. Please try again later.'
         # custom user agent so users know what "new account signin for Google" is
         self.custom_useragent = {'User-Agent': custom_useragent}
-        self._connect()
+        self._connect(proxies=proxies)
         self.results = None
 
         # set user defined options used globally
@@ -56,13 +57,15 @@ class TrendReq(object):
         self.interest_by_region_widget = dict()
         self.related_queries_widget_list = list()
 
-    def _connect(self):
+    def _connect(self, proxies=None):
         """
         Connect to Google.
         Go to login page GALX hidden input value and send it back to google + login and password.
         http://stackoverflow.com/questions/6754709/logging-in-to-google-using-python
         """
         self.ses = requests.session()
+        if proxies:
+            self.ses.proxies.update(proxies)
         login_html = self.ses.get(TrendReq.LOGIN_URL, headers=self.custom_useragent)
         soup_login = BeautifulSoup(login_html.content, 'lxml').find('form').find_all('input')
         form_data = dict()
@@ -92,8 +95,8 @@ class TrendReq(object):
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
-        if 'application/json' in response.headers['Content-Type'] or \
-                        'application/javascript' in response.headers['Content-Type']:
+        if any(['application/json' in response.headers['Content-Type'],
+                'application/javascript' in response.headers['Content-Type']]):
             # trim initial characters
             # some responses start with garbage characters, like ")]}',"
             # these have to be cleaned before being passed to the json parser
@@ -104,10 +107,8 @@ class TrendReq(object):
         else:
             # this is often the case when the amount of keywords in the payload for the IP
             # is not allowed by Google
-            raise exceptions.ResponseError(
-                'The request failed: Google returned a response with code {0}.'.format(response.status_code),
-                response=response
-            )
+            raise exceptions.ResponseError('The request failed: Google returned a '
+                                           'response with code {0}.'.format(response.status_code), response=response)
 
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
