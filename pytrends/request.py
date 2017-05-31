@@ -92,8 +92,10 @@ class TrendReq(object):
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
+        # and sometimes even 'text/javascript
         if 'application/json' in response.headers['Content-Type'] or \
-                        'application/javascript' in response.headers['Content-Type']:
+                        'application/javascript' in response.headers['Content-Type'] or \
+                                        'text/javascript' in response.headers['Content-Type']:
             # trim initial characters
             # some responses start with garbage characters, like ")]}',"
             # these have to be cleaned before being passed to the json parser
