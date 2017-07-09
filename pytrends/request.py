@@ -147,6 +147,8 @@ class TrendReq(object):
 
         # order of the json matters...
         first_region_token = True
+        # clear self.related_queries_widget_list of old keywords'widgets
+        self.related_queries_widget_list.clear()
         # assign requests
         for widget in widget_dict:
             if widget['title'] == 'Interest over time':
