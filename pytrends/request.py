@@ -183,6 +183,9 @@ class TrendReq(object):
         )
 
         df = pd.DataFrame(req_json['default']['timelineData'])
+        if (df.empty):
+            return df
+        
         df['date'] = pd.to_datetime(df['time'], unit='s')
         df = df.set_index(['date']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
