@@ -133,7 +133,20 @@ class TrendReq(object):
         for idx, kw in enumerate(self.kw_list):
             result_df[kw] = result_df[idx].astype('int')
             del result_df[idx]
-        return result_df
+
+        if 'isPartial' in df:
+            # make other dataframe from isPartial key data
+            # split list columns into seperate ones, remove brackets and split on comma
+            df = df.fillna(False)
+            result_df2 = df['isPartial'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
+            result_df2.columns = ['isPartial']
+            # concatenate the two dataframes
+            final = pd.concat([result_df, result_df2], axis=1)
+        else:
+            final = result_df
+            final['isPartial'] = False
+
+        return final
 
     def interest_by_region(self, resolution='COUNTRY'):
         """Request data from Google's Interest by Region section and return a dataframe"""
