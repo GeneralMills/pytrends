@@ -35,8 +35,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 ## Requirements
 
 * Written for both Python 2.7+ and Python 3.3+
-* Requires a google account to use.
-* Requires BeautifulSoup4, Requests, lxml, Pandas
+* Requires Requests, lxml, Pandas
 
 <sub><sup>[back to top](#pytrends)</sub></sup>
 
@@ -44,19 +43,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 
 ### Connect to Google
 
-    pytrends = TrendReq(google_username, google_password, hl='en-US', tz=360, custom_useragent=None)
-
-Parameters
-
-* `google_username`
-
-  - *Required*
-  - a valid gmail address
-
-* `google_password`
-
-  - *Required*
-  - password for the gmail account
+    pytrends = TrendReq(hl='en-US', tz=360)
 
 ### Build Payload
 
@@ -162,9 +149,6 @@ Many API methods use the following:
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
 
-* `custom_useragent`
-
-  - name to identify requests coming from your script
 
 <sub><sup>[back to top](#api-payload-keys)</sub></sup>
 
@@ -249,7 +233,7 @@ Returns dictionary
 * This is not an official or supported API
 * Google may change aggregation level for items with very large or very small search volume
 * Google will send you an email saying that you had a new login after running this.
-* Rate Limit is not pubically known, let me know if you have a consistent estimate.
+* Rate Limit is not publicly known, let me know if you have a consistent estimate.
 
 # Credits
 
