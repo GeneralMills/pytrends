@@ -23,13 +23,13 @@ class TrendReq(object):
     LOGIN_URL = 'https://accounts.google.com/ServiceLogin'
     AUTH_URL = 'https://accounts.google.com/ServiceLoginAuth'
 
-    GENERAL_URL = 'https://www.google.com/trends/api/explore'
-    INTEREST_OVER_TIME_URL = 'https://www.google.com/trends/api/widgetdata/multiline'
-    INTEREST_BY_REGION_URL = 'https://www.google.com/trends/api/widgetdata/comparedgeo'
-    RELATED_QUERIES_URL = 'https://www.google.com/trends/api/widgetdata/relatedsearches'
+    GENERAL_URL = 'https://trends.google.com/trends/api/explore'
+    INTEREST_OVER_TIME_URL = 'https://trends.google.com/trends/api/widgetdata/multiline'
+    INTEREST_BY_REGION_URL = 'https://trends.google.com/trends/api/widgetdata/comparedgeo'
+    RELATED_QUERIES_URL = 'https://trends.google.com/trends/api/widgetdata/relatedsearches'
     TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/hottrends/hotItems'
     TOP_CHARTS_URL = 'https://trends.google.com/trends/topcharts/chart'
-    SUGGESTIONS_URL = 'https://www.google.com/trends/api/autocomplete/'
+    SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
 
     def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent='PyTrends',
                  proxies=None):
@@ -185,7 +185,7 @@ class TrendReq(object):
         df = pd.DataFrame(req_json['default']['timelineData'])
         if (df.empty):
             return df
-        
+
         df['date'] = pd.to_datetime(df['time'], unit='s')
         df = df.set_index(['date']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
