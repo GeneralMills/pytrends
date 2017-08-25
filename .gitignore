@@ -139,4 +139,4 @@ ENV/
 .ropeproject
 
 # test files
-/examples/test.py
+/examples/test_example.py

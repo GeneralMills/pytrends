@@ -3,7 +3,6 @@ import sys
 import requests
 import json
 import pandas as pd
-from bs4 import BeautifulSoup
 from pytrends import exceptions
 
 if sys.version_info[0] == 2:  # Python 2
@@ -20,9 +19,6 @@ class TrendReq(object):
     GET_METHOD = 'get'
     POST_METHOD = 'post'
 
-    LOGIN_URL = 'https://accounts.google.com/ServiceLogin'
-    AUTH_URL = 'https://accounts.google.com/ServiceLoginAuth'
-
     GENERAL_URL = 'https://trends.google.com/trends/api/explore'
     INTEREST_OVER_TIME_URL = 'https://trends.google.com/trends/api/widgetdata/multiline'
     INTEREST_BY_REGION_URL = 'https://trends.google.com/trends/api/widgetdata/comparedgeo'
@@ -31,19 +27,12 @@ class TrendReq(object):
     TOP_CHARTS_URL = 'https://trends.google.com/trends/topcharts/chart'
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
 
-    def __init__(self, google_username, google_password, hl='en-US', tz=360, geo='', custom_useragent='PyTrends',
-                 proxies=None):
+    def __init__(self, hl='en-US', tz=360, geo=''):
         """
-        Initialize hard-coded URLs, HTTP headers, and login parameters
-        needed to connect to Google Trends, then connect.
+        Initialize default values for params
         """
-        self.username = google_username
-        self.password = google_password
         # google rate limit
         self.google_rl = 'You have reached your quota limit. Please try again later.'
-        # custom user agent so users know what "new account signin for Google" is
-        self.custom_useragent = {'User-Agent': custom_useragent}
-        self._connect(proxies=proxies)
         self.results = None
 
         # set user defined options used globally
@@ -57,25 +46,6 @@ class TrendReq(object):
         self.interest_by_region_widget = dict()
         self.related_queries_widget_list = list()
 
-    def _connect(self, proxies=None):
-        """
-        Connect to Google.
-        Go to login page GALX hidden input value and send it back to google + login and password.
-        http://stackoverflow.com/questions/6754709/logging-in-to-google-using-python
-        """
-        self.ses = requests.session()
-        if proxies:
-            self.ses.proxies.update(proxies)
-        login_html = self.ses.get(TrendReq.LOGIN_URL, headers=self.custom_useragent)
-        soup_login = BeautifulSoup(login_html.content, 'lxml').find('form').find_all('input')
-        form_data = dict()
-        for u in soup_login:
-            if u.has_attr('value') and u.has_attr('name'):
-                form_data[u['name']] = u['value']
-        # override the inputs with out login and pwd:
-        form_data['Email'] = self.username
-        form_data['Passwd'] = self.password
-        self.ses.post(TrendReq.AUTH_URL, data=form_data)
 
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
@@ -88,9 +58,9 @@ class TrendReq(object):
         :return:
         """
         if method == TrendReq.POST_METHOD:
-            response = self.ses.post(url, **kwargs)
+            response = requests.post(url, **kwargs)
         else:
-            response = self.ses.get(url, **kwargs)
+            response = requests.get(url, **kwargs)
 
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
