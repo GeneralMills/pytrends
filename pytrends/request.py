@@ -1,8 +1,11 @@
 from __future__ import absolute_import, print_function, unicode_literals
-import sys
-import requests
+
 import json
+import sys
+
 import pandas as pd
+import requests
+
 from pytrends import exceptions
 
 if sys.version_info[0] == 2:  # Python 2
@@ -42,10 +45,10 @@ class TrendReq(object):
         self.kw_list = list()
 
         # intialize widget payloads
+        self.token_payload = dict()
         self.interest_over_time_widget = dict()
         self.interest_by_region_widget = dict()
         self.related_queries_widget_list = list()
-
 
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
@@ -87,7 +90,7 @@ class TrendReq(object):
         """Create the payload for related queries, interest over time and interest by region"""
         self.kw_list = kw_list
         self.geo = geo
-        token_payload = {
+        self.token_payload = {
             'hl': self.hl,
             'tz': self.tz,
             'req': {'comparisonItem': [], 'category': cat},
@@ -97,21 +100,21 @@ class TrendReq(object):
         # build out json for each keyword
         for kw in self.kw_list:
             keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': self.geo}
-            token_payload['req']['comparisonItem'].append(keyword_payload)
+            self.token_payload['req']['comparisonItem'].append(keyword_payload)
         # requests will mangle this if it is not a string
-        token_payload['req'] = json.dumps(token_payload['req'])
+        self.token_payload['req'] = json.dumps(self.token_payload['req'])
         # get tokens
-        self._tokens(token_payload)
+        self._tokens()
         return
 
-    def _tokens(self, token_payload):
+    def _tokens(self):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
 
         # make the request and parse the returned json
         widget_dict = self._get_data(
             url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
-            params=token_payload,
+            params=self.token_payload,
             trim_chars=4,
         )['widgets']
 
