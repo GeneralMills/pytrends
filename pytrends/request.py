@@ -124,16 +124,13 @@ class TrendReq(object):
         self.related_queries_widget_list[:] = []
         # assign requests
         for widget in widget_dict:
-            if widget['title'] == 'Interest over time':
-                self.interest_over_time_widget = widget
-            if widget['title'] == 'Interest by region' and first_region_token:
-                self.interest_by_region_widget = widget
-                first_region_token = False
-            if widget['title'] == 'Interest by subregion' and first_region_token:
-                self.interest_by_region_widget = widget
-                first_region_token = False
             # response for each term, put into a list
-            if widget['title'] == 'Related queries':
+            if widget['id'] == 'TIMESERIES':
+                self.interest_over_time_widget = widget
+            if widget['id'] == 'GEO_MAP' and first_region_token:
+                self.interest_by_region_widget = widget
+                first_region_token = False
+            if widget['id'] == 'RELATED_QUERIES':
                 self.related_queries_widget_list.append(widget)
         return
 
