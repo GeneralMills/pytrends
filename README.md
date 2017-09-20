@@ -184,6 +184,8 @@ Returns pandas.DataFrame
 
 Returns dictionary of pandas.DataFrames
 
+<sub><sup>[back to top](#related_topics)</sub></sup>
+
 ### Related Queries
 
     pytrends.related_queries()
