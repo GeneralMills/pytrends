@@ -48,6 +48,7 @@ class TrendReq(object):
         self.token_payload = dict()
         self.interest_over_time_widget = dict()
         self.interest_by_region_widget = dict()
+        self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
 
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
@@ -120,16 +121,20 @@ class TrendReq(object):
 
         # order of the json matters...
         first_region_token = True
-        # clear self.related_queries_widget_list of old keywords'widgets
+        # clear self.related_queries_widget_list and self.related_topics_widget_list
+        # of old keywords'widgets
         self.related_queries_widget_list[:] = []
+        self.related_topics_widget_list[:] = []
         # assign requests
         for widget in widget_dict:
-            # response for each term, put into a list
             if widget['id'] == 'TIMESERIES':
                 self.interest_over_time_widget = widget
             if widget['id'] == 'GEO_MAP' and first_region_token:
                 self.interest_by_region_widget = widget
                 first_region_token = False
+            # response for each term, put into a list
+            if widget['id'] == 'RELATED_TOPICS':
+                self.related_topics_widget_list.append(widget)
             if widget['id'] == 'RELATED_QUERIES':
                 self.related_queries_widget_list.append(widget)
         return
@@ -208,6 +213,42 @@ class TrendReq(object):
             result_df[kw] = result_df[idx].astype('int')
             del result_df[idx]
         return result_df
+
+    def related_topics(self):
+        """Request data from Google's Related Topics section and return a dictionary of dataframes
+
+        If no top and/or rising related topics are found, the value for the key "top" and/or "rising" will be None
+        """
+
+        # make the request
+        related_payload = dict()
+        result_dict = dict()
+        for request_json in self.related_topics_widget_list:
+            # ensure we know which keyword we are looking at rather than relying on order
+            kw = request_json['request']['restriction']['complexKeywordsRestriction']['keyword'][0]['value']
+            # convert to string as requests will mangle
+            related_payload['req'] = json.dumps(request_json['request'])
+            related_payload['token'] = request_json['token']
+            related_payload['tz'] = self.tz
+
+            # parse the returned json
+            req_json = self._get_data(
+                url=TrendReq.RELATED_QUERIES_URL,
+                method=TrendReq.GET_METHOD,
+                trim_chars=5,
+                params=related_payload,
+            )
+
+            # top topics
+            try:
+                df = pd.DataFrame(req_json['default']['rankedList'][0]['rankedKeyword'])
+                df = pd.DataFrame(df['topic'].tolist()).join(df[['value']])
+            except KeyError:
+                # in case no top topics are found, the lines above will throw a KeyError
+                df = None
+
+            result_dict[kw] = df
+        return result_dict
 
     def related_queries(self):
         """Request data from Google's Related Queries section and return a dictionary of dataframes

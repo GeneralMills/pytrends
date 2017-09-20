@@ -19,6 +19,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 
     * [Interest Over Time](#interest-over-time)
     * [Interest by Region](#interest-by-region)
+    * [Related Topics](#related-topics)
     * [Related Queries](#related-queries)
     * [Trending Searches](#trending-searches)
     * [Top Charts](#top-charts)
@@ -67,7 +68,9 @@ The following API methods are available:
 
 * [Interest by Region](#interest-by-region): returns data for where the keyword is most searched as shown on Google Trends' Interest by Region section.
 
-* [Related Queries](#related-queries): returns data for the related keywords to a provided keyword  shown on Google Trends' Related Queries section.
+* [Related Topics](#related-topics): returns data for the related keywords to a provided keyword shown on Google Trends' Related Topics section.
+
+* [Related Queries](#related-queries): returns data for the related keywords to a provided keyword shown on Google Trends' Related Queries section.
 
 * [Trending Searches](#trending-searches): returns data for latest trending searches shown on Google Trends' Trending Searches section.
 
@@ -174,6 +177,14 @@ Parameters
 Returns pandas.DataFrame
 
 <sub><sup>[back to top](#interest_by_region)</sub></sup>
+
+### Related Topics
+
+    pytrends.related_topics()
+
+Returns dictionary of pandas.DataFrames
+
+<sub><sup>[back to top](#related_topics)</sub></sup>
 
 ### Related Queries
 
