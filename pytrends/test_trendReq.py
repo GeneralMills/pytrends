@@ -32,6 +32,11 @@ class TestTrendReq(TestCase):
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         self.assertIsNotNone(pytrend.interest_by_region())
 
+    def test_related_topics(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'])
+        self.assertIsNotNone(pytrend.related_topics())
+
     def test_related_queries(self):
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
