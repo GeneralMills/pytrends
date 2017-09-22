@@ -140,3 +140,6 @@ ENV/
 
 # test files
 /examples/test_example.py
+
+# VSCode
+.vscode/
