@@ -161,7 +161,7 @@ class TrendReq(object):
         if (df.empty):
             return df
 
-        df['date'] = pd.to_datetime(df['time'], unit='s')
+        df['date'] = pd.to_datetime(df['time'].astype(dtype='float64'), unit='s')
         df = df.set_index(['date']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
