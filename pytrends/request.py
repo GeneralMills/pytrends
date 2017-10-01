@@ -133,9 +133,9 @@ class TrendReq(object):
                 self.interest_by_region_widget = widget
                 first_region_token = False
             # response for each term, put into a list
-            if widget['id'] == 'RELATED_TOPICS':
+            if 'RELATED_TOPICS' in widget['id']:
                 self.related_topics_widget_list.append(widget)
-            if widget['id'] == 'RELATED_QUERIES':
+            if 'RELATED_QUERIES' in widget['id']:
                 self.related_queries_widget_list.append(widget)
         return
 
