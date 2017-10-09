@@ -44,6 +44,8 @@ Allows simple interface for automating downloading of reports from Google Trends
 
 ### Connect to Google
 
+    from pytrends.request import TrendReq
+
     pytrends = TrendReq(hl='en-US', tz=360)
 
 ### Build Payload
