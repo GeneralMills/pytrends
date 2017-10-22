@@ -49,8 +49,8 @@ Allows simple interface for automating downloading of reports from Google Trends
     pytrends = TrendReq(hl='en-US', tz=360)
 
 ### Build Payload
-
-    pytrends = build_payload(kw_list, cat=0, timeframe='today 5-y', geo='', gprop='')
+    kw_list = ["Blockchain"]
+    pytrends.build_payload(kw_list, cat=0, timeframe='today 5-y', geo='', gprop='')
 
 Parameters
 
