@@ -71,8 +71,8 @@ class TrendReq(object):
         # but occasionally it sends 'application/javascript
         # and sometimes even 'text/javascript
         if 'application/json' in response.headers['Content-Type'] or \
-                        'application/javascript' in response.headers['Content-Type'] or \
-                                        'text/javascript' in response.headers['Content-Type']:
+            'application/javascript' in response.headers['Content-Type'] or \
+                'text/javascript' in response.headers['Content-Type']:
 
             # trim initial characters
             # some responses start with garbage characters, like ")]}',"
@@ -294,11 +294,11 @@ class TrendReq(object):
             result_dict[kw] = {'top': top_df, 'rising': rising_df}
         return result_dict
 
-    def trending_searches(self):
+    def trending_searches(self, pn='p1'):
         """Request data from Google's Trending Searches section and return a dataframe"""
 
         # make the request
-        forms = {'ajax': 1, 'pn': 'p1', 'htd': '', 'htv': 'l'}
+        forms = {'ajax': 1, 'pn': pn, 'htd': '', 'htv': 'l'}
         req_json = self._get_data(
             url=TrendReq.TRENDING_SEARCHES_URL,
             method=TrendReq.POST_METHOD,
