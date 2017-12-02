@@ -94,8 +94,7 @@ class TrendReq(object):
         self.token_payload = {
             'hl': self.hl,
             'tz': self.tz,
-            'req': {'comparisonItem': [], 'category': cat},
-            'property': gprop,
+            'req': {'comparisonItem': [], 'category': cat, 'property': gprop}
         }
 
         # build out json for each keyword
