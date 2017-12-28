@@ -242,6 +242,14 @@ Returns dictionary
 
 <sub><sup>[back to top](#suggestions)</sub></sup>
 
+### Categories
+
+    pytrends.categories()
+
+Returns dictionary
+
+<sub><sup>[back to top](#suggestions)</sub></sup>
+
 # Caveats
 
 * This is not an official or supported API
