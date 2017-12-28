@@ -347,7 +347,7 @@ class TrendReq(object):
         return req_json
 
     def categories(self):
-        """Request available categories data from Google's API and return a list."""
+        """Request available categories data from Google's API and return a dictionary"""
 
         params = {'hl': self.hl}
 
