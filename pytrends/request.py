@@ -29,6 +29,7 @@ class TrendReq(object):
     TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/hottrends/hotItems'
     TOP_CHARTS_URL = 'https://trends.google.com/trends/topcharts/chart'
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
+    CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
 
     def __init__(self, hl='en-US', tz=360, geo=''):
         """
@@ -342,4 +343,17 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5
         )['default']['topics']
+        return req_json
+
+    def categories(self):
+        """Request available categories data from Google's API and return a dictionary"""
+
+        params = {'hl': self.hl}
+
+        req_json = self._get_data(
+                url=TrendReq.CATEGORIES_URL,
+                params=params,
+                method=TrendReq.GET_METHOD,
+                trim_chars=5
+        )
         return req_json
