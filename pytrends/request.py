@@ -204,6 +204,8 @@ class TrendReq(object):
             params=region_payload
         )
         df = pd.DataFrame(req_json['default']['geoMapData'])
+        if (df.empty):
+            return df
         # rename the column with the search keyword
         df = df[['geoName', 'value']].set_index(['geoName']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
