@@ -175,6 +175,8 @@ Parameters
 
   - 'CITY' returns city level data
   - 'COUNTRY' returns country level data
+  - 'DMA'  returns Metro level data
+  - 'REGION'  returns Region level data
 
 Returns pandas.DataFrame
 

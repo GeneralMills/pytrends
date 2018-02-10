@@ -191,6 +191,8 @@ class TrendReq(object):
         region_payload = dict()
         if self.geo == '':
             self.interest_by_region_widget['request']['resolution'] = resolution
+        elif self.geo == 'US' and resolution in ['DMA', 'CITY', 'REGION']:
+            self.interest_by_region_widget['request']['resolution'] = resolution
         # convert to string as requests will mangle
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
