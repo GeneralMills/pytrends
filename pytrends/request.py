@@ -184,14 +184,13 @@ class TrendReq(object):
 
         return final
 
-    def interest_by_region(self, resolution='COUNTRY'):
+    def interest_by_region(self, resolution='COUNTRY', country=''):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
         # make the request
         region_payload = dict()
-        if self.geo == '':
-            self.interest_by_region_widget['request']['resolution'] = resolution
-        # convert to string as requests will mangle
+        self.interest_by_region_widget['request']['resolution'] = resolution
+        region_payload['country'] = ''
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
         region_payload['tz'] = self.tz
