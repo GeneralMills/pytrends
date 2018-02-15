@@ -90,7 +90,7 @@ Many API methods use the following:
 
   - keywords to get data for
   - Example ```['Pizza']```
-  - Up to five terms in a list: ```['Pizza, Italian, Spaghetti, Breadsticks, Sausage']```
+  - Up to five terms in a list: ```['Pizza', 'Italian', 'Spaghetti', 'Breadsticks', 'Sausage']```
 
     * Advanced Keywords
 
