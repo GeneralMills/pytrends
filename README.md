@@ -208,7 +208,7 @@ Returns pandas.DataFrame
 
 ### Top Charts
 
-    pytrends.topcharts(date, cid, geo='US', cat='')
+    pytrends.top_charts(date, cid, geo='US', cat='')
 
 Parameters
 
