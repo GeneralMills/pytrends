@@ -46,7 +46,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 
     from pytrends.request import TrendReq
 
-    pytrends = TrendReq(hl='en-US', tz=360, proxies = '')
+    pytrends = TrendReq(hl='en-US', tz=360)
 
 or if you want to use proxies as you are blocked due to Google rate limit:
 
