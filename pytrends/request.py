@@ -31,7 +31,7 @@ class TrendReq(object):
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
 
-    def __init__(self, hl='en-US', tz=360, geo=''):
+    def __init__(self, hl='en-US', tz=360, geo='', proxies=''):
         """
         Initialize default values for params
         """
@@ -44,6 +44,8 @@ class TrendReq(object):
         self.hl = hl
         self.geo = geo
         self.kw_list = list()
+        self.proxies = proxies #add a proxy option 
+        #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
 
         # intialize widget payloads
         self.token_payload = dict()
@@ -63,9 +65,15 @@ class TrendReq(object):
         :return:
         """
         if method == TrendReq.POST_METHOD:
-            response = requests.post(url, **kwargs)
+            s = requests.session()
+            if self.proxies != '':
+                s.proxies.update(self.proxies)
+            response = s.post(url, **kwargs)
         else:
-            response = requests.get(url, **kwargs)
+            s = requests.session()
+            if self.proxies != '':
+                s.proxies.update(self.proxies)
+            response = s.get(url,**kwargs)
 
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,

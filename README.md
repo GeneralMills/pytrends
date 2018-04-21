@@ -48,6 +48,15 @@ Allows simple interface for automating downloading of reports from Google Trends
 
     pytrends = TrendReq(hl='en-US', tz=360)
 
+or if you want to use proxies as you are blocked due to Google rate limit:
+
+
+    from pytrends.request import TrendReq
+
+    pytrends = TrendReq(hl='en-US', tz=360, proxies = {'https': 'https://34.203.233.13:80'})
+
+Note: only https proxies will work, and you need to add the port number after the proxy ip address
+
 ### Build Payload
     kw_list = ["Blockchain"]
     pytrends.build_payload(kw_list, cat=0, timeframe='today 5-y', geo='', gprop='')
