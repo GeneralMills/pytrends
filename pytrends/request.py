@@ -369,3 +369,4 @@ class TrendReq(object):
                 trim_chars=5
         )
         return req_json
+
