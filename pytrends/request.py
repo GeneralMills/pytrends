@@ -46,7 +46,10 @@ class TrendReq(object):
         self.kw_list = list()
         self.proxies = proxies #add a proxy option
         #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
-        self.cookies = requests.get('https://trends.google.com').cookies
+        self.cookies = dict(filter(
+            lambda i: i[0] == 'NID',
+            requests.get('https://trends.google.com').cookies.items()
+        ))
 
         # intialize widget payloads
         self.token_payload = dict()
