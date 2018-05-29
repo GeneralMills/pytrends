@@ -1,4 +1,6 @@
+from requests.cookies import RequestsCookieJar
 from unittest import TestCase
+
 from pytrends.request import TrendReq
 
 
@@ -10,6 +12,7 @@ class TestTrendReq(TestCase):
         self.assertEqual(pytrend.hl, 'en-US')
         self.assertEqual(pytrend.tz, 360)
         self.assertEqual(pytrend.geo, '')
+        self.assertIsInstance(pytrend.cookies, RequestsCookieJar)
 
     def test_build_payload(self):
         """Should return the widgets to get data"""
