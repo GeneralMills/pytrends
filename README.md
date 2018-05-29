@@ -18,6 +18,7 @@ Allows simple interface for automating downloading of reports from Google Trends
   * [Common API parameters](#common-api-parameters)
 
     * [Interest Over Time](#interest-over-time)
+    * [Historical Hourly Interest](#historical-hourly-interest)
     * [Interest by Region](#interest-by-region)
     * [Related Topics](#related-topics)
     * [Related Queries](#related-queries)
@@ -76,6 +77,8 @@ Parameters
 The following API methods are available:
 
 * [Interest Over Time](#interest-over-time): returns historical, indexed data for when the keyword was searched most as shown on Google Trends' Interest Over Time section.
+
+* [Historical Hourly Interest](#historical-hourly-interest): returns historical, indexed, hourly data for when the keyword was searched most as shown on Google Trends' Interest Over Time section. It sends multiple requests to Google, each retrieving one week of hourly data. It seems like this would be the only way to get historical, hourly data. 
 
 * [Interest by Region](#interest-by-region): returns data for where the keyword is most searched as shown on Google Trends' Interest by Region section.
 
@@ -173,6 +176,30 @@ Many API methods use the following:
 Returns pandas.Dataframe
 
 <sub><sup>[back to top](#interest_over_time)</sub></sup>
+
+
+### Historical Hourly Interest
+
+    pytrends.get_historical_interest(kw_list, year_start=2018, month_start=1, day_start=1, hour_start=0, year_end=2018, month_end=2, day_end=1, hour_end=0, cat=0, geo='', gprop='', sleep=0)
+    
+Parameters 
+
+* `kw_list`
+
+  - *Required*
+  - list of keywords that you would like the historical data
+
+* `year_start, month_start, day_start, hour_start, year_end, month_end, day_end, hour_end`
+
+  - the time period for which you would like the historical data
+  
+* `sleep`
+
+  - If you are rate-limited by Google, you should set this parameter to something (i.e. 60) to space off each API call. 
+  
+Returns pandas.Dataframe
+
+<sub><sup>[back to top](#historical-hourly-interest)</sub></sup>
 
 ### Interest by Region
 
