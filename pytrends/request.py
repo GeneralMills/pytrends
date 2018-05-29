@@ -44,8 +44,9 @@ class TrendReq(object):
         self.hl = hl
         self.geo = geo
         self.kw_list = list()
-        self.proxies = proxies #add a proxy option 
+        self.proxies = proxies #add a proxy option
         #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
+        self.cookies = requests.get('https://trends.google.com').cookies
 
         # intialize widget payloads
         self.token_payload = dict()
@@ -64,16 +65,13 @@ class TrendReq(object):
         :param kwargs: any extra key arguments passed to the request builder (usually query parameters or data)
         :return:
         """
+        s = requests.session()
+        if self.proxies != '':
+            s.proxies.update(self.proxies)
         if method == TrendReq.POST_METHOD:
-            s = requests.session()
-            if self.proxies != '':
-                s.proxies.update(self.proxies)
-            response = s.post(url, **kwargs)
+            response = s.post(url, cookies=self.cookies, **kwargs)
         else:
-            s = requests.session()
-            if self.proxies != '':
-                s.proxies.update(self.proxies)
-            response = s.get(url,**kwargs)
+            response = s.get(url, cookies=self.cookies, **kwargs)
 
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
