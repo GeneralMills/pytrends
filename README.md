@@ -238,6 +238,7 @@ Returns dictionary of pandas.DataFrames
 
 	pytrends.trending_searches(pn='p1') # in English
 	pytrends.trending_searches(pn='p4') # in Japanese
+
 Returns pandas.DataFrame
 
 <sub><sup>[back to top](#trending_searches)</sub></sup>
