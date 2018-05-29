@@ -12,6 +12,7 @@ setup(
     version='4.4.0',
     description='Pseudo API for Google Trends',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url='https://github.com/dreyco676/pytrends',
     author=['John Hogue', 'Burton DeWilde'],
     author_email='dreyco676@gmail.com',
