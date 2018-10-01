@@ -203,7 +203,7 @@ Returns pandas.Dataframe
 
 ### Interest by Region
 
-    pytrends.interest_by_region(resolution='COUNTRY')
+    pytrends.interest_by_region(resolution='COUNTRY', inc_low_vol=True, inc_geo_code=False)
 
 Parameters
 
@@ -213,6 +213,14 @@ Parameters
   - 'COUNTRY' returns country level data
   - 'DMA'  returns Metro level data
   - 'REGION'  returns Region level data
+
+* `inc_low_vol`
+
+  - True/False (includes google trends data for low volume countries/regions as well)
+
+* `inc_geo_code`
+  
+  - True/False (includes ISO codes of countries along with the names in the data)
 
 Returns pandas.DataFrame
 

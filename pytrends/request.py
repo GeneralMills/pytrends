@@ -198,7 +198,7 @@ class TrendReq(object):
 
         return final
 
-    def interest_by_region(self, resolution='COUNTRY'):
+    def interest_by_region(self, resolution='COUNTRY', inc_low_vol=True, inc_geo_code=False):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
         # make the request
@@ -207,6 +207,9 @@ class TrendReq(object):
             self.interest_by_region_widget['request']['resolution'] = resolution
         elif self.geo == 'US' and resolution in ['DMA', 'CITY', 'REGION']:
             self.interest_by_region_widget['request']['resolution'] = resolution
+            
+        self.interest_by_region_widget['request']['includeLowSearchVolumeGeos'] = inc_low_vol
+        
         # convert to string as requests will mangle
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
@@ -222,14 +225,19 @@ class TrendReq(object):
         df = pd.DataFrame(req_json['default']['geoMapData'])
         if (df.empty):
             return df
+
         # rename the column with the search keyword
-        df = df[['geoName', 'value']].set_index(['geoName']).sort_index()
+        df = df[['geoName', 'geoCode', 'value']].set_index(['geoName']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
+        if inc_geo_code:
+            result_df['geoCode'] = df['geoCode']
+            
         # rename each column with its search term
         for idx, kw in enumerate(self.kw_list):
             result_df[kw] = result_df[idx].astype('int')
             del result_df[idx]
+
         return result_df
 
     def related_topics(self):
