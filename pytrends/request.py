@@ -51,7 +51,9 @@ class TrendReq(object):
         #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
         self.cookies = dict(filter(
             lambda i: i[0] == 'NID',
-            requests.get('https://trends.google.com').cookies.items()
+            requests.get(
+                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
+            ).cookies.items()
         ))
 
         # intialize widget payloads
@@ -72,6 +74,7 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
+        s.headers.update({'accept-language': self.hl})
         if self.proxies != '':
             s.proxies.update(self.proxies)
         if method == TrendReq.POST_METHOD:
