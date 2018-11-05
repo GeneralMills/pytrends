@@ -3,7 +3,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 import json
 import sys
 
-from pandas.io.json.normalize import nested_to_record
 import pandas as pd
 import requests
 
@@ -268,21 +267,13 @@ class TrendReq(object):
 
             # top topics
             try:
-                top_list = req_json['default']['rankedList'][0]['rankedKeyword']
-                df_top = pd.DataFrame([nested_to_record(d, sep='_') for d in top_list])
+                df = pd.DataFrame(req_json['default']['rankedList'][0]['rankedKeyword'])
+                df = pd.DataFrame(df['topic'].tolist()).join(df[['value']])
             except KeyError:
                 # in case no top topics are found, the lines above will throw a KeyError
-                df_top = None
+                df = None
 
-            #rising topics
-            try:
-                rising_list = req_json['default']['rankedList'][1]['rankedKeyword']
-                df_rising = pd.DataFrame([nested_to_record(d, sep='_')  for d in rising_list])
-            except KeyError:
-                # in case no rising topics are found, the lines above will throw a KeyError
-                df_rising = None
-
-            result_dict[kw] = {'rising': df_rising, 'top' : df_top}
+            result_dict[kw] = df
         return result_dict
 
     def related_queries(self):
