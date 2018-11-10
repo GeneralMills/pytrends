@@ -15,6 +15,11 @@ print(interest_over_time_df.head())
 interest_by_region_df = pytrend.interest_by_region()
 print(interest_by_region_df.head())
 
+# Related Topics, returns a dictionary of dataframes
+# It works on only one keyword.
+related_topics_dict = pytrend.related_topics()
+print(related_topics_dict)
+
 # Related Queries, returns a dictionary of dataframes
 related_queries_dict = pytrend.related_queries()
 print(related_queries_dict)
