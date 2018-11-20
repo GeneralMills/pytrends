@@ -398,7 +398,7 @@ class TrendReq(object):
 
     def get_historical_interest(self, keywords, year_start=2018, month_start=1, day_start=1, hour_start=0, year_end=2018, month_end=2, day_end=1, hour_end= 0, cat=0, geo='', gprop='', sleep=0):
         """Gets historical hourly data for interest by chunking requests to 1 week at a time (which is what Google allows)"""
-        run_extra_loop = False
+
         # construct datetime obejcts - raises ValueError if invalid parameters
         initial_start_date = start_date = datetime(year_start, month_start, day_start, hour_start)
         end_date = datetime(year_end, month_end, day_end, hour_end)
