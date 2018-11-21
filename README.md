@@ -132,8 +132,9 @@ Many API methods use the following:
 
 * `tz`
 
-  - Timezone Offset
-  - For example US CST is ```'360'```
+  - Timezone Offset (in minutes)
+  - For more information of Timezone Offset, [view this wiki page containing about UCT offset](https://en.wikipedia.org/wiki/UTC_offset)
+  - For example US CST is ```'360'``` 
 
 * `timeframe`
 
