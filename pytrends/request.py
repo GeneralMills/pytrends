@@ -139,6 +139,8 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             params=self.token_payload,
             trim_chars=4,
+            retries=self.retries,
+            backoff_factor=self.backoff_factor,
         )['widgets']
 
         # order of the json matters...
@@ -177,6 +179,8 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=over_time_payload,
+            retries=self.retries,
+            backoff_factor=self.backoff_factor,
         )
 
         df = pd.DataFrame(req_json['default']['timelineData'])
@@ -230,7 +234,9 @@ class TrendReq(object):
             url=TrendReq.INTEREST_BY_REGION_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            params=region_payload
+            params=region_payload,
+            retries=self.retries,
+            backoff_factor=self.backoff_factor,
         )
         df = pd.DataFrame(req_json['default']['geoMapData'])
         if (df.empty):
@@ -273,6 +279,8 @@ class TrendReq(object):
                 method=TrendReq.GET_METHOD,
                 trim_chars=5,
                 params=related_payload,
+                retries=self.retries,
+                backoff_factor=self.backoff_factor,
             )
 
             # top topics
@@ -385,7 +393,9 @@ class TrendReq(object):
             url=TrendReq.SUGGESTIONS_URL + kw_param,
             params=parameters,
             method=TrendReq.GET_METHOD,
-            trim_chars=5
+            trim_chars=5,
+            retries=self.retries,
+            backoff_factor=self.backoff_factor,
         )['default']['topics']
         return req_json
 
@@ -398,7 +408,9 @@ class TrendReq(object):
                 url=TrendReq.CATEGORIES_URL,
                 params=params,
                 method=TrendReq.GET_METHOD,
-                trim_chars=5
+                trim_chars=5,
+                retries=self.retries,
+                backoff_factor=self.backoff_factor,
         )
         return req_json
 
