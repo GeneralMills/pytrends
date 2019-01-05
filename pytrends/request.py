@@ -6,6 +6,8 @@ import sys
 from pandas.io.json.normalize import nested_to_record
 import pandas as pd
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 from datetime import datetime, timedelta
 import time
@@ -64,7 +66,7 @@ class TrendReq(object):
         self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
 
-    def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
+    def _get_data(self, url, method=GET_METHOD, trim_chars=0, retries=3, backoff_factor=0.5, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
 
         :param url: the url to which the request will be sent
@@ -74,7 +76,9 @@ class TrendReq(object):
         :param kwargs: any extra key arguments passed to the request builder (usually query parameters or data)
         :return:
         """
-        s = requests.session()
+        s = session or requests.session()
+        retry = Retry(total=retries, read=retries, connect=retries, backoff_factor=backoff_factor)
+        adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if self.proxies != '':
             s.proxies.update(self.proxies)
