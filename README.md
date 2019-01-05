@@ -165,6 +165,14 @@ Many API methods use the following:
   - Example ```'images'```
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
+  
+* `retries`
+
+  - number of retries you want
+  
+* `backoff_factor`
+
+  - retry interval
 
 
 <sub><sup>[back to top](#api-payload-keys)</sub></sup>
