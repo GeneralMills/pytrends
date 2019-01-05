@@ -76,7 +76,7 @@ class TrendReq(object):
         :param kwargs: any extra key arguments passed to the request builder (usually query parameters or data)
         :return:
         """
-        s = session or requests.session()
+        s = requests.session()
         retry = Retry(total=retries, read=retries, connect=retries, backoff_factor=backoff_factor)
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
