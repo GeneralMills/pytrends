@@ -37,7 +37,7 @@ class TrendReq(object):
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
 
-    def __init__(self, hl='en-US', tz=360, geo='', proxies=''):
+    def __init__(self, hl='en-US', tz=360, geo='', proxies='', retries=3, backoff_factor=0.3):
         """
         Initialize default values for params
         """
@@ -51,6 +51,8 @@ class TrendReq(object):
         self.geo = geo
         self.kw_list = list()
         self.proxies = proxies #add a proxy option
+        self.retries = retries
+        self.backoff_factor = backoff_factor
         #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
         self.cookies = dict(filter(
             lambda i: i[0] == 'NID',
@@ -66,7 +68,7 @@ class TrendReq(object):
         self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
 
-    def _get_data(self, url, method=GET_METHOD, trim_chars=0, retries=3, backoff_factor=0.5, **kwargs):
+    def _get_data(self, url, method=GET_METHOD, trim_chars=0, retries=3, backoff_factor=0.3, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
 
         :param url: the url to which the request will be sent
