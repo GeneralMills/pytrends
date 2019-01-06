@@ -409,13 +409,10 @@ class TrendReq(object):
         df = pd.DataFrame()
 
         date_iterator = start_date
-        date_iterator += delta
+        date_iterator += delta - timedelta(hours=1)
 
-        while True:
-            if (date_iterator > end_date):
-                # has retrieved all of the data
-                break
-
+        done = False
+        while not done:
             # format date to comply with API call
             start_date_str = start_date.strftime('%Y-%m-%dT%H')
             date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
@@ -424,7 +421,13 @@ class TrendReq(object):
             try:
                 self.build_payload(keywords,cat, tf, geo, gprop)
                 week_df = self.interest_over_time()
+                if (date_iterator >= end_date):
+                    done = True
+                    # Cut down results to only go up to end date.
+                    end_date_str = end_date.strftime('%Y-%m-%d %H:%M:%S')
+                    week_df = week_df[:end_date_str]
                 df = df.append(week_df)
+            
             except Exception as e:
                 print(e)
                 pass
