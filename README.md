@@ -54,7 +54,7 @@ or if you want to use proxies as you are blocked due to Google rate limit:
 
     from pytrends.request import TrendReq
 
-    pytrends = TrendReq(hl='en-US', tz=360, proxies = {'https': 'https://34.203.233.13:80'})
+    pytrends = TrendReq(hl='en-US', tz=360, proxies = {'https': 'https://34.203.233.13:80'}, retries=2, backoff_factor=0.1)
 
 Note: only https proxies will work, and you need to add the port number after the proxy ip address
 
@@ -165,14 +165,6 @@ Many API methods use the following:
   - Example ```'images'```
   - Defaults to web searches
   - Can be ```images```, ```news```, ```youtube``` or ```froogle``` (for Google Shopping results)
-  
-* `retries`
-
-  - number of retries you want
-  
-* `backoff_factor`
-
-  - retry interval
 
 
 <sub><sup>[back to top](#api-payload-keys)</sub></sup>
