@@ -57,7 +57,8 @@ class TrendReq(object):
         self.cookies = dict(filter(
             lambda i: i[0] == 'NID',
             requests.get(
-                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
+                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
+                proxies=proxies
             ).cookies.items()
         ))
 
