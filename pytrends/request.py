@@ -134,7 +134,7 @@ class TrendReq(object):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
 
         # make the request and parse the returned json
-        widget_dict = self.](
+        widget_dict = self._get_data(
             url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
             params=self.token_payload,
