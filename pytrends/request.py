@@ -68,7 +68,7 @@ class TrendReq(object):
         self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
 
-    def _get_data(self, url, method=GET_METHOD, trim_chars=0, retries=3, backoff_factor=0.3, **kwargs):
+    def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
 
         :param url: the url to which the request will be sent
@@ -139,8 +139,6 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             params=self.token_payload,
             trim_chars=4,
-            retries=self.retries,
-            backoff_factor=self.backoff_factor,
         )['widgets']
 
         # order of the json matters...
@@ -179,8 +177,6 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=over_time_payload,
-            retries=self.retries,
-            backoff_factor=self.backoff_factor,
         )
 
         df = pd.DataFrame(req_json['default']['timelineData'])
@@ -235,8 +231,6 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=region_payload,
-            retries=self.retries,
-            backoff_factor=self.backoff_factor,
         )
         df = pd.DataFrame(req_json['default']['geoMapData'])
         if (df.empty):
@@ -279,8 +273,6 @@ class TrendReq(object):
                 method=TrendReq.GET_METHOD,
                 trim_chars=5,
                 params=related_payload,
-                retries=self.retries,
-                backoff_factor=self.backoff_factor,
             )
 
             # top topics
@@ -394,8 +386,6 @@ class TrendReq(object):
             params=parameters,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            retries=self.retries,
-            backoff_factor=self.backoff_factor,
         )['default']['topics']
         return req_json
 
@@ -409,8 +399,6 @@ class TrendReq(object):
                 params=params,
                 method=TrendReq.GET_METHOD,
                 trim_chars=5,
-                retries=self.retries,
-                backoff_factor=self.backoff_factor,
         )
         return req_json
 
