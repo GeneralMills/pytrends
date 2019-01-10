@@ -83,14 +83,14 @@ class TrendReq(object):
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if self.proxies != '':
-            s.proxies.update(self.proxies[self.proxy_counter].proxy)
+            s.proxies.update(self.proxies[self.proxy_counter]['proxy'])
         try:
             if method == TrendReq.POST_METHOD:
-                response = s.post(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter].proxy, **kwargs)
+                response = s.post(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter]['proxy'], **kwargs)
             else:
-                response = s.get(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter].proxy, **kwargs)
+                response = s.get(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter]['proxy'], **kwargs)
         except requests.exceptions.ProxyError:
-            print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter].proxy, self.proxies[self.proxy_counter+1].proxy))
+            print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter]['proxy'], self.proxies[self.proxy_counter+1]['proxy']))
             if self.proxy_counter<len(self.proxies):
                 self.proxy_counter += 1
             else: self.proxy_counter = 0
