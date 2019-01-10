@@ -64,7 +64,7 @@ class TrendReq(object):
                 ).cookies.items()
             ))
         except requests.exceptions.ProxyError:
-            print('Proxy {} error. Swiching to proxy {}'.format(proxies[self.proxy_counter].proxy), proxies[self.proxy_counter+1].proxy))
+            print('Proxy {} error. Swiching to proxy {}'.format(proxies[self.proxy_counter].proxy, proxies[self.proxy_counter+1].proxy))
             if self.proxy_counter<len(proxies):
                 self.proxy_counter += 1
             else: self.proxy_counter = 0
@@ -98,7 +98,7 @@ class TrendReq(object):
             else:
                 response = s.get(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter].proxy, **kwargs)
         except requests.exceptions.ProxyError:
-            print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter].proxy), self.proxies[self.proxy_counter+1].proxy))
+            print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter].proxy, self.proxies[self.proxy_counter+1].proxy))
             if self.proxy_counter<len(self.proxies):
                 self.proxy_counter += 1
             else: self.proxy_counter = 0
