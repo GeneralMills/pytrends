@@ -37,7 +37,7 @@ class TrendReq(object):
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
 
-    def __init__(self, hl='en-US', tz=360, geo='', proxies='', retries=3, backoff_factor=0.3):
+    def __init__(self, hl='en-US', tz=360, geo='', proxies='', retries=2, backoff_factor=0.1):
         """
         Initialize default values for params
         """
@@ -53,7 +53,7 @@ class TrendReq(object):
         self.proxies = proxies #add a proxy option
         self.retries = retries
         self.backoff_factor = backoff_factor
-        #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
+        #proxies format: {"https": "https://192.168.0.1:8888"}
         self.cookies = dict(filter(
             lambda i: i[0] == 'NID',
             requests.get(
@@ -134,7 +134,7 @@ class TrendReq(object):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
 
         # make the request and parse the returned json
-        widget_dict = self._get_data(
+        widget_dict = self.](
             url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
             params=self.token_payload,
