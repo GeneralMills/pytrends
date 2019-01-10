@@ -59,16 +59,9 @@ class TrendReq(object):
             self.cookies = dict(filter(
                 lambda i: i[0] == 'NID',
                 requests.get(
-                    'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
-                    proxies=proxies[self.proxy_counter].proxy
+                    'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
                 ).cookies.items()
             ))
-        except requests.exceptions.ProxyError:
-            print('Proxy {} error. Swiching to proxy {}'.format(proxies[self.proxy_counter].proxy, proxies[self.proxy_counter+1].proxy))
-            if self.proxy_counter<len(proxies):
-                self.proxy_counter += 1
-            else: self.proxy_counter = 0
-            continue
         # intialize widget payloads
         self.token_payload = dict()
         self.interest_over_time_widget = dict()
@@ -102,7 +95,6 @@ class TrendReq(object):
             if self.proxy_counter<len(self.proxies):
                 self.proxy_counter += 1
             else: self.proxy_counter = 0
-            continue
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
