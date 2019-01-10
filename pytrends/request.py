@@ -55,13 +55,12 @@ class TrendReq(object):
         self.backoff_factor = backoff_factor
         self.proxy_counter = 0
         #proxies format: {"https": "https://192.168.0.1:8888"}
-        try:
-            self.cookies = dict(filter(
-                lambda i: i[0] == 'NID',
-                requests.get(
-                    'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
-                ).cookies.items()
-            ))
+        self.cookies = dict(filter(
+            lambda i: i[0] == 'NID',
+            requests.get(
+                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
+            ).cookies.items()
+        ))
         # intialize widget payloads
         self.token_payload = dict()
         self.interest_over_time_widget = dict()
