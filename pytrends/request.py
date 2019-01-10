@@ -79,7 +79,7 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
-        retry = Retry(total=retries, read=retries, connect=retries, backoff_factor=backoff_factor)
+        retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if self.proxies != '':
