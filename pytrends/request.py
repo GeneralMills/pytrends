@@ -86,9 +86,9 @@ class TrendReq(object):
             s.proxies.update(self.proxies[self.proxy_counter])
         try:
             if method == TrendReq.POST_METHOD:
-                response = s.post(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter], **kwargs)
+                response = s.post(url, cookies=self.cookies, proxies={'https':'https://'+ self.proxies[self.proxy_counter]}, **kwargs)
             else:
-                response = s.get(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter], **kwargs)
+                response = s.get(url, cookies=self.cookies, proxies={'https':'https://'+ self.proxies[self.proxy_counter]}, **kwargs)
         except requests.exceptions.ProxyError:
             print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter], self.proxies[self.proxy_counter]))
             if self.proxy_counter<len(self.proxies):
