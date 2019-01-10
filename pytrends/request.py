@@ -53,15 +53,22 @@ class TrendReq(object):
         self.proxies = proxies #add a proxy option
         self.retries = retries
         self.backoff_factor = backoff_factor
+        self.proxy_counter = 0
         #proxies format: {"https": "https://192.168.0.1:8888"}
-        self.cookies = dict(filter(
-            lambda i: i[0] == 'NID',
-            requests.get(
-                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
-                proxies=proxies
-            ).cookies.items()
-        ))
-
+        try:
+            self.cookies = dict(filter(
+                lambda i: i[0] == 'NID',
+                requests.get(
+                    'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
+                    proxies=proxies[self.proxy_counter].proxy
+                ).cookies.items()
+            ))
+        except requests.exceptions.ProxyError:
+            print('Proxy {} error. Swiching to proxy {}'.format(proxies[self.proxy_counter].proxy), proxies[self.proxy_counter+1].proxy))
+            if self.proxy_counter<len(proxies):
+                self.proxy_counter += 1
+            else: self.proxy_counter = 0
+            continue
         # intialize widget payloads
         self.token_payload = dict()
         self.interest_over_time_widget = dict()
