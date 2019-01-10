@@ -91,11 +91,11 @@ class TrendReq(object):
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if self.proxies != '':
-            s.proxies.update(self.proxies)
+            s.proxies.update(self.proxies[self.proxy_counter].proxy)
         if method == TrendReq.POST_METHOD:
-            response = s.post(url, cookies=self.cookies, **kwargs)
+            response = s.post(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter].proxy, **kwargs)
         else:
-            response = s.get(url, cookies=self.cookies, **kwargs)
+            response = s.get(url, cookies=self.cookies, proxies=self.proxies[self.proxy_counter].proxy, **kwargs)
 
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
