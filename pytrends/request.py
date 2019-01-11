@@ -86,30 +86,14 @@ class TrendReq(object):
             proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
             s.proxies.update(proxy)
             if method == TrendReq.POST_METHOD:
-                try:
-                    response = s.post(url, cookies=self.cookies, proxies=proxy, **kwargs)
-                except requests.exceptions.ProxyError:
-                    print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter], self.proxies[self.proxy_counter+1]))
-                    if self.proxy_counter<len(self.proxies):
-                        self.proxy_counter += 1
-                    else: self.proxy_counter = 0
-                    self._get_data(url, method, trim_chars, **kwargs)
-                    return
+                response = s.post(url, cookies=self.cookies, proxies=proxy, **kwargs)
             else:
-                try:
-                    response = s.get(url, cookies=self.cookies, proxies=proxy, **kwargs)
-                except requests.exceptions.ProxyError:
-                    print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter], self.proxies[self.proxy_counter+1]))
-                    if self.proxy_counter<len(self.proxies):
-                        self.proxy_counter += 1
-                    else: self.proxy_counter = 0
-                    self._get_data(url, method, trim_chars, **kwargs)
-                    return
+                response = s.get(url, cookies=self.cookies, proxies=proxy, **kwargs)
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
         # and sometimes even 'text/javascript
-        if 'application/json' in response.headers['Content-Type'] or \
+        if response.status_code == 200 and 'application/json' in response.headers['Content-Type'] or \
             'application/javascript' in response.headers['Content-Type'] or \
                 'text/javascript' in response.headers['Content-Type']:
 
@@ -156,7 +140,7 @@ class TrendReq(object):
             params=self.token_payload,
             trim_chars=4,
         )['widgets']
-
+        
         # order of the json matters...
         first_region_token = True
         # clear self.related_queries_widget_list and self.related_topics_widget_list
