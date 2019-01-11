@@ -89,10 +89,6 @@ class TrendReq(object):
                 response = s.post(url, cookies=self.cookies, proxies=proxy, **kwargs)
             else:
                 response = s.get(url, cookies=self.cookies, proxies=proxy, **kwargs)
-        if self.proxy_counter < len(self.proxies)-1:
-            self.proxy_counter += 1
-        else:
-            self.proxy_counter = 0
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
@@ -111,8 +107,9 @@ class TrendReq(object):
         else:
             # this is often the case when the amount of keywords in the payload for the IP
             # is not allowed by Google
-            raise exceptions.ResponseError('The request failed: Google returned a '
-                                           'response with code {0}.'.format(response.status_code), response=response)
+            #raise exceptions.ResponseError('The request failed: Google returned a '
+            #                               'response with code {0}.'.format(response.status_code), response=response)
+            return False
 
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
