@@ -114,7 +114,7 @@ class TrendReq(object):
     def ChangeIP(proxies):
         if self.proxy_counter > len(proxies)-1:
             self.proxy_counter += 1
-        else
+        else:
             self.proxy_counter = 0
             print('loop')
     
