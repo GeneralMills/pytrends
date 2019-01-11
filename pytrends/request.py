@@ -110,7 +110,14 @@ class TrendReq(object):
             #raise exceptions.ResponseError('The request failed: Google returned a '
             #                               'response with code {0}.'.format(response.status_code), response=response)
             return False
-
+    
+    def ChangeIP(proxies):
+        if self.proxy_counter > len(proxies)-1:
+            self.proxy_counter += 1
+        else
+            self.proxy_counter = 0
+            print('loop')
+    
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
         self.kw_list = kw_list
