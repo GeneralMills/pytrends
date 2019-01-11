@@ -55,10 +55,13 @@ class TrendReq(object):
         self.backoff_factor = backoff_factor
         self.proxy_counter = 0
         #proxies format: {"https": "https://192.168.0.1:8888"}
+        if len(self.proxies) > 0:
+            proxies = {'https':'https://'+ self.proxies[self.proxy_counter]}
         self.cookies = dict(filter(
             lambda i: i[0] == 'NID',
             requests.get(
-                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
+                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
+                proxies=proxies
             ).cookies.items()
         ))
         # intialize widget payloads
@@ -85,6 +88,13 @@ class TrendReq(object):
         if len(self.proxies) > 0:
             proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
             s.proxies.update(proxy)
+            self.cookies = dict(filter(
+                lambda i: i[0] == 'NID',
+                requests.get(
+                    'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
+                    proxies=proxy
+                ).cookies.items()
+            ))
         if method == TrendReq.POST_METHOD:
             response = s.post(url, cookies=self.cookies, **kwargs)
         else:
@@ -111,8 +121,8 @@ class TrendReq(object):
             #                               'response with code {0}.'.format(response.status_code), response=response)
             return False
     
-    def ChangeIP(proxies):
-        if self.proxy_counter > len(proxies)-1:
+    def GetNewIP(self):
+        if self.proxy_counter > len(self.proxies)-1:
             self.proxy_counter += 1
         else:
             self.proxy_counter = 0
