@@ -85,10 +85,10 @@ class TrendReq(object):
         if len(self.proxies) > 0:
             proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
             s.proxies.update(proxy)
-            if method == TrendReq.POST_METHOD:
-                response = s.post(url, cookies=self.cookies, **kwargs)
-            else:
-                response = s.get(url, cookies=self.cookies, **kwargs)
+        if method == TrendReq.POST_METHOD:
+            response = s.post(url, cookies=self.cookies, **kwargs)
+        else:
+            response = s.get(url, cookies=self.cookies, **kwargs)
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
