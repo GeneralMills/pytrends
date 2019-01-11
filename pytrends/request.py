@@ -78,22 +78,24 @@ class TrendReq(object):
         :param kwargs: any extra key arguments passed to the request builder (usually query parameters or data)
         :return:
         """
+        proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
         s = requests.session()
         retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if self.proxies != '':
-            s.proxies.update(self.proxies[self.proxy_counter])
+            s.proxies.update(proxy)
         try:
             if method == TrendReq.POST_METHOD:
-                response = s.post(url, cookies=self.cookies, proxies={'https':'https://'+ self.proxies[self.proxy_counter]}, **kwargs)
+                response = s.post(url, cookies=self.cookies, proxies=proxy, **kwargs)
             else:
-                response = s.get(url, cookies=self.cookies, proxies={'https':'https://'+ self.proxies[self.proxy_counter]}, **kwargs)
+                response = s.get(url, cookies=self.cookies, proxies=proxy, **kwargs)
         except requests.exceptions.ProxyError:
             print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter], self.proxies[self.proxy_counter]))
             if self.proxy_counter<len(self.proxies):
                 self.proxy_counter += 1
             else: self.proxy_counter = 0
+            self._get_data(url, GET_METHOD, trim_chars, kwargs)
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
