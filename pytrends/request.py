@@ -85,17 +85,17 @@ class TrendReq(object):
         s.headers.update({'accept-language': self.hl})
         if self.proxies != '':
             s.proxies.update(proxy)
-        try:
-            if method == TrendReq.POST_METHOD:
-                response = s.post(url, cookies=self.cookies, proxies=proxy, **kwargs)
-            else:
-                response = s.get(url, cookies=self.cookies, proxies=proxy, **kwargs)
-        except requests.exceptions.ProxyError:
-            print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter], self.proxies[self.proxy_counter]))
-            if self.proxy_counter<len(self.proxies):
-                self.proxy_counter += 1
-            else: self.proxy_counter = 0
-            self._get_data(url, method, trim_chars, **kwargs)
+            try:
+                if method == TrendReq.POST_METHOD:
+                    response = s.post(url, cookies=self.cookies, proxies=proxy, **kwargs)
+                else:
+                    response = s.get(url, cookies=self.cookies, proxies=proxy, **kwargs)
+            except requests.exceptions.ProxyError:
+                print('Proxy {} error. Swiching to proxy {}'.format(self.proxies[self.proxy_counter], self.proxies[self.proxy_counter]))
+                if self.proxy_counter<len(self.proxies):
+                    self.proxy_counter += 1
+                else: self.proxy_counter = 0
+                self._get_data(url, method, trim_chars, **kwargs)
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
