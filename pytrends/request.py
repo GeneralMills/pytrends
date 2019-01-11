@@ -78,12 +78,13 @@ class TrendReq(object):
         :param kwargs: any extra key arguments passed to the request builder (usually query parameters or data)
         :return:
         """
-        proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
+        if len(proxies) > 0:
+            proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
         s = requests.session()
         retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
-        if self.proxies != '':
+        if proxy != '':
             s.proxies.update(proxy)
             try:
                 if method == TrendReq.POST_METHOD:
