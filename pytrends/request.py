@@ -89,7 +89,7 @@ class TrendReq(object):
                 response = s.post(url, cookies=self.cookies, proxies=proxy, **kwargs)
             else:
                 response = s.get(url, cookies=self.cookies, proxies=proxy, **kwargs)
-        if self.proxy_counter < len(self.proxies):
+        if self.proxy_counter < len(self.proxies)-1:
             self.proxy_counter += 1
         else:
             self.proxy_counter = 0
