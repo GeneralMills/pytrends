@@ -37,7 +37,7 @@ class TrendReq(object):
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
 
-    def __init__(self, hl='en-US', tz=360, geo='', proxies='', retries=2, backoff_factor=0.1):
+    def __init__(self, hl='en-US', tz=360, geo='', timeout=(2,5), proxies='', retries=2, backoff_factor=0.1):
         """
         Initialize default values for params
         """
@@ -50,6 +50,7 @@ class TrendReq(object):
         self.hl = hl
         self.geo = geo
         self.kw_list = list()
+        self.timeout = timeout
         self.proxies = proxies #add a proxy option
         self.retries = retries
         self.backoff_factor = backoff_factor
@@ -68,7 +69,7 @@ class TrendReq(object):
             try:
                 return dict(filter(lambda i: i[0] == 'NID',requests.get(
                     'https://trends.google.com/?geo={geo}'.format(geo=self.hl[-2:]),
-                    timeout=(self.retries,2**self.retries),
+                    timeout=self.timeout,
                     proxies={'https':'http://'+ self.proxies[self.proxy_counter]}
                 ).cookies.items()))
             except requests.exceptions.ProxyError:
@@ -100,14 +101,14 @@ class TrendReq(object):
         retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
+        self.cookies = GetGoogleCookie()
         if len(self.proxies) > 0:
-            self.cookies = GetGoogleCookie()
-            proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
-            s.proxies.update(proxy)
+            s.proxies.update({'https':'https://'+ self.proxies[self.proxy_counter]})
+            s.timeout.update(self.timeout)
         if method == TrendReq.POST_METHOD:
             response = s.post(url, cookies=self.cookies, **kwargs)
         else:
-            response = s.get(url, cookies=self.cookies, **kwargs)
+            response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
