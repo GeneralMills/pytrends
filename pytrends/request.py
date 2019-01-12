@@ -66,7 +66,11 @@ class TrendReq(object):
     def GetGoogleCookie(self):
         while True:
             try:
-                resp = requests.get('https://trends.google.com/?geo={geo}'.format(geo=self.hl[-2:]),timeout=(self.retries,2**self.retries),proxies={'https':'https://'+ self.proxies[self.proxy_counter]})
+                resp = requests.get(
+                    'https://trends.google.com/?geo={geo}'.format(geo=self.hl[-2:]),
+                    timeout=(self.retries,2**self.retries),
+                    proxies={'https':'http://'+ self.proxies[self.proxy_counter]}
+                )
                 if resp.status_code == 200:
                     break
             except requests.exceptions.ProxyError:
