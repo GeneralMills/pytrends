@@ -55,9 +55,7 @@ class TrendReq(object):
         self.backoff_factor = backoff_factor
         self.proxy_counter = 0
         #proxies format: {"https": "https://192.168.0.1:8888"}
-        if len(self.proxies) > 0:
-            proxies = {'https':'https://'+ self.proxies[self.proxy_counter]}
-        self.cookies = self.GetGoogleCookie(proxies)
+        self.cookies = self.GetGoogleCookie()
         # intialize widget payloads
         self.token_payload = dict()
         self.interest_over_time_widget = dict()
@@ -65,25 +63,26 @@ class TrendReq(object):
         self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
     
-    def GetGoogleCookie(self, proxies):
+    def GetGoogleCookie(self):
         while True:
             try:
-                resp = requests.get('https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),timeout=(retries,2**retries),proxies=proxies)
+                resp = requests.get('https://trends.google.com/?geo={geo}'.format(geo=self.hl[-2:]),timeout=(self.retries,2**self.retries),proxies={'https':'https://'+ self.proxies[self.proxy_counter]})
                 if resp.status_code == 200:
                     break
             except requests.exceptions.ProxyError:
                 print('Proxy error. Changing IP')
-                #TODO: remove proxy from list
-                self.proxies.remove(self.proxies[self.proxy_counter])
-                self.GetNewIP(0)
+                if len(self.proxies)>0:
+                    self.proxies.remove(self.proxies[self.proxy_counter])
+                else:
+                    print('Proxy list is empty. Bye!')
                 continue
         
         return dict(filter(lambda i: i[0] == 'NID',resp.cookies.items()))
     
-    def GetNewIP(self, flag):
-        if flag!=0 and self.proxy_counter > len(self.proxies)-1:
+    def GetNewIP(self):
+        if self.proxy_counter > len(self.proxies)-1:
             self.proxy_counter += 1
-        elif flag!=0:
+        else:
             self.proxy_counter = 0
             print('loop')
     
@@ -102,9 +101,9 @@ class TrendReq(object):
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if len(self.proxies) > 0:
+            self.cookies = GetGoogleCookie()
             proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
             s.proxies.update(proxy)
-            self.cookies = GetGoogleCookie(proxy)
         if method == TrendReq.POST_METHOD:
             response = s.post(url, cookies=self.cookies, **kwargs)
         else:
