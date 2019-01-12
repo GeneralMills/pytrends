@@ -57,21 +57,36 @@ class TrendReq(object):
         #proxies format: {"https": "https://192.168.0.1:8888"}
         if len(self.proxies) > 0:
             proxies = {'https':'https://'+ self.proxies[self.proxy_counter]}
-        self.cookies = dict(filter(
-            lambda i: i[0] == 'NID',
-            requests.get(
-                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
-                timeout=(retries,2**retries),
-                proxies=proxies
-            ).cookies.items()
-        ))
+        self.cookies = self.GetGoogleCookie(proxies)
         # intialize widget payloads
         self.token_payload = dict()
         self.interest_over_time_widget = dict()
         self.interest_by_region_widget = dict()
         self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
-
+    
+    def GetGoogleCookie(self, proxies):
+        while True:
+            try:
+                resp = requests.get('https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),timeout=(retries,2**retries),proxies=proxies)
+                if resp.status_code == 200:
+                    break
+            except requests.exceptions.ProxyError:
+                print('Proxy error. Changing IP')
+                #TODO: remove proxy from list
+                self.proxies.remove(self.proxies[self.proxy_counter])
+                self.GetNewIP(0)
+                continue
+        
+        return dict(filter(lambda i: i[0] == 'NID',resp.cookies.items()))
+    
+    def GetNewIP(self, flag):
+        if flag!=0 and self.proxy_counter > len(self.proxies)-1:
+            self.proxy_counter += 1
+        elif flag!=0:
+            self.proxy_counter = 0
+            print('loop')
+    
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
 
@@ -89,14 +104,7 @@ class TrendReq(object):
         if len(self.proxies) > 0:
             proxy = {'https':'https://'+ self.proxies[self.proxy_counter]}
             s.proxies.update(proxy)
-            self.cookies = dict(filter(
-                lambda i: i[0] == 'NID',
-                requests.get(
-                    'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
-                    timeout=(retries,2**retries),
-                    proxies=proxy
-                ).cookies.items()
-            ))
+            self.cookies = GetGoogleCookie(proxy)
         if method == TrendReq.POST_METHOD:
             response = s.post(url, cookies=self.cookies, **kwargs)
         else:
@@ -122,13 +130,6 @@ class TrendReq(object):
             #raise exceptions.ResponseError('The request failed: Google returned a '
             #                               'response with code {0}.'.format(response.status_code), response=response)
             return False
-    
-    def GetNewIP(self):
-        if self.proxy_counter > len(self.proxies)-1:
-            self.proxy_counter += 1
-        else:
-            self.proxy_counter = 0
-            print('loop')
     
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
