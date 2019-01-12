@@ -65,7 +65,7 @@ class TrendReq(object):
     
     def GetGoogleCookie(self):
         while True:
-            if len(self.proxies) > 0: proxy={'https':'http://'+ self.proxies[self.proxy_counter]}
+            if len(self.proxies) > 0: proxy={'https':self.proxies[self.proxy_counter]}
             else: proxy=''
             try:
                 return dict(filter(lambda i: i[0] == 'NID',requests.get(
