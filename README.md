@@ -54,7 +54,25 @@ or if you want to use proxies as you are blocked due to Google rate limit:
 
     from pytrends.request import TrendReq
 
-    pytrends = TrendReq(hl='en-US', tz=360, proxies = {'https': 'https://34.203.233.13:80'}, retries=2, backoff_factor=0.1)
+    pytrends = TrendReq(hl='en-US', tz=360, timeout=(10,25), proxies=['34.203.233.13:80',], retries=2, backoff_factor=0.1)
+
+* `timeout(connect, read)`
+
+  - Timezone Offset
+  - For example US CST is ```'360'```
+
+* `proxies`
+
+  - https proxies Google passed ONLY
+  - list ```['34.203.233.13:80','35.201.123.31:880', ..., ...]```
+  
+* `retries`
+
+  - number of retries total/connect/read all represented by one scalar
+
+* `backoff_factor`
+
+  - A backoff factor to apply between attempts after the second try (most errors are resolved immediately by a second try without a delay). urllib3 will sleep for: ```{backoff factor} * (2 ^ ({number of total retries} - 1))``` seconds. If the backoff_factor is 0.1, then sleep() will sleep for [0.0s, 0.2s, 0.4s, …] between retries. It will never be longer than Retry.BACKOFF_MAX. By default, backoff is disabled (set to 0).
 
 Note: only https proxies will work, and you need to add the port number after the proxy ip address
 
