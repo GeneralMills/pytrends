@@ -81,7 +81,7 @@ class TrendReq(object):
                     print('Proxy list is empty. Bye!')
                 continue
     
-    def GetNewIP(self):
+    def GetNewProxy(self):
         if self.proxy_counter > len(self.proxies)-1:
             self.proxy_counter += 1
         else:
@@ -123,6 +123,7 @@ class TrendReq(object):
             content = response.text[trim_chars:]
 
             # parse json
+            self.GetNewProxy()
             return json.loads(content)
         else:
             # this is often the case when the amount of keywords in the payload for the IP
