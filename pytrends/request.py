@@ -61,6 +61,7 @@ class TrendReq(object):
             lambda i: i[0] == 'NID',
             requests.get(
                 'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
+                timeout=(retries,2**retries),
                 proxies=proxies
             ).cookies.items()
         ))
@@ -92,6 +93,7 @@ class TrendReq(object):
                 lambda i: i[0] == 'NID',
                 requests.get(
                     'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
+                    timeout=(retries,2**retries),
                     proxies=proxy
                 ).cookies.items()
             ))
