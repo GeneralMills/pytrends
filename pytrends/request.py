@@ -66,11 +66,13 @@ class TrendReq(object):
     
     def GetGoogleCookie(self):
         while True:
+            if len(self.proxies) > 0: proxy={'https':'http://'+ self.proxies[self.proxy_counter]}
+            else: proxy=''
             try:
                 return dict(filter(lambda i: i[0] == 'NID',requests.get(
                     'https://trends.google.com/?geo={geo}'.format(geo=self.hl[-2:]),
                     timeout=self.timeout,
-                    proxies={'https':'http://'+ self.proxies[self.proxy_counter]}
+                    proxies=proxy
                 ).cookies.items()))
             except requests.exceptions.ProxyError:
                 print('Proxy error. Changing IP')
