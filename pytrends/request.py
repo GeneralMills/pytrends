@@ -103,7 +103,7 @@ class TrendReq(object):
         retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
         adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
-        self.cookies = GetGoogleCookie()
+        self.cookies = self.GetGoogleCookie()
         if len(self.proxies) > 0:
             s.proxies.update({'https':'https://'+ self.proxies[self.proxy_counter]})
             s.timeout.update(self.timeout)
