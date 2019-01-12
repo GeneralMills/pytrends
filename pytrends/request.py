@@ -108,7 +108,7 @@ class TrendReq(object):
         if method == TrendReq.POST_METHOD:
             response = s.post(url, timeout=self.timeout, cookies=self.cookies, **kwargs)
         else:
-            response = s.get(url, timeout=self.timeout, timeout=self.timeout, cookies=self.cookies, **kwargs)
+            response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
