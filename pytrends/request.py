@@ -37,14 +37,13 @@ class TrendReq(object):
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
 
-    def __init__(self, hl='en-US', tz=360, geo='', timeout=(2,5), proxies='', retries=2, backoff_factor=0.1):
+    def __init__(self, hl='en-US', tz=360, geo='', timeout=(2,5), proxies='', retries=0, backoff_factor=0):
         """
         Initialize default values for params
         """
         # google rate limit
         self.google_rl = 'You have reached your quota limit. Please try again later.'
         self.results = None
-
         # set user defined options used globally
         self.tz = tz
         self.hl = hl
@@ -87,7 +86,6 @@ class TrendReq(object):
             self.proxy_counter += 1
         else:
             self.proxy_counter = 0
-            print('loop')
     
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
@@ -100,8 +98,9 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
-        retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
-        adapter = HTTPAdapter(max_retries=retry)
+        if self.retries > 0 and self.backoff_factor > 0:
+            retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
+            adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         self.cookies = self.GetGoogleCookie()
         if len(self.proxies) > 0:
