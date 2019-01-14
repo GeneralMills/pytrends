@@ -194,7 +194,7 @@ class TrendReq(object):
 		}
 
 		# make the request and parse the returned json
-			req_json = self._get_data(
+		req_json = self._get_data(
 			url=TrendReq.INTEREST_OVER_TIME_URL,
 			method=TrendReq.GET_METHOD,
 			trim_chars=5,
