@@ -366,9 +366,9 @@ class TrendReq(object):
 		# parse the returned json
 		sub_df = pd.DataFrame()
 		for trenddate in req_json:
-		sub_df['date'] = trenddate['date']
-		for trend in trenddate['trendsList']:
-		sub_df = sub_df.append(trend, ignore_index=True)
+			sub_df['date'] = trenddate['date']
+			for trend in trenddate['trendsList']:
+				sub_df = sub_df.append(trend, ignore_index=True)
 		result_df = pd.concat([result_df, sub_df])
 		return result_df
 
@@ -387,11 +387,9 @@ class TrendReq(object):
 
 	def suggestions(self, keyword):
 		"""Request data from Google's Keyword Suggestion dropdown and return a dictionary"""
-
 		# make the request
 		kw_param = quote(keyword)
 		parameters = {'hl': self.hl}
-
 		req_json = self._get_data(
 			url=TrendReq.SUGGESTIONS_URL + kw_param,
 			params=parameters,
@@ -413,29 +411,22 @@ class TrendReq(object):
 
 	def get_historical_interest(self, keywords, year_start=2018, month_start=1, day_start=1, hour_start=0, year_end=2018, month_end=2, day_end=1, hour_end= 0, cat=0, geo='', gprop='', sleep=0):
 		"""Gets historical hourly data for interest by chunking requests to 1 week at a time (which is what Google allows)"""
-
 		# construct datetime obejcts - raises ValueError if invalid parameters
 		start_date = datetime(year_start, month_start, day_start, hour_start)
 		end_date = datetime(year_end, month_end, day_end, hour_end)
-
 		# the timeframe has to be in 1 week intervals or Google will reject it
 		delta = timedelta(days=7)
-
 		df = pd.DataFrame()
-
 		date_iterator = start_date
 		date_iterator += delta
-
 		while True:
 		if (date_iterator > end_date):
 			# has retrieved all of the data
 			break
-
 		# format date to comply with API call
 		start_date_str = start_date.strftime('%Y-%m-%dT%H')
 		date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
 		tf = start_date_str + ' ' + date_iterator_str
-
 		try:
 			self.build_payload(keywords,cat, tf, geo, gprop)
 			week_df = self.interest_over_time()
@@ -443,12 +434,9 @@ class TrendReq(object):
 		except Exception as e:
 			print(e)
 			pass
-
 		start_date += delta
 		date_iterator += delta
-
 		# just in case you are rate-limited by Google. Recommended is 60 if you are.
 		if sleep > 0:
 		time.sleep(sleep)
-
 		return df
