@@ -319,38 +319,38 @@ class TrendReq(object):
 		related_payload = dict()
 		result_dict = dict()
 		for request_json in self.related_queries_widget_list:
-		# ensure we know which keyword we are looking at rather than relying on order
-		kw = request_json['request']['restriction']['complexKeywordsRestriction']['keyword'][0]['value']
-		# convert to string as requests will mangle
-		related_payload['req'] = json.dumps(request_json['request'])
-		related_payload['token'] = request_json['token']
-		related_payload['tz'] = self.tz
+			# ensure we know which keyword we are looking at rather than relying on order
+			kw = request_json['request']['restriction']['complexKeywordsRestriction']['keyword'][0]['value']
+			# convert to string as requests will mangle
+			related_payload['req'] = json.dumps(request_json['request'])
+			related_payload['token'] = request_json['token']
+			related_payload['tz'] = self.tz
 
-		# parse the returned json
-		req_json = self._get_data(
-		url=TrendReq.RELATED_QUERIES_URL,
-		method=TrendReq.GET_METHOD,
-		trim_chars=5,
-		params=related_payload,
-		)
+			# parse the returned json
+			req_json = self._get_data(
+				url=TrendReq.RELATED_QUERIES_URL,
+				method=TrendReq.GET_METHOD,
+				trim_chars=5,
+				params=related_payload,
+			)
 
-		# top queries
-		try:
-		top_df = pd.DataFrame(req_json['default']['rankedList'][0]['rankedKeyword'])
-		top_df = top_df[['query', 'value']]
-		except KeyError:
-		# in case no top queries are found, the lines above will throw a KeyError
-		top_df = None
+			# top queries
+			try:
+				top_df = pd.DataFrame(req_json['default']['rankedList'][0]['rankedKeyword'])
+				top_df = top_df[['query', 'value']]
+			except KeyError:
+				# in case no top queries are found, the lines above will throw a KeyError
+				top_df = None
 
-		# rising queries
-		try:
-			rising_df = pd.DataFrame(req_json['default']['rankedList'][1]['rankedKeyword'])
-			rising_df = rising_df[['query', 'value']]
-		except KeyError:
-			# in case no rising queries are found, the lines above will throw a KeyError
-			rising_df = None
+			# rising queries
+			try:
+				rising_df = pd.DataFrame(req_json['default']['rankedList'][1]['rankedKeyword'])
+				rising_df = rising_df[['query', 'value']]
+			except KeyError:
+				# in case no rising queries are found, the lines above will throw a KeyError
+				rising_df = None
 
-		result_dict[kw] = {'top': top_df, 'rising': rising_df}
+			result_dict[kw] = {'top': top_df, 'rising': rising_df}
 		return result_dict
 
 	def trending_searches(self, pn='p1'):
