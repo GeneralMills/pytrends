@@ -420,9 +420,9 @@ class TrendReq(object):
 		date_iterator = start_date
 		date_iterator += delta
 		while True:
-		if (date_iterator > end_date):
-			# has retrieved all of the data
-			break
+			if (date_iterator > end_date):
+				# has retrieved all of the data
+				break
 		# format date to comply with API call
 		start_date_str = start_date.strftime('%Y-%m-%dT%H')
 		date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
