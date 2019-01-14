@@ -146,8 +146,8 @@ class TrendReq(object):
 		}
 		# build out json for each keyword
 		for kw in self.kw_list:
-		keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': self.geo}
-		self.token_payload['req']['comparisonItem'].append(keyword_payload)
+			keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': self.geo}
+			self.token_payload['req']['comparisonItem'].append(keyword_payload)
 		# requests will mangle this if it is not a string
 		self.token_payload['req'] = json.dumps(self.token_payload['req'])
 		# get tokens
@@ -172,16 +172,16 @@ class TrendReq(object):
 		self.related_topics_widget_list[:] = []
 		# assign requests
 		for widget in widget_dict:
-		if widget['id'] == 'TIMESERIES':
-			self.interest_over_time_widget = widget
-		if widget['id'] == 'GEO_MAP' and first_region_token:
-			self.interest_by_region_widget = widget
-		first_region_token = False
-		# response for each term, put into a list
-		if 'RELATED_TOPICS' in widget['id']:
-			self.related_topics_widget_list.append(widget)
-		if 'RELATED_QUERIES' in widget['id']:
-			self.related_queries_widget_list.append(widget)
+			if widget['id'] == 'TIMESERIES':
+				self.interest_over_time_widget = widget
+			if widget['id'] == 'GEO_MAP' and first_region_token:
+				self.interest_by_region_widget = widget
+				first_region_token = False
+			# response for each term, put into a list
+			if 'RELATED_TOPICS' in widget['id']:
+				self.related_topics_widget_list.append(widget)
+			if 'RELATED_QUERIES' in widget['id']:
+				self.related_queries_widget_list.append(widget)
 		return
 
 	def interest_over_time(self):
@@ -202,28 +202,28 @@ class TrendReq(object):
 		)
 		df = pd.DataFrame(req_json['default']['timelineData'])
 		if (df.empty):
-		return df
+			return df
 		df['date'] = pd.to_datetime(df['time'].astype(dtype='float64'), unit='s')
 		df = df.set_index(['date']).sort_index()
 		# split list columns into seperate ones, remove brackets and split on comma
 		result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
 		# rename each column with its search term, relying on order that google provides...
 		for idx, kw in enumerate(self.kw_list):
-		# there is currently a bug with assigning columns that may be
-		# parsed as a date in pandas: use explicit insert column method
-		result_df.insert(len(result_df.columns), kw, result_df[idx].astype('int'))
-		del result_df[idx]
+			# there is currently a bug with assigning columns that may be
+			# parsed as a date in pandas: use explicit insert column method
+			result_df.insert(len(result_df.columns), kw, result_df[idx].astype('int'))
+			del result_df[idx]
 		if 'isPartial' in df:
-		# make other dataframe from isPartial key data
-		# split list columns into seperate ones, remove brackets and split on comma
-		df = df.fillna(False)
-		result_df2 = df['isPartial'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
-		result_df2.columns = ['isPartial']
-		# concatenate the two dataframes
-		final = pd.concat([result_df, result_df2], axis=1)
+			# make other dataframe from isPartial key data
+			# split list columns into seperate ones, remove brackets and split on comma
+			df = df.fillna(False)
+			result_df2 = df['isPartial'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
+			result_df2.columns = ['isPartial']
+			# concatenate the two dataframes
+			final = pd.concat([result_df, result_df2], axis=1)
 		else:
-		final = result_df
-		final['isPartial'] = False
+			final = result_df
+			final['isPartial'] = False
 		return final
 
 	def interest_by_region(self, resolution='COUNTRY', inc_low_vol=False, inc_geo_code=False):
