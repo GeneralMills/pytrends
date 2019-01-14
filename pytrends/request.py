@@ -423,20 +423,20 @@ class TrendReq(object):
 			if (date_iterator > end_date):
 				# has retrieved all of the data
 				break
-		# format date to comply with API call
-		start_date_str = start_date.strftime('%Y-%m-%dT%H')
-		date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
-		tf = start_date_str + ' ' + date_iterator_str
-		try:
-			self.build_payload(keywords,cat, tf, geo, gprop)
-			week_df = self.interest_over_time()
-			df = df.append(week_df)
-		except Exception as e:
-			print(e)
-			pass
-		start_date += delta
-		date_iterator += delta
-		# just in case you are rate-limited by Google. Recommended is 60 if you are.
-		if sleep > 0:
-		time.sleep(sleep)
+			# format date to comply with API call
+			start_date_str = start_date.strftime('%Y-%m-%dT%H')
+			date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+			tf = start_date_str + ' ' + date_iterator_str
+			try:
+				self.build_payload(keywords,cat, tf, geo, gprop)
+				week_df = self.interest_over_time()
+				df = df.append(week_df)
+			except Exception as e:
+				print(e)
+				pass
+			start_date += delta
+			date_iterator += delta
+			# just in case you are rate-limited by Google. Recommended is 60 if you are.
+			if sleep > 0:
+				time.sleep(sleep)
 		return df
