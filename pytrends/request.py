@@ -50,11 +50,10 @@ class TrendReq(object):
         self.geo = geo
         self.kw_list = list()
         self.timeout = timeout
-        self.proxies = proxies #add a proxy option
+        self.proxies = proxies	#	add a proxy option
         self.retries = retries
         self.backoff_factor = backoff_factor
-        self.proxy_counter = 0
-        #proxies format: {"https": "https://192.168.0.1:8888"}
+        self.proxy_index = 0
         self.cookies = self.GetGoogleCookie()
         # intialize widget payloads
         self.token_payload = dict()
@@ -64,8 +63,12 @@ class TrendReq(object):
         self.related_queries_widget_list = list()
     
     def GetGoogleCookie(self):
+		"""
+		Gets google cookie (used for each and every proxy; once on init otherwise)
+		Removes proxy from the list on proxy error
+		"""
         while True:
-            if len(self.proxies) > 0: proxy={'https':self.proxies[self.proxy_counter]}
+            if len(self.proxies) > 0: proxy={'https':self.proxies[self.proxy_index]}
             else: proxy=''
             try:
                 return dict(filter(lambda i: i[0] == 'NID',requests.get(
@@ -76,16 +79,19 @@ class TrendReq(object):
             except requests.exceptions.ProxyError:
                 print('Proxy error. Changing IP')
                 if len(self.proxies)>0:
-                    self.proxies.remove(self.proxies[self.proxy_counter])
+                    self.proxies.remove(self.proxies[self.proxy_index])
                 else:
                     print('Proxy list is empty. Bye!')
                 continue
     
     def GetNewProxy(self):
-        if self.proxy_counter > len(self.proxies)-1:
-            self.proxy_counter += 1
+		"""
+		Increment proxy INDEX; zero on overflow
+		"""
+        if self.proxy_index > len(self.proxies)-1:
+            self.proxy_index += 1
         else:
-            self.proxy_counter = 0
+            self.proxy_index = 0
     
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
@@ -98,17 +104,18 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
-        if self.retries > 0 and self.backoff_factor > 0:
+		#	Retries mechanism. Activated when one of statements >0 (best used for proxy)
+        if self.retries > 0 or self.backoff_factor > 0:
             retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
             adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
-        self.cookies = self.GetGoogleCookie()
         if len(self.proxies) > 0:
-            s.proxies.update({'https':self.proxies[self.proxy_counter]})
+			self.cookies = self.GetGoogleCookie()	#	reset google cookie for proxy
+            s.proxies.update({'https':self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
-            response = s.post(url, timeout=self.timeout, cookies=self.cookies, **kwargs)
+            response = s.post(url, timeout=self.timeout, cookies=self.cookies **kwargs)	#	DO NOT USE retries or backoff_factor here
         else:
-            response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)
+            response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)	#	DO NOT USE retries or backoff_factor here
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
@@ -126,11 +133,9 @@ class TrendReq(object):
             self.GetNewProxy()
             return json.loads(content)
         else:
-            # this is often the case when the amount of keywords in the payload for the IP
-            # is not allowed by Google
-            #raise exceptions.ResponseError('The request failed: Google returned a '
-            #                               'response with code {0}.'.format(response.status_code), response=response)
-            return False
+			#	error
+            raise exceptions.ResponseError('The request failed: Google returned a '
+                                           'response with code {0}.'.format(response.status_code), response=response)
     
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
