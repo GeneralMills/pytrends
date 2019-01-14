@@ -63,10 +63,10 @@ class TrendReq(object):
         self.related_queries_widget_list = list()
     
     def GetGoogleCookie(self):
-		"""
-		Gets google cookie (used for each and every proxy; once on init otherwise)
-		Removes proxy from the list on proxy error
-		"""
+	"""
+	Gets google cookie (used for each and every proxy; once on init otherwise)
+	Removes proxy from the list on proxy error
+	"""
         while True:
             if len(self.proxies) > 0: proxy={'https':self.proxies[self.proxy_index]}
             else: proxy=''
@@ -85,9 +85,9 @@ class TrendReq(object):
                 continue
     
     def GetNewProxy(self):
-		"""
-		Increment proxy INDEX; zero on overflow
-		"""
+	"""
+	Increment proxy INDEX; zero on overflow
+	"""
         if self.proxy_index > len(self.proxies)-1:
             self.proxy_index += 1
         else:
@@ -104,18 +104,18 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
-		#	Retries mechanism. Activated when one of statements >0 (best used for proxy)
+	#	Retries mechanism. Activated when one of statements >0 (best used for proxy)
         if self.retries > 0 or self.backoff_factor > 0:
-            retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
-            adapter = HTTPAdapter(max_retries=retry)
+		retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
+		adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if len(self.proxies) > 0:
-			self.cookies = self.GetGoogleCookie()	#	reset google cookie for proxy
-            s.proxies.update({'https':self.proxies[self.proxy_index]})
+		self.cookies = self.GetGoogleCookie()	#	reset google cookie for proxy
+		s.proxies.update({'https':self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
-            response = s.post(url, timeout=self.timeout, cookies=self.cookies **kwargs)	#	DO NOT USE retries or backoff_factor here
+		response = s.post(url, timeout=self.timeout, cookies=self.cookies **kwargs)	#	DO NOT USE retries or backoff_factor here
         else:
-            response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)	#	DO NOT USE retries or backoff_factor here
+		response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)	#	DO NOT USE retries or backoff_factor here
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
