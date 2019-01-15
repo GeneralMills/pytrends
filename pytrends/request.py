@@ -100,18 +100,18 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
-        #   Retries mechanism. Activated when one of statements >0 (best used for proxy)
+        # Retries mechanism. Activated when one of statements >0 (best used for proxy)
         if self.retries > 0 or self.backoff_factor > 0:
             retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
             adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if len(self.proxies) > 0:
-	    self.cookies = self.GetGoogleCookie()	#	reset google cookie for proxy
+	    self.cookies = self.GetGoogleCookie()   # reset google cookie for proxy
             s.proxies.update({'https':self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
-            response = s.post(url, timeout=self.timeout, cookies=self.cookies **kwargs)	#	DO NOT USE retries or backoff_factor here
+            response = s.post(url, timeout=self.timeout, cookies=self.cookies **kwargs)    # DO NOT USE retries or backoff_factor here
         else:
-            response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)	#	DO NOT USE retries or backoff_factor here
+            response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)    # DO NOT USE retries or backoff_factor here
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
@@ -127,7 +127,7 @@ class TrendReq(object):
             self.GetNewProxy()
             return json.loads(content)
         else:
-	    #	error
+	    # error
             raise exceptions.ResponseError('The request failed: Google returned a '
                                            'response with code {0}.'.format(response.status_code), response=response)
     
