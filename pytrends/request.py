@@ -63,10 +63,10 @@ class TrendReq(object):
         self.related_queries_widget_list = list()
     
     def GetGoogleCookie(self):
-		"""
-		Gets google cookie (used for each and every proxy; once on init otherwise)
-		Removes proxy from the list on proxy error
-		"""
+	"""
+	Gets google cookie (used for each and every proxy; once on init otherwise)
+	Removes proxy from the list on proxy error
+	"""
         while True:
             if len(self.proxies) > 0: proxy={'https':self.proxies[self.proxy_index]}
             else: proxy=''
@@ -85,9 +85,9 @@ class TrendReq(object):
                 continue
     
     def GetNewProxy(self):
-		"""
-		Increment proxy INDEX; zero on overflow
-		"""
+	"""
+	Increment proxy INDEX; zero on overflow
+	"""
         if self.proxy_index > len(self.proxies)-1:
             self.proxy_index += 1
         else:
@@ -95,7 +95,6 @@ class TrendReq(object):
     
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
-
         :param url: the url to which the request will be sent
         :param method: the HTTP method ('get' or 'post')
         :param trim_chars: how many characters should be trimmed off the beginning of the content of the response
@@ -104,13 +103,13 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
-		#	Retries mechanism. Activated when one of statements >0 (best used for proxy)
+	#   Retries mechanism. Activated when one of statements >0 (best used for proxy)
         if self.retries > 0 or self.backoff_factor > 0:
             retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
             adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if len(self.proxies) > 0:
-			self.cookies = self.GetGoogleCookie()	#	reset google cookie for proxy
+	    self.cookies = self.GetGoogleCookie()	#	reset google cookie for proxy
             s.proxies.update({'https':self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
             response = s.post(url, timeout=self.timeout, cookies=self.cookies **kwargs)	#	DO NOT USE retries or backoff_factor here
@@ -123,17 +122,15 @@ class TrendReq(object):
         if response.status_code == 200 and 'application/json' in response.headers['Content-Type'] or \
             'application/javascript' in response.headers['Content-Type'] or \
                 'text/javascript' in response.headers['Content-Type']:
-
             # trim initial characters
             # some responses start with garbage characters, like ")]}',"
             # these have to be cleaned before being passed to the json parser
             content = response.text[trim_chars:]
-
             # parse json
             self.GetNewProxy()
             return json.loads(content)
         else:
-			#	error
+	    #	error
             raise exceptions.ResponseError('The request failed: Google returned a '
                                            'response with code {0}.'.format(response.status_code), response=response)
     
