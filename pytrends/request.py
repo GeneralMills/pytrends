@@ -106,7 +106,7 @@ class TrendReq(object):
             adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
         if len(self.proxies) > 0:
-	    self.cookies = self.GetGoogleCookie()   # reset google cookie for proxy
+            self.cookies = self.GetGoogleCookie()
             s.proxies.update({'https':self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
             response = s.post(url, timeout=self.timeout, cookies=self.cookies **kwargs)    # DO NOT USE retries or backoff_factor here
