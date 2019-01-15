@@ -19,15 +19,12 @@ if sys.version_info[0] == 2:  # Python 2
 else:  # Python 3
     from urllib.parse import quote
 
-
 class TrendReq(object):
     """
     Google Trends API
     """
-
     GET_METHOD = 'get'
     POST_METHOD = 'post'
-
     GENERAL_URL = 'https://trends.google.com/trends/api/explore'
     INTEREST_OVER_TIME_URL = 'https://trends.google.com/trends/api/widgetdata/multiline'
     INTEREST_BY_REGION_URL = 'https://trends.google.com/trends/api/widgetdata/comparedgeo'
@@ -63,10 +60,10 @@ class TrendReq(object):
         self.related_queries_widget_list = list()
     
     def GetGoogleCookie(self):
-	"""
-	Gets google cookie (used for each and every proxy; once on init otherwise)
-	Removes proxy from the list on proxy error
-	"""
+        """
+        Gets google cookie (used for each and every proxy; once on init otherwise)
+        Removes proxy from the list on proxy error
+        """
         while True:
             if len(self.proxies) > 0: proxy={'https':self.proxies[self.proxy_index]}
             else: proxy=''
@@ -85,9 +82,9 @@ class TrendReq(object):
                 continue
     
     def GetNewProxy(self):
-	"""
-	Increment proxy INDEX; zero on overflow
-	"""
+        """
+        Increment proxy INDEX; zero on overflow
+        """
         if self.proxy_index > len(self.proxies)-1:
             self.proxy_index += 1
         else:
@@ -103,7 +100,7 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
-	#   Retries mechanism. Activated when one of statements >0 (best used for proxy)
+        #   Retries mechanism. Activated when one of statements >0 (best used for proxy)
         if self.retries > 0 or self.backoff_factor > 0:
             retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
             adapter = HTTPAdapter(max_retries=retry)
@@ -156,7 +153,6 @@ class TrendReq(object):
 
     def _tokens(self):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
-
         # make the request and parse the returned json
         widget_dict = self._get_data(
             url=TrendReq.GENERAL_URL,
@@ -164,7 +160,6 @@ class TrendReq(object):
             params=self.token_payload,
             trim_chars=4,
         )['widgets']
-        
         # order of the json matters...
         first_region_token = True
         # clear self.related_queries_widget_list and self.related_topics_widget_list
