@@ -10,7 +10,11 @@ import pandas as pd
 # be issues when rescaling, e.g. zero entries, we should have an
 # overlap that does not consist of only one period. Therefore,
 # I limit the step size to 250. This leaves 19 periods for overlap.
-def get_historical_daily_interest(kw_list, start_date, end_date=None):
+def get_historical_daily_interest(kw_list, start_date, end_date=None,
+                                  verbose=False):
+    # Check if kw_list is an actual list, even if only 1 word
+    if not isinstance(kw_list, list):
+        raise ValueError('kw_list must be a list containing at least one word')
     # Check if start and end date are of the datetime.datetime.date class
     if not isinstance(start_date, date):
         raise ValueError(
@@ -65,7 +69,8 @@ def get_historical_daily_interest(kw_list, start_date, end_date=None):
         # New timeframe
         timeframe = new_date.strftime(
             '%Y-%m-%d')+' '+old_date.strftime('%Y-%m-%d')
-        print(timeframe)
+        if verbose:
+            print(timeframe)
 
         # Download data
         pytrend.build_payload(kw_list=kw_list, timeframe=timeframe)
@@ -83,12 +88,9 @@ def get_historical_daily_interest(kw_list, start_date, end_date=None):
             # Since we might encounter zeros, we loop over the
             # overlap until we find a non-zero element
             for t in range(1, overlap+1):
-                # print('t = ',t)
-                # print(temp_df[kw].iloc[-t])
                 if temp_df[kw].iloc[-t] != 0:
                     scaling = interest_over_time_df[kw].iloc[t-1] / \
                         temp_df[kw].iloc[-t]
-                    # print('Found non-zero overlap!')
                     break
                 elif t == overlap:
                     print(
