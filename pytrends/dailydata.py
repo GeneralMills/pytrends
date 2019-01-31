@@ -8,9 +8,12 @@ import pandas as pd
 
 def getLastDateOfMonth(year: int, month: int) -> date:
     """Given a year and a month returns an instance of the date class
-       containing the last day of the corresponding month.
+    containing the last day of the corresponding month.
+
+    Source: https://stackoverflow.com/a/43088/1445572
     """
-    if month == 12:             # last day of year is always 31st
+    if month == 12:
+        # last day of year is always 31st
         return date(year, month, 31)
     else:
         # go to the next month 1st day, and move back 1 day
@@ -19,8 +22,8 @@ def getLastDateOfMonth(year: int, month: int) -> date:
 
 def getTimeframe(start: date, stop: date) -> str:
     """Given two dates, returns a stringified version of the interval between
-       the two dates which is used to retrieve data for a specific time frame
-       from Google Trends.
+    the two dates which is used to retrieve data for a specific time frame
+    from Google Trends.
     """
     return f"{start.strftime('%Y-%m-%d')} {stop.strftime('%Y-%m-%d')}"
 
