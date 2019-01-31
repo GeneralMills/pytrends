@@ -1,106 +1,111 @@
-# Split up search requests to get daily Google Trend data
-# Important: data needs to be rescaled due to the way the index is generated
-from datetime import datetime, timedelta, date
+from datetime import date, timedelta
+from functools import partial
+from time import sleep
+
 from pytrends.request import TrendReq
 import pandas as pd
 
 
-# The maximum for a timeframe for which we get daily data is 270.
-# Therefore we could go back 269 days. However, since there might
-# be issues when rescaling, e.g. zero entries, we should have an
-# overlap that does not consist of only one period. Therefore,
-# I limit the step size to 250. This leaves 19 periods for overlap.
-def get_historical_daily_interest(kw_list, start_date, end_date=None,
-                                  verbose=False):
-    # Check if kw_list is an actual list, even if only 1 word
-    if not isinstance(kw_list, list):
-        raise ValueError('kw_list must be a list containing at least one word')
-    # Check if start and end date are of the datetime.datetime.date class
-    if not isinstance(start_date, date):
-        raise ValueError(
-            'start_date is not an instance of datetime.date class')
-    if end_date is None:
-        end_date = datetime.today().date()
+def getLastDateOfMonth(year: int, month: int) -> date:
+    """Given a year and a month returns an instance of the date class
+       containing the last day of the corresponding month.
+    """
+    if month == 12:             # last day of year is always 31st
+        return date(year, month, 31)
     else:
-        if not isinstance(end_date, date):
-            raise ValueError(
-                'end_date is not an instance of datetime.date class')
-    if end_date <= start_date:
-        raise ValueError('end_date comes before start_date')
+        # go to the next month 1st day, and move back 1 day
+        return date(year, month + 1, 1) - timedelta(days=1)
 
-    maxstep = 269
-    overlap = 40
-    step = maxstep - overlap + 1
 
-    # Login to Google. Only need to run this once, the rest of requests
-    # will use the same session.
-    pytrend = TrendReq()
+def getTimeframe(start: date, stop: date) -> str:
+    """Given two dates, returns a stringified version of the interval between
+       the two dates which is used to retrieve data for a specific time frame
+       from Google Trends.
+    """
+    return f"{start.strftime('%Y-%m-%d')} {stop.strftime('%Y-%m-%d')}"
 
-    # Run the first time
-    old_date = end_date
 
-    # Go back in time
-    new_date = old_date - timedelta(days=step)
+def getDailyData(word: str, start_year: int = 2007, stop_year: int = 2018,
+                 verbose: bool = True) -> pd.DataFrame:
+    """Given a word, fetches daily search volume data from Google Trends and
+    returns results in a pandas DataFrame.
 
-    # Create new timeframe for which we download data
-    timeframe = new_date.strftime('%Y-%m-%d')+' '+old_date.strftime('%Y-%m-%d')
-    pytrend.build_payload(kw_list=kw_list, timeframe=timeframe)
-    interest_over_time_df = pytrend.interest_over_time()
+    Details: Due to the way Google Trends scales and returns data, special
+    care needs to be taken to make the daily data comparable over different
+    months. To do that, we download daily data on a month by month basis,
+    and also monthly data. The monthly data is downloaded in one go, so that
+    the monthly values are comparable amongst themselves and can be used to
+    scale the daily data. The daily data is scaled by multiplying the daily
+    value by the monthly search volume divided by 100.
+    For a more detailed explanation see http://bit.ly/trendsscaling
 
-    # RUN ITERATIONS
+    Args:
+        word (str): Word to fetch daily data for.
+        start_year (int): First year to fetch data for. Starts at the beginning
+            of this year (1st of January).
+        stop_year (int): Last year to fetch data for (inclusive). Stops at the
+            end of this year (31st of December).
+        verbose (bool): If True, then prints the word and current time frame
+            we are fecthing the data for.
 
-    while new_date > start_date:
+    Returns:
+        complete (pd.DataFrame): Contains 4 columns.
+            The column named after the word argument contains the daily search
+            volume already scaled and comparable through time.
+            The column f'{word}_unscaled' is the original daily data fetched
+            month by month, and it is not comparable across different months
+            (but is comparable within a month).
+            The column f'{word}_monthly' contains the original monthly data
+            fetched at once. The values in this column have been backfilled
+            so that there are no NaN present.
+            The column 'scale' contains the scale used to obtain the scaled
+            daily data.
+    """
 
-        # Save the new date from the previous iteration.
-        # Overlap == 1 would mean that we start where we
-        # stopped on the iteration before, which gives us
-        # indeed overlap == 1.
-        old_date = new_date + timedelta(days=overlap-1)
+    # Set up start and stop dates
+    start_date = date(start_year, 1, 1)
+    stop_date = date(stop_year, 12, 31)
 
-        # Update the new date to take a step into the past
-        # Since the timeframe that we can apply for daily data
-        # is limited, we use step = maxstep - overlap instead of
-        # maxstep.
-        new_date = new_date - timedelta(days=step)
-        # If we went past our start_date, use it instead
-        if new_date < start_date:
-            new_date = start_date
+    # Start pytrends for US region
+    pytrends = TrendReq(hl='en-US', tz=360)
+    # Initialize build_payload with the word we need data for
+    build_payload = partial(pytrends.build_payload,
+                            kw_list=[word], cat=0, geo='US', gprop='')
 
-        # New timeframe
-        timeframe = new_date.strftime(
-            '%Y-%m-%d')+' '+old_date.strftime('%Y-%m-%d')
-        if verbose:
-            print(timeframe)
+    # Obtain monthly data for all months in years [start_year, stop_year]
+    build_payload(timeframe=getTimeframe(start_date, stop_date))
+    monthly = pytrends.interest_over_time().drop(columns=['isPartial'])
 
-        # Download data
-        pytrend.build_payload(kw_list=kw_list, timeframe=timeframe)
-        temp_df = pytrend.interest_over_time()
-        if (temp_df.empty):
-            raise ValueError(
-                'Google sent back an empty dataframe. Possibly there were'
-                ' no searches at all during the this period! Set start_date'
-                ' to a later date.')
-        # Renormalize the dataset and drop last line
-        for kw in kw_list:
-            beg = new_date
-            end = old_date - timedelta(days=1)
+    # Get daily data, month by month
+    results = {}
+    # if a timeout or too many requests error occur we need to adjust wait time
+    attempts = 0
+    current = start_date
+    while current < stop_date:
+        lastDateOfMonth = getLastDateOfMonth(current.year, current.month)
+        timeframe = getTimeframe(current, lastDateOfMonth)
+        build_payload(timeframe=timeframe)
+        try:
+            if verbose:
+                print(f'{word}:{timeframe}')
+            day_data = pytrends.interest_over_time()
+        except Exception as err:
+            print(err)
+            print('Trying again in {60 + 5*attempts} seconds.')
+            sleep(60 + 5*attempts)  # increase wait time if getting 429s
+        else:
+            results[current] = day_data
+            current = lastDateOfMonth + timedelta(days=1)
+            attempts = 0            # reset attempts counter
+        finally:
+            sleep(5)           # don't go too fast or Google will send 429s
 
-            # Since we might encounter zeros, we loop over the
-            # overlap until we find a non-zero element
-            for t in range(1, overlap+1):
-                if temp_df[kw].iloc[-t] != 0:
-                    scaling = interest_over_time_df[kw].iloc[t-1] / \
-                        temp_df[kw].iloc[-t]
-                    break
-                elif t == overlap:
-                    print(
-                        'Did not find non-zero overlap, set scaling to zero!'
-                        ' Increase Overlap!')
-                    scaling = 0
-            # Apply scaling
-            temp_df.loc[beg:end, kw] = temp_df.loc[beg:end, kw]*scaling
-        interest_over_time_df = pd.concat(
-            [temp_df[:-overlap], interest_over_time_df])
+    daily = pd.concat(results.values()).drop(columns=['isPartial'])
+    complete = daily.join(monthly, lsuffix='_unscaled', rsuffix='_monthly')
 
-    # Save dataset
-    return interest_over_time_df
+    # Scale daily data by monthly weights so the data is comparable
+    complete[f'{word}_monthly'].ffill(inplace=True)  # fill NaN values
+    complete['scale'] = complete[f'{word}_monthly']/100
+    complete[word] = complete[f'{word}_unscaled']*complete.scale
+
+    return complete
