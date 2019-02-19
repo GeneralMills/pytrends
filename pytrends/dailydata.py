@@ -3,6 +3,7 @@ from functools import partial
 from time import sleep
 
 from pytrends.request import TrendReq
+from pytrends.exceptions import ResponseError
 import pandas as pd
 
 
@@ -92,9 +93,9 @@ def getDailyData(word: str, start_year: int = 2007, stop_year: int = 2018,
             if verbose:
                 print(f'{word}:{timeframe}')
             day_data = pytrends.interest_over_time()
-        except Exception as err:
+        except ResponseError as err:  # wait before trying again
             print(err)
-            print('Trying again in {60 + 5*attempts} seconds.')
+            print(f'Trying again in {60 + 5*attempts} seconds.')
             sleep(60 + 5*attempts)  # increase wait time if getting 429s
         else:
             results[current] = day_data
