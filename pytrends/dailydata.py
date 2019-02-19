@@ -29,8 +29,27 @@ def getTimeframe(start: date, stop: date) -> str:
     return f"{start.strftime('%Y-%m-%d')} {stop.strftime('%Y-%m-%d')}"
 
 
-def getDailyData(word: str, start_year: int = 2007, stop_year: int = 2018,
-                 verbose: bool = True) -> pd.DataFrame:
+def _fetchData(pytrends, build_payload, timeframe: str) -> pd.DataFrame:
+    """Attempts to fecth data and retries in case of a ResponseError."""
+    attempts, fetched = 0, False
+    while not fetched:
+        try:
+            build_payload(timeframe=timeframe)
+        except ResponseError as err:
+            print(err)
+            print(f'Trying again in {60 + 5*attempts} seconds.')
+            sleep(60 + 5*attempts)
+            attempts += 1
+        else:
+            fetched = True
+    return pytrends.interest_over_time()
+
+
+def getDailyData(word: str,
+                 start_year: int = 2007,
+                 stop_year: int = 2018,
+                 verbose: bool = True,
+                 wait_time: float = 5.0) -> pd.DataFrame:
     """Given a word, fetches daily search volume data from Google Trends and
     returns results in a pandas DataFrame.
 
@@ -77,32 +96,21 @@ def getDailyData(word: str, start_year: int = 2007, stop_year: int = 2018,
                             kw_list=[word], cat=0, geo='US', gprop='')
 
     # Obtain monthly data for all months in years [start_year, stop_year]
-    build_payload(timeframe=getTimeframe(start_date, stop_date))
-    monthly = pytrends.interest_over_time().drop(columns=['isPartial'])
+    monthly = _fetchData(pytrends, build_payload,
+                         getTimeframe(start_date, stop_date))
 
     # Get daily data, month by month
     results = {}
     # if a timeout or too many requests error occur we need to adjust wait time
-    attempts = 0
     current = start_date
     while current < stop_date:
         lastDateOfMonth = getLastDateOfMonth(current.year, current.month)
         timeframe = getTimeframe(current, lastDateOfMonth)
-        build_payload(timeframe=timeframe)
-        try:
-            if verbose:
-                print(f'{word}:{timeframe}')
-            day_data = pytrends.interest_over_time()
-        except ResponseError as err:  # wait before trying again
-            print(err)
-            print(f'Trying again in {60 + 5*attempts} seconds.')
-            sleep(60 + 5*attempts)  # increase wait time if getting 429s
-        else:
-            results[current] = day_data
-            current = lastDateOfMonth + timedelta(days=1)
-            attempts = 0            # reset attempts counter
-        finally:
-            sleep(5)           # don't go too fast or Google will send 429s
+        if verbose:
+            print(f'{word}:{timeframe}')
+        results[current] = _fetchData(pytrends, build_payload, timeframe)
+        current = lastDateOfMonth + timedelta(days=1)
+        sleep(wait_time)  # don't go too fast or Google will send 429s
 
     daily = pd.concat(results.values()).drop(columns=['isPartial'])
     complete = daily.join(monthly, lsuffix='_unscaled', rsuffix='_monthly')
