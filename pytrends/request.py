@@ -48,12 +48,16 @@ class TrendReq(object):
         self.hl = hl
         self.geo = geo
         self.kw_list = list()
-        self.proxies = proxies #add a proxy option
+        self.session = requests.session()
+        self.session.headers.update({'accept-language': self.hl})
+        if proxies != '':
+            self.session.proxies.update(proxies)
         #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
         self.cookies = dict(filter(
             lambda i: i[0] == 'NID',
-            requests.get(
-                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
+            self.session.get(
+                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:]),
+                timeout=5,
             ).cookies.items()
         ))
 
@@ -74,14 +78,10 @@ class TrendReq(object):
         :param kwargs: any extra key arguments passed to the request builder (usually query parameters or data)
         :return:
         """
-        s = requests.session()
-        s.headers.update({'accept-language': self.hl})
-        if self.proxies != '':
-            s.proxies.update(self.proxies)
         if method == TrendReq.POST_METHOD:
-            response = s.post(url, cookies=self.cookies, **kwargs)
+            response = self.session.post(url, cookies=self.cookies, **kwargs)
         else:
-            response = s.get(url, cookies=self.cookies, **kwargs)
+            response = self.session.get(url, cookies=self.cookies, **kwargs)
 
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
@@ -211,9 +211,9 @@ class TrendReq(object):
             self.interest_by_region_widget['request']['resolution'] = resolution
         elif self.geo == 'US' and resolution in ['DMA', 'CITY', 'REGION']:
             self.interest_by_region_widget['request']['resolution'] = resolution
-            
+
         self.interest_by_region_widget['request']['includeLowSearchVolumeGeos'] = inc_low_vol
-        
+
         # convert to string as requests will mangle
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
@@ -236,7 +236,7 @@ class TrendReq(object):
         result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
         if inc_geo_code:
             result_df['geoCode'] = df['geoCode']
-            
+
         # rename each column with its search term
         for idx, kw in enumerate(self.kw_list):
             result_df[kw] = result_df[idx].astype('int')
