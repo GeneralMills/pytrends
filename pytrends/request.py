@@ -3,7 +3,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 import json
 import sys
 
-from pandas.io.json.normalize import nested_to_record
 import pandas as pd
 import requests
 
@@ -52,9 +51,7 @@ class TrendReq(object):
         #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
         self.cookies = dict(filter(
             lambda i: i[0] == 'NID',
-            requests.get(
-                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
-            ).cookies.items()
+            requests.get('https://trends.google.com').cookies.items()
         ))
 
         # intialize widget payloads
@@ -75,7 +72,6 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
-        s.headers.update({'accept-language': self.hl})
         if self.proxies != '':
             s.proxies.update(self.proxies)
         if method == TrendReq.POST_METHOD:
@@ -183,9 +179,7 @@ class TrendReq(object):
         result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
         # rename each column with its search term, relying on order that google provides...
         for idx, kw in enumerate(self.kw_list):
-            # there is currently a bug with assigning columns that may be
-            # parsed as a date in pandas: use explicit insert column method
-            result_df.insert(len(result_df.columns), kw, result_df[idx].astype('int'))
+            result_df[kw] = result_df[idx].astype('int')
             del result_df[idx]
 
         if 'isPartial' in df:
@@ -202,7 +196,7 @@ class TrendReq(object):
 
         return final
 
-    def interest_by_region(self, resolution='COUNTRY', inc_low_vol=False, inc_geo_code=False):
+    def interest_by_region(self, resolution='COUNTRY'):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
         # make the request
@@ -211,9 +205,8 @@ class TrendReq(object):
             self.interest_by_region_widget['request']['resolution'] = resolution
         elif self.geo == 'US' and resolution in ['DMA', 'CITY', 'REGION']:
             self.interest_by_region_widget['request']['resolution'] = resolution
-            
-        self.interest_by_region_widget['request']['includeLowSearchVolumeGeos'] = inc_low_vol
-        
+        elif self.geo == 'BR' and resolution in ['CITY', 'REGION']:
+            self.interest_by_region_widget['request']['resolution'] = resolution
         # convert to string as requests will mangle
         region_payload['req'] = json.dumps(self.interest_by_region_widget['request'])
         region_payload['token'] = self.interest_by_region_widget['token']
@@ -229,19 +222,14 @@ class TrendReq(object):
         df = pd.DataFrame(req_json['default']['geoMapData'])
         if (df.empty):
             return df
-
         # rename the column with the search keyword
-        df = df[['geoName', 'geoCode', 'value']].set_index(['geoName']).sort_index()
+        df = df[['geoName', 'value']].set_index(['geoName']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(str(x).replace('[', '').replace(']', '').split(',')))
-        if inc_geo_code:
-            result_df['geoCode'] = df['geoCode']
-            
         # rename each column with its search term
         for idx, kw in enumerate(self.kw_list):
             result_df[kw] = result_df[idx].astype('int')
             del result_df[idx]
-
         return result_df
 
     def related_topics(self):
@@ -271,21 +259,13 @@ class TrendReq(object):
 
             # top topics
             try:
-                top_list = req_json['default']['rankedList'][0]['rankedKeyword']
-                df_top = pd.DataFrame([nested_to_record(d, sep='_') for d in top_list])
+                df = pd.DataFrame(req_json['default']['rankedList'][0]['rankedKeyword'])
+                df = pd.DataFrame(df['topic'].tolist()).join(df[['value']])
             except KeyError:
                 # in case no top topics are found, the lines above will throw a KeyError
-                df_top = None
+                df = None
 
-            #rising topics
-            try:
-                rising_list = req_json['default']['rankedList'][1]['rankedKeyword']
-                df_rising = pd.DataFrame([nested_to_record(d, sep='_')  for d in rising_list])
-            except KeyError:
-                # in case no rising topics are found, the lines above will throw a KeyError
-                df_rising = None
-
-            result_dict[kw] = {'rising': df_rising, 'top' : df_top}
+            result_dict[kw] = df
         return result_dict
 
     def related_queries(self):
@@ -399,29 +379,29 @@ class TrendReq(object):
     def get_historical_interest(self, keywords, year_start=2018, month_start=1, day_start=1, hour_start=0, year_end=2018, month_end=2, day_end=1, hour_end= 0, cat=0, geo='', gprop='', sleep=0):
         """Gets historical hourly data for interest by chunking requests to 1 week at a time (which is what Google allows)"""
 
-        # construct datetime obejcts - raises ValueError if invalid parameters
+        # construct datetime obejcts - raises ValueError if invalid parameters       
         start_date = datetime(year_start, month_start, day_start, hour_start)
         end_date = datetime(year_end, month_end, day_end, hour_end)
 
-        # the timeframe has to be in 1 week intervals or Google will reject it
+        # the timeframe has to be in 1 week intervals or Google will reject it 
         delta = timedelta(days=7)
 
         df = pd.DataFrame()
 
         date_iterator = start_date
-        date_iterator += delta
+        date_iterator += delta 
 
         while True:
             if (date_iterator > end_date):
-                # has retrieved all of the data
+                # has retrieved all of the data 
                 break
 
-            # format date to comply with API call
+            # format date to comply with API call 
             start_date_str = start_date.strftime('%Y-%m-%dT%H')
             date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
             tf = start_date_str + ' ' + date_iterator_str
 
-            try:
+            try: 
                 self.build_payload(keywords,cat, tf, geo, gprop)
                 week_df = self.interest_over_time()
                 df = df.append(week_df)
@@ -430,10 +410,10 @@ class TrendReq(object):
                 pass
 
             start_date += delta
-            date_iterator += delta
+            date_iterator += delta 
 
-            # just in case you are rate-limited by Google. Recommended is 60 if you are.
+            # just in case you are rate-limited by Google. Recommended is 60 if you are. 
             if sleep > 0:
                 time.sleep(sleep)
 
-        return df
+        return df 
