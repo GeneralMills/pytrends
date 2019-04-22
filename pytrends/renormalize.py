@@ -2,8 +2,6 @@
 
 # Try to split up search requests to get daily Google Trend data
 
-#timeres = 'daily'
-timeres = 'hourly'
 
 ## SETUP ##
 from datetime import datetime, timedelta
