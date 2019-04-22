@@ -107,7 +107,7 @@ while new_date>start_date:
             if temp_df[kw].iloc[-t] != 0:
                 # TODO dame da kore...
                 
-                scaling = interest_over_time_df[kw].iloc[t-1]/temp_df[kw].iloc[-t]
+                scaling = float(interest_over_time_df[kw].iloc[t-1])/temp_df[kw].iloc[-t]
                 #print('Found non-zero overlap!')
                 print(scaling)
                 break
