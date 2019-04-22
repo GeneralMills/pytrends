@@ -97,7 +97,7 @@ while new_date>start_date:
     # Renormalize the dataset and drop last line
     for kw in kw_list:
         beg = new_date
-        end = old_date - timedelta(hours=1) # TODO not so sure abt htis
+        end = old_date - timedelta(hours=1)
         
         # Since we might encounter zeros, we loop over the
         # overlap until we find a non-zero element
