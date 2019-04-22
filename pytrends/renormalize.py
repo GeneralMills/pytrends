@@ -1,6 +1,15 @@
 ## INITIAL COMMENTS ##
+# Re-scale Trends data so that all values are on the same scale.
 
-# Try to split up search requests to get daily Google Trend data
+# Why do we do this?
+# To obtain data at the a certain resolution from Google Trends,
+# it must be requested in batches (for example, 1-hour data
+# needs to be requested in 7-day intervals).
+# However, the values that the Trends API returns are scaled
+# from 0-100 within that batch, so it is impossible to compare
+# data points from different batches.
+# This script re-scales the data by requesting batches with
+# overlapping time periods.
 
 
 ## SETUP ##
