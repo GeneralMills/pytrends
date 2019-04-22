@@ -22,12 +22,14 @@ import time
 
 daily = False
 hourly = False
-if sys.argv[1] == 'hourly':
+if len(sys.argv != 2):
+    print("Usage: python scaledata.py <hourly/daily>"
+elif sys.argv[1] == 'hourly':
     hourly = True
 elif sys.argv[1] == 'daily':
     daily = True
 else:
-    print("Usage: scaledata.py <hourly/data>")
+    print("Usage: python scaledata.py <hourly/daily>")
 
 path = '.'
 os.chdir(path)
