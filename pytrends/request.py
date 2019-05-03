@@ -34,6 +34,7 @@ class TrendReq(object):
     TOP_CHARTS_URL = 'https://trends.google.com/trends/topcharts/chart'
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
+    TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
 
     def __init__(self, hl='en-US', tz=360, geo='', proxies=''):
         """
@@ -95,7 +96,6 @@ class TrendReq(object):
             # some responses start with garbage characters, like ")]}',"
             # these have to be cleaned before being passed to the json parser
             content = response.text[trim_chars:]
-
             # parse json
             return json.loads(content)
         else:
@@ -333,7 +333,7 @@ class TrendReq(object):
         return result_dict
 
     def trending_searches(self, pn='united_states'):
-        """Request data from Google's Trending Searches section and return a dataframe"""
+        """Request data from Google's Hot Searches section and return a dataframe"""
 
         # make the request
         # forms become obsolute due to the new TRENDING_SEACHES_URL
@@ -344,6 +344,24 @@ class TrendReq(object):
         )[pn]
         result_df = pd.DataFrame(req_json)
         return result_df
+
+
+    def today_searches(self, pn='US'):
+        """Request data from Google Daily Trends section and returns a dataframe"""
+        forms = {'ns': 15, 'geo': pn, 'tz': '-180', 'hl': 'en-US'}
+        req_json = self._get_data(
+            url=TrendReq.TODAY_SEARCHES_URL,
+            method=TrendReq.GET_METHOD,
+            trim_chars=5,
+            params=forms
+        )['default']['trendingSearchesDays'][0]['trendingSearches']
+        result_df = pd.DataFrame()
+        # parse the returned json
+        sub_df = pd.DataFrame()
+        for trend in req_json:
+            sub_df = sub_df.append(trend['title'], ignore_index=True)
+        result_df = pd.concat([result_df, sub_df])
+        return result_df.iloc[:,-1]
 
     def top_charts(self, date, cid, geo='US', cat=''):
         """Request data from Google's Top Charts section and return a dataframe"""

@@ -23,6 +23,10 @@ print(related_queries_dict)
 trending_searches_df = pytrend.trending_searches()
 print(trending_searches_df.head())
 
+# Get Google Hot Trends data
+today_searches_df = pytrend.today_searches()
+print(today_searches_df.head())
+
 # Get Google Top Charts
 top_charts_df = pytrend.top_charts(cid='actors', date=201611)
 print(top_charts_df.head())
