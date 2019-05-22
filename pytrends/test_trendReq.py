@@ -1,4 +1,3 @@
-from requests.cookies import RequestsCookieJar
 from unittest import TestCase
 
 from pytrends.request import TrendReq

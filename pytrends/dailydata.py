@@ -2,9 +2,10 @@ from datetime import date, timedelta
 from functools import partial
 from time import sleep
 
-from pytrends.request import TrendReq
-from pytrends.exceptions import ResponseError
 import pandas as pd
+
+from pytrends.exceptions import ResponseError
+from pytrends.request import TrendReq
 
 
 def getLastDateOfMonth(year: int, month: int) -> date:
@@ -37,8 +38,8 @@ def _fetchData(pytrends, build_payload, timeframe: str) -> pd.DataFrame:
             build_payload(timeframe=timeframe)
         except ResponseError as err:
             print(err)
-            print(f'Trying again in {60 + 5*attempts} seconds.')
-            sleep(60 + 5*attempts)
+            print(f'Trying again in {60 + 5 * attempts} seconds.')
+            sleep(60 + 5 * attempts)
             attempts += 1
         else:
             fetched = True
@@ -117,7 +118,7 @@ def getDailyData(word: str,
 
     # Scale daily data by monthly weights so the data is comparable
     complete[f'{word}_monthly'].ffill(inplace=True)  # fill NaN values
-    complete['scale'] = complete[f'{word}_monthly']/100
-    complete[word] = complete[f'{word}_unscaled']*complete.scale
+    complete['scale'] = complete[f'{word}_monthly'] / 100
+    complete[word] = complete[f'{word}_unscaled'] * complete.scale
 
     return complete

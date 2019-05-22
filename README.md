@@ -273,22 +273,15 @@ Returns pandas.DataFrame
 
 ### Top Charts
 
-    pytrends.top_charts(date, cid, geo='US', cat='')
+    pytrends.top_charts(date, hl='en-US', tz=300, geo='GLOBAL')
 
 Parameters
 
 * `date`
 
   - *Required*
-  - YYYYMM integer or string value
-  - Example `'201611'` for November 2016 Top Chart data
-
-* `cid`
-
-  - *Required*
-  - Topic to get data for
-  - Only able to choose from those listed on https://www.google.com/trends/topcharts
-  - Example the chart 'Baseketball players `cid` is `'basketball_players'`
+  - YYYY or YYYYMM integer
+  - Example `201611` for November 2016 Top Chart data
 
 Returns pandas.DataFrame
 
