@@ -244,8 +244,8 @@ Returns dictionary of pandas.DataFrames
 
 ### Trending Searches
 
-	pytrends.trending_searches(pn='p1') # in English
-	pytrends.trending_searches(pn='p4') # in Japanese
+	pytrends.trending_searches(pn='united_states') # trending searches in real time for United States
+	pytrends.trending_searches(pn='japan') # Japan
 
 Returns pandas.DataFrame
 
