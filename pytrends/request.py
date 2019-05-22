@@ -6,6 +6,8 @@ import sys
 from pandas.io.json.normalize import nested_to_record
 import pandas as pd
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 from datetime import datetime, timedelta
 import time
@@ -17,15 +19,12 @@ if sys.version_info[0] == 2:  # Python 2
 else:  # Python 3
     from urllib.parse import quote
 
-
 class TrendReq(object):
     """
     Google Trends API
     """
-
     GET_METHOD = 'get'
     POST_METHOD = 'post'
-
     GENERAL_URL = 'https://trends.google.com/trends/api/explore'
     INTEREST_OVER_TIME_URL = 'https://trends.google.com/trends/api/widgetdata/multiline'
     INTEREST_BY_REGION_URL = 'https://trends.google.com/trends/api/widgetdata/comparedgeo'
@@ -36,38 +35,64 @@ class TrendReq(object):
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
     TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
 
-    def __init__(self, hl='en-US', tz=360, geo='', proxies=''):
+    def __init__(self, hl='en-US', tz=360, geo='', timeout=(2,5), proxies='', retries=0, backoff_factor=0):
         """
         Initialize default values for params
         """
         # google rate limit
         self.google_rl = 'You have reached your quota limit. Please try again later.'
         self.results = None
-
         # set user defined options used globally
         self.tz = tz
         self.hl = hl
         self.geo = geo
         self.kw_list = list()
-        self.proxies = proxies #add a proxy option
-        #proxies format: {"http": "http://192.168.0.1:8888" , "https": "https://192.168.0.1:8888"}
-        self.cookies = dict(filter(
-            lambda i: i[0] == 'NID',
-            requests.get(
-                'https://trends.google.com/?geo={geo}'.format(geo=hl[-2:])
-            ).cookies.items()
-        ))
-
+        self.timeout = timeout
+        self.proxies = proxies	#	add a proxy option
+        self.retries = retries
+        self.backoff_factor = backoff_factor
+        self.proxy_index = 0
+        self.cookies = self.GetGoogleCookie()
         # intialize widget payloads
         self.token_payload = dict()
         self.interest_over_time_widget = dict()
         self.interest_by_region_widget = dict()
         self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
-
+    
+    def GetGoogleCookie(self):
+        """
+        Gets google cookie (used for each and every proxy; once on init otherwise)
+        Removes proxy from the list on proxy error
+        """
+        while True:
+            if len(self.proxies) > 0: proxy={'https':self.proxies[self.proxy_index]}
+            else: proxy=''
+            try:
+                return dict(filter(lambda i: i[0] == 'NID',requests.get(
+                    'https://trends.google.com/?geo={geo}'.format(geo=self.hl[-2:]),
+                    timeout=self.timeout,
+                    proxies=proxy
+                ).cookies.items()))
+            except requests.exceptions.ProxyError:
+                print('Proxy error. Changing IP')
+                if len(self.proxies)>0:
+                    self.proxies.remove(self.proxies[self.proxy_index])
+                else:
+                    print('Proxy list is empty. Bye!')
+                continue
+    
+    def GetNewProxy(self):
+        """
+        Increment proxy INDEX; zero on overflow
+        """
+        if self.proxy_index > len(self.proxies)-1:
+            self.proxy_index += 1
+        else:
+            self.proxy_index = 0
+    
     def _get_data(self, url, method=GET_METHOD, trim_chars=0, **kwargs):
         """Send a request to Google and return the JSON response as a Python object
-
         :param url: the url to which the request will be sent
         :param method: the HTTP method ('get' or 'post')
         :param trim_chars: how many characters should be trimmed off the beginning of the content of the response
@@ -76,34 +101,37 @@ class TrendReq(object):
         :return:
         """
         s = requests.session()
+        # Retries mechanism. Activated when one of statements >0 (best used for proxy)
+        if self.retries > 0 or self.backoff_factor > 0:
+            retry = Retry(total=self.retries, read=self.retries, connect=self.retries, backoff_factor=self.backoff_factor)
+            adapter = HTTPAdapter(max_retries=retry)
         s.headers.update({'accept-language': self.hl})
-        if self.proxies != '':
-            s.proxies.update(self.proxies)
+        if len(self.proxies) > 0:
+            self.cookies = self.GetGoogleCookie()
+            s.proxies.update({'https':self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
-            response = s.post(url, cookies=self.cookies, **kwargs)
+            response = s.post(url, timeout=self.timeout, cookies=self.cookies **kwargs)    # DO NOT USE retries or backoff_factor here
         else:
-            response = s.get(url, cookies=self.cookies, **kwargs)
-
+            response = s.get(url, timeout=self.timeout, cookies=self.cookies, **kwargs)    # DO NOT USE retries or backoff_factor here
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
         # and sometimes even 'text/javascript
-        if 'application/json' in response.headers['Content-Type'] or \
+        if response.status_code == 200 and 'application/json' in response.headers['Content-Type'] or \
             'application/javascript' in response.headers['Content-Type'] or \
                 'text/javascript' in response.headers['Content-Type']:
-
             # trim initial characters
             # some responses start with garbage characters, like ")]}',"
             # these have to be cleaned before being passed to the json parser
             content = response.text[trim_chars:]
             # parse json
+            self.GetNewProxy()
             return json.loads(content)
         else:
-            # this is often the case when the amount of keywords in the payload for the IP
-            # is not allowed by Google
+	    # error
             raise exceptions.ResponseError('The request failed: Google returned a '
                                            'response with code {0}.'.format(response.status_code), response=response)
-
+    
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='', gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
         self.kw_list = kw_list
@@ -126,7 +154,6 @@ class TrendReq(object):
 
     def _tokens(self):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
-
         # make the request and parse the returned json
         widget_dict = self._get_data(
             url=TrendReq.GENERAL_URL,
@@ -134,7 +161,6 @@ class TrendReq(object):
             params=self.token_payload,
             trim_chars=4,
         )['widgets']
-
         # order of the json matters...
         first_region_token = True
         # clear self.related_queries_widget_list and self.related_topics_widget_list
@@ -224,7 +250,7 @@ class TrendReq(object):
             url=TrendReq.INTEREST_BY_REGION_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            params=region_payload
+            params=region_payload,
         )
         df = pd.DataFrame(req_json['default']['geoMapData'])
         if (df.empty):
@@ -389,7 +415,7 @@ class TrendReq(object):
             url=TrendReq.SUGGESTIONS_URL + kw_param,
             params=parameters,
             method=TrendReq.GET_METHOD,
-            trim_chars=5
+            trim_chars=5,
         )['default']['topics']
         return req_json
 
@@ -402,7 +428,7 @@ class TrendReq(object):
                 url=TrendReq.CATEGORIES_URL,
                 params=params,
                 method=TrendReq.GET_METHOD,
-                trim_chars=5
+                trim_chars=5,
         )
         return req_json
 

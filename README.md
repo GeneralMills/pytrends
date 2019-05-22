@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Unofficial API for Google Trends
+Unofficial API for Google Trends (fork)
 
 Allows simple interface for automating downloading of reports from Google Trends. Main feature is to allow the script to login to Google on your behalf to enable a higher rate limit. Only good until Google changes their backend again :-P. When that happens feel free to contribute!
 
@@ -54,7 +54,25 @@ or if you want to use proxies as you are blocked due to Google rate limit:
 
     from pytrends.request import TrendReq
 
-    pytrends = TrendReq(hl='en-US', tz=360, proxies = {'https': 'https://34.203.233.13:80'})
+    pytrends = TrendReq(hl='en-US', tz=360, timeout=(10,25), proxies=['https://34.203.233.13:80',], retries=2, backoff_factor=0.1)
+
+* `timeout(connect, read)`
+
+  - Timezone Offset
+  - For example US CST is ```'360'```
+
+* `proxies`
+
+  - https proxies Google passed ONLY
+  - list ```['https://34.203.233.13:80','https://35.201.123.31:880', ..., ...]```
+  
+* `retries`
+
+  - number of retries total/connect/read all represented by one scalar
+
+* `backoff_factor`
+
+  - A backoff factor to apply between attempts after the second try (most errors are resolved immediately by a second try without a delay). urllib3 will sleep for: ```{backoff factor} * (2 ^ ({number of total retries} - 1))``` seconds. If the backoff_factor is 0.1, then sleep() will sleep for [0.0s, 0.2s, 0.4s, …] between retries. It will never be longer than Retry.BACKOFF_MAX. By default, backoff is disabled (set to 0).
 
 Note: the parameter `hl` specifies host language for accessing Google Trends. 
 Note: only https proxies will work, and you need to add the port number after the proxy ip address
