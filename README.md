@@ -6,6 +6,8 @@ Unofficial API for Google Trends
 
 Allows simple interface for automating downloading of reports from Google Trends. Main feature is to allow the script to login to Google on your behalf to enable a higher rate limit. Only good until Google changes their backend again :-P. When that happens feel free to contribute!
 
+**Looking for maintainers!**
+
 
 ## Table of contens
 
