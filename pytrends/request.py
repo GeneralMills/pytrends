@@ -30,7 +30,7 @@ class TrendReq(object):
     INTEREST_BY_REGION_URL = 'https://trends.google.com/trends/api/widgetdata/comparedgeo'
     RELATED_QUERIES_URL = 'https://trends.google.com/trends/api/widgetdata/relatedsearches'
     TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/hottrends/visualize/internal/data'
-    TOP_CHARTS_URL = 'https://trends.google.com/trends/topcharts/chart'
+    TOP_CHARTS_URL = 'https://trends.google.com/trends/api/topcharts'
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
     TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
@@ -429,9 +429,10 @@ class TrendReq(object):
         # make the request and parse the returned json
         req_json = self._get_data(
             url=TrendReq.TOP_CHARTS_URL,
-            method=TrendReq.POST_METHOD,
+            method=TrendReq.GET_METHOD,
+            trim_chars=5,
             params=chart_payload,
-        )['data']['entityList']
+        )['topCharts'][0]['listItems']
         df = pd.DataFrame(req_json)
         return df
 
