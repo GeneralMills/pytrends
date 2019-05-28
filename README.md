@@ -6,6 +6,8 @@ Unofficial API for Google Trends
 
 Allows simple interface for automating downloading of reports from Google Trends. Main feature is to allow the script to login to Google on your behalf to enable a higher rate limit. Only good until Google changes their backend again :-P. When that happens feel free to contribute!
 
+**Looking for maintainers!**
+
 
 ## Table of contens
 
@@ -54,8 +56,27 @@ or if you want to use proxies as you are blocked due to Google rate limit:
 
     from pytrends.request import TrendReq
 
-    pytrends = TrendReq(hl='en-US', tz=360, proxies = {'https': 'https://34.203.233.13:80'})
+    pytrends = TrendReq(hl='en-US', tz=360, timeout=(10,25), proxies=['https://34.203.233.13:80',], retries=2, backoff_factor=0.1)
 
+* `timeout(connect, read)`
+
+  - Timezone Offset
+  - For example US CST is ```'360'```
+
+* `proxies`
+
+  - https proxies Google passed ONLY
+  - list ```['https://34.203.233.13:80','https://35.201.123.31:880', ..., ...]```
+  
+* `retries`
+
+  - number of retries total/connect/read all represented by one scalar
+
+* `backoff_factor`
+
+  - A backoff factor to apply between attempts after the second try (most errors are resolved immediately by a second try without a delay). urllib3 will sleep for: ```{backoff factor} * (2 ^ ({number of total retries} - 1))``` seconds. If the backoff_factor is 0.1, then sleep() will sleep for [0.0s, 0.2s, 0.4s, …] between retries. It will never be longer than Retry.BACKOFF_MAX. By default, backoff is disabled (set to 0).
+
+Note: the parameter `hl` specifies host language for accessing Google Trends. 
 Note: only https proxies will work, and you need to add the port number after the proxy ip address
 
 ### Build Payload
@@ -132,8 +153,9 @@ Many API methods use the following:
 
 * `tz`
 
-  - Timezone Offset
-  - For example US CST is ```'360'```
+  - Timezone Offset (in minutes)
+  - For more information of Timezone Offset, [view this wiki page containing about UCT offset](https://en.wikipedia.org/wiki/UTC_offset)
+  - For example US CST is ```'360'``` 
 
 * `timeframe`
 
@@ -253,22 +275,15 @@ Returns pandas.DataFrame
 
 ### Top Charts
 
-    pytrends.top_charts(date, cid, geo='US', cat='')
+    pytrends.top_charts(date, hl='en-US', tz=300, geo='GLOBAL')
 
 Parameters
 
 * `date`
 
   - *Required*
-  - YYYYMM integer or string value
-  - Example `'201611'` for November 2016 Top Chart data
-
-* `cid`
-
-  - *Required*
-  - Topic to get data for
-  - Only able to choose from those listed on https://www.google.com/trends/topcharts
-  - Example the chart 'Baseketball players `cid` is `'basketball_players'`
+  - YYYY or YYYYMM integer
+  - Example `201611` for November 2016 Top Chart data
 
 Returns pandas.DataFrame
 

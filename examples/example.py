@@ -1,6 +1,5 @@
 from pytrends.request import TrendReq
 
-
 # Login to Google. Only need to run this once, the rest of requests will use the same session.
 pytrend = TrendReq()
 
@@ -28,7 +27,7 @@ today_searches_df = pytrend.today_searches()
 print(today_searches_df.head())
 
 # Get Google Top Charts
-top_charts_df = pytrend.top_charts(cid='actors', date=201611)
+top_charts_df = pytrend.top_charts(2018, hl='en-US', tz=300, geo='GLOBAL')
 print(top_charts_df.head())
 
 # Get Google Keyword Suggestions
