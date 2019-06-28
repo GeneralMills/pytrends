@@ -25,7 +25,7 @@ Allows simple interface for automating downloading of reports from Google Trends
     * [Related Topics](#related-topics)
     * [Related Queries](#related-queries)
     * [Trending Searches](#trending-searches)
-    *[Realtime Search Trends](#realtime-search-trends)
+    * [Realtime Search Trends](#realtime-search-trends)
     * [Top Charts](#top-charts)
     * [Suggestions](#suggestions)
 
