@@ -277,7 +277,7 @@ Returns pandas.DataFrame
 ### Realtime Search Trends
 
 	pytrend.realtime_trending_searches(pn='US') # realtime search trends for United States
-	pytrends.trending_searches(pn='IN') # India
+	pytrends.realtime_trending_searches(pn='IN') # India
 
 Returns pandas.DataFrame
 
