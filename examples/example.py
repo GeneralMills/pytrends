@@ -23,7 +23,7 @@ print(related_queries_dict)
 trending_searches_df = pytrend.trending_searches()
 print(trending_searches_df.head())
 
-Get Google Hot Trends data
+# Get Google Hot Trends data
 today_searches_df = pytrend.today_searches()
 print(today_searches_df.head())
 

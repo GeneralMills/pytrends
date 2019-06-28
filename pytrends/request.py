@@ -450,19 +450,12 @@ class TrendReq(object):
             params=forms
         )['storySummaries']['trendingStories']
 
+        # parse the returned json
         wanted_keys = ["entityNames"]
 
-        final_json =  [{ key: ts[key] for key in ts.keys() if key in wanted_keys} for ts in req_json ]
+        final_json = [{ key: ts[key] for key in ts.keys() if key in wanted_keys} for ts in req_json ]
 
         result_df = pd.DataFrame(final_json)
-        # parse the returned json
-
-        # result_df = req_json
-        # sub_df = pd.DataFrame()
-        # for trending_story in req_json:
-        #     sub_df = sub_df.append(trending_story['title'], ignore_index=True)
-        # result_df = pd.concat([result_df, sub_df])
-        # return result_df.iloc[:, -1]
 
         return result_df
 
