@@ -1,10 +1,11 @@
 from pytrends.request import TrendReq
+import time
 
 # Login to Google. Only need to run this once, the rest of requests will use the same session.
 pytrend = TrendReq()
 
 # Create payload and capture API tokens. Only needed for interest_over_time(), interest_by_region() & related_queries()
-pytrend.build_payload(kw_list=['pizza', 'bagel'])
+# pytrend.build_payload(kw_list=['pizza', 'bagel'])
 
 # Interest Over Time
 interest_over_time_df = pytrend.interest_over_time()
@@ -22,7 +23,7 @@ print(related_queries_dict)
 trending_searches_df = pytrend.trending_searches()
 print(trending_searches_df.head())
 
-# Get Google Hot Trends data
+Get Google Hot Trends data
 today_searches_df = pytrend.today_searches()
 print(today_searches_df.head())
 
@@ -33,3 +34,8 @@ print(top_charts_df.head())
 # Get Google Keyword Suggestions
 suggestions_dict = pytrend.suggestions(keyword='pizza')
 print(suggestions_dict)
+
+# Get Google Realtime Search Trends
+
+realtime_searches = pytrend.realtime_trending_searches()
+print(realtime_searches.head())
