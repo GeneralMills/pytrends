@@ -451,7 +451,7 @@ class TrendReq(object):
         )['storySummaries']['trendingStories']
 
         # parse the returned json
-        wanted_keys = ["entityNames"]
+        wanted_keys = ["entityNames", "title"]
 
         final_json = [{ key: ts[key] for key in ts.keys() if key in wanted_keys} for ts in req_json ]
 
