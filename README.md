@@ -25,6 +25,7 @@ Allows simple interface for automating downloading of reports from Google Trends
     * [Related Topics](#related-topics)
     * [Related Queries](#related-queries)
     * [Trending Searches](#trending-searches)
+    * [Realtime Search Trends](#realtime-search-trends)
     * [Top Charts](#top-charts)
     * [Suggestions](#suggestions)
 
@@ -272,6 +273,15 @@ Returns dictionary of pandas.DataFrames
 Returns pandas.DataFrame
 
 <sub><sup>[back to top](#trending_searches)</sub></sup>
+
+### Realtime Search Trends
+
+	pytrends.realtime_trending_searches(pn='US') # realtime search trends for United States
+	pytrends.realtime_trending_searches(pn='IN') # India
+
+Returns pandas.DataFrame
+
+<sub><sup>[back to top](#realtime-search-trends)</sub></sup>
 
 ### Top Charts
 
