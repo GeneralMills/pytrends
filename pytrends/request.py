@@ -150,7 +150,7 @@ class TrendReq(object):
                       gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
         self.kw_list = kw_list
-        self.geo = geo
+        self.geo = geo or self.geo
         self.token_payload = {
             'hl': self.hl,
             'tz': self.tz,
