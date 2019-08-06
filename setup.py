@@ -29,7 +29,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: MIT License'
     ],
-    install_requires=["requests", "pandas", 'lxml'],
+    install_requires=["requests", "pandas==0.24.2", 'lxml'],
     keywords='google trends api search',
     packages=['pytrends'],
 )
