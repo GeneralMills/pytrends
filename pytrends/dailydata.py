@@ -1,24 +1,21 @@
 from datetime import date, timedelta
 from functools import partial
 from time import sleep
+from calendar import monthrange
 
 import pandas as pd
 
 from pytrends.exceptions import ResponseError
 from pytrends.request import TrendReq
 
+
 def get_last_date_of_month(year: int, month: int) -> date:
     """Given a year and a month returns an instance of the date class
     containing the last day of the corresponding month.
 
-    Source: https://stackoverflow.com/a/43088/1445572
+    Source: https://stackoverflow.com/questions/42950/get-last-day-of-the-month-in-python
     """
-    if month == 12:
-        # last day of year is always 31st
-        return date(year, month, 31)
-    else:
-        # go to the next month 1st day, and move back 1 day
-        return date(year, month + 1, 1) - timedelta(days=1)
+    return date(year, month, monthrange(year, month)[1])
 
 
 def convert_dates_to_timeframe(start: date, stop: date) -> str:
