@@ -46,8 +46,11 @@ def _fetch_data(pytrends, build_payload, timeframe: str) -> pd.DataFrame:
 
 
 def get_daily_data(word: str,
-                 start_year: int = 2007,
-                 stop_year: int = 2018,
+                 start_year: int,
+                 start_mon: int,
+                 stop_year: int,
+                 stop_mon: int,
+                 geo = 'US'
                  verbose: bool = True,
                  wait_time: float = 5.0) -> pd.DataFrame:
     """Given a word, fetches daily search volume data from Google Trends and
@@ -64,10 +67,11 @@ def get_daily_data(word: str,
 
     Args:
         word (str): Word to fetch daily data for.
-        start_year (int): First year to fetch data for. Starts at the beginning
-            of this year (1st of January).
-        stop_year (int): Last year to fetch data for (inclusive). Stops at the
-            end of this year (31st of December).
+        start_year (int): the start year
+        start_mon (int): start 1st day of the month
+        stop_year (int): the end year
+        stop_mon (int): end at the last day of the month
+        geo (str): abbreviation for geolocation
         verbose (bool): If True, then prints the word and current time frame
             we are fecthing the data for.
 
@@ -86,14 +90,14 @@ def get_daily_data(word: str,
     """
 
     # Set up start and stop dates
-    start_date = date(start_year, 1, 1)
-    stop_date = date(stop_year, 12, 31)
+    start_date = date(start_year, start_mon, 1) 
+    stop_date = get_last_date_of_month(stop_year, stop_mon)
 
     # Start pytrends for US region
     pytrends = TrendReq(hl='en-US', tz=360)
     # Initialize build_payload with the word we need data for
     build_payload = partial(pytrends.build_payload,
-                            kw_list=[word], cat=0, geo='US', gprop='')
+                            kw_list=[word], cat=0, geo=geo, gprop='')
 
     # Obtain monthly data for all months in years [start_year, stop_year]
     monthly = _fetch_data(pytrends, build_payload,
