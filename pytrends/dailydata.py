@@ -50,7 +50,7 @@ def get_daily_data(word: str,
                  start_mon: int,
                  stop_year: int,
                  stop_mon: int,
-                 geo = 'US'
+                 geo = 'US',
                  verbose: bool = True,
                  wait_time: float = 5.0) -> pd.DataFrame:
     """Given a word, fetches daily search volume data from Google Trends and
