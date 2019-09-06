@@ -37,6 +37,9 @@ def _fetch_data(pytrends, build_payload, timeframe: str) -> pd.DataFrame:
             print(f'Trying again in {60 + 5 * attempts} seconds.')
             sleep(60 + 5 * attempts)
             attempts += 1
+            if attempts > 3:
+                print('Failed after 3 attemps, abort fetching.')
+                break
         else:
             fetched = True
     return pytrends.interest_over_time()
