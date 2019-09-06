@@ -7,8 +7,7 @@ import pandas as pd
 from pytrends.exceptions import ResponseError
 from pytrends.request import TrendReq
 
-
-def getLastDateOfMonth(year: int, month: int) -> date:
+def get_last_date_of_month(year: int, month: int) -> date:
     """Given a year and a month returns an instance of the date class
     containing the last day of the corresponding month.
 
@@ -22,7 +21,7 @@ def getLastDateOfMonth(year: int, month: int) -> date:
         return date(year, month + 1, 1) - timedelta(days=1)
 
 
-def getTimeframe(start: date, stop: date) -> str:
+def convert_dates_to_timeframe(start: date, stop: date) -> str:
     """Given two dates, returns a stringified version of the interval between
     the two dates which is used to retrieve data for a specific time frame
     from Google Trends.
@@ -30,7 +29,7 @@ def getTimeframe(start: date, stop: date) -> str:
     return f"{start.strftime('%Y-%m-%d')} {stop.strftime('%Y-%m-%d')}"
 
 
-def _fetchData(pytrends, build_payload, timeframe: str) -> pd.DataFrame:
+def _fetch_data(pytrends, build_payload, timeframe: str) -> pd.DataFrame:
     """Attempts to fecth data and retries in case of a ResponseError."""
     attempts, fetched = 0, False
     while not fetched:
@@ -46,7 +45,7 @@ def _fetchData(pytrends, build_payload, timeframe: str) -> pd.DataFrame:
     return pytrends.interest_over_time()
 
 
-def getDailyData(word: str,
+def get_daily_data(word: str,
                  start_year: int = 2007,
                  stop_year: int = 2018,
                  verbose: bool = True,
@@ -97,19 +96,19 @@ def getDailyData(word: str,
                             kw_list=[word], cat=0, geo='US', gprop='')
 
     # Obtain monthly data for all months in years [start_year, stop_year]
-    monthly = _fetchData(pytrends, build_payload,
-                         getTimeframe(start_date, stop_date))
+    monthly = _fetch_data(pytrends, build_payload,
+                         convert_dates_to_timeframe(start_date, stop_date))
 
     # Get daily data, month by month
     results = {}
     # if a timeout or too many requests error occur we need to adjust wait time
     current = start_date
     while current < stop_date:
-        lastDateOfMonth = getLastDateOfMonth(current.year, current.month)
-        timeframe = getTimeframe(current, lastDateOfMonth)
+        lastDateOfMonth = get_last_date_of_month(current.year, current.month)
+        timeframe = convert_dates_to_timeframe(current, lastDateOfMonth)
         if verbose:
             print(f'{word}:{timeframe}')
-        results[current] = _fetchData(pytrends, build_payload, timeframe)
+        results[current] = _fetch_data(pytrends, build_payload, timeframe)
         current = lastDateOfMonth + timedelta(days=1)
         sleep(wait_time)  # don't go too fast or Google will send 429s
 
