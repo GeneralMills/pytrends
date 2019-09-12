@@ -50,7 +50,7 @@ def get_daily_data(word: str,
                  start_mon: int,
                  stop_year: int,
                  stop_mon: int,
-                 geo = 'US',
+                 geo: str = 'US',
                  verbose: bool = True,
                  wait_time: float = 5.0) -> pd.DataFrame:
     """Given a word, fetches daily search volume data from Google Trends and
@@ -71,7 +71,7 @@ def get_daily_data(word: str,
         start_mon (int): start 1st day of the month
         stop_year (int): the end year
         stop_mon (int): end at the last day of the month
-        geo (str): abbreviation for geolocation
+        geo (str): geolocation
         verbose (bool): If True, then prints the word and current time frame
             we are fecthing the data for.
 
@@ -108,12 +108,12 @@ def get_daily_data(word: str,
     # if a timeout or too many requests error occur we need to adjust wait time
     current = start_date
     while current < stop_date:
-        lastDateOfMonth = get_last_date_of_month(current.year, current.month)
-        timeframe = convert_dates_to_timeframe(current, lastDateOfMonth)
+        last_date_of_month = get_last_date_of_month(current.year, current.month)
+        timeframe = convert_dates_to_timeframe(current, last_date_of_month)
         if verbose:
             print(f'{word}:{timeframe}')
         results[current] = _fetch_data(pytrends, build_payload, timeframe)
-        current = lastDateOfMonth + timedelta(days=1)
+        current = last_date_of_month + timedelta(days=1)
         sleep(wait_time)  # don't go too fast or Google will send 429s
 
     daily = pd.concat(results.values()).drop(columns=['isPartial'])
