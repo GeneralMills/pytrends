@@ -7,10 +7,8 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 import requests
-try:
-    from pandas.io.json.normalize import nested_to_record
-except ImportError:
-    from pandas.io.json._normalize import nested_to_record
+
+from pandas.io.json._normalize import nested_to_record
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
