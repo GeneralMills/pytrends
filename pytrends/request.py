@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 import requests
+
 from pandas.io.json._normalize import nested_to_record
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
@@ -147,7 +148,7 @@ class TrendReq(object):
                       gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
         self.kw_list = kw_list
-        self.geo = geo
+        self.geo = geo or self.geo
         self.token_payload = {
             'hl': self.hl,
             'tz': self.tz,
