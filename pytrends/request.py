@@ -90,7 +90,7 @@ class TrendReq(object):
         """
         Increment proxy INDEX; zero on overflow
         """
-        if self.proxy_index > len(self.proxies) - 1:
+        if self.proxy_index < (len(self.proxies) - 1):
             self.proxy_index += 1
         else:
             self.proxy_index = 0
