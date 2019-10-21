@@ -8,8 +8,9 @@ from datetime import datetime, timedelta
 import pandas as pd
 import requests
 
+
+
 from pandas.io.json._normalize import nested_to_record
-from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 from pytrends import exceptions
@@ -111,7 +112,7 @@ class TrendReq(object):
             retry = Retry(total=self.retries, read=self.retries,
                           connect=self.retries,
                           backoff_factor=self.backoff_factor)
-            adapter = HTTPAdapter(max_retries=retry)
+
         s.headers.update({'accept-language': self.hl})
         if len(self.proxies) > 0:
             self.cookies = self.GetGoogleCookie()
