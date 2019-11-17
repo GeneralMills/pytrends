@@ -4,7 +4,7 @@
 <p id="asblquery">If you can not see anything here, is because answer is opaque. Still you can see the network traffic in the debugger</p>
 
 <script>
-  def asblResponse(myJson) {
+  function asblResponse(myJson) {
     console.log(myJson);
     document.querySelector('#asblquery').innerHTML=JSON.stringify(myJson)
   }
