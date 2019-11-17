@@ -1,4 +1,26 @@
 <p>this page is to test api calls from javascript clients</p>
 
+<p>complete, client: asbl<p>
+<p id="asblquery"></p>
+
 <script>
+  fetch('https://www.google.com/complete/search?client=qsb-android-asbl&q=')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    console.log(myJson);
+    document.querySelector('#asblquery').innerHTML=JSON.stringify(myJson)
+  }).catch(function(error) {
+  console.log('Hubo un problema con la petición Fetch:' + error.message);
+})  
+    fetch('https://www.google.com/complete/search?client=qsb-android&q=')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    console.log(myJson);
+  }).catch(function(error) {
+  console.log('Hubo un problema con la petición Fetch:' + error.message);
+}) 
 </script>
