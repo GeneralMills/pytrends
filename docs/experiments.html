@@ -4,7 +4,7 @@
 <p id="asblquery"></p>
 
 <script>
-  fetch('https://www.google.com/complete/search?client=qsb-android-asbl&q=')
+  fetch('https://www.google.com/complete/search?client=qsb-android-asbl&q=', {mode: "no-cors"})
   .then(function(response) {
     return response.json();
   })
@@ -14,7 +14,7 @@
   }).catch(function(error) {
   console.log('Hubo un problema con la petición Fetch:' + error.message);
 })  
-    fetch('https://www.google.com/complete/search?client=qsb-android&q=')
+    fetch('https://www.google.com/complete/search?client=qsb-android&q=',{mode: "no-cors"})
   .then(function(response) {
     return response.json();
   })
