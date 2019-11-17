@@ -6,6 +6,7 @@
 <script>
   fetch('https://www.google.com/complete/search?client=qsb-android-asbl&q=', {mode: "no-cors"})
   .then(function(response) {
+    console.log(response);
     return response.json();
   })
   .then(function(myJson) {
@@ -16,6 +17,7 @@
 })  
     fetch('https://www.google.com/complete/search?client=qsb-android&q=',{mode: "no-cors"})
   .then(function(response) {
+    console.log(response);
     return response.json();
   })
   .then(function(myJson) {
