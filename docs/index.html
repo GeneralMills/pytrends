@@ -22,11 +22,22 @@
 		}})
 
   function asblResponse(myJson) {
-    console.log(myJson);
+    console.log(this,myJson);
     app.answers.push(myJson)
     //document.querySelector('#asblquery').innerHTML=JSON.stringify(myJson)
   }
 </script>
 
-<script src='https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse&gl=es'></script>
+<script src='https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse'></script>
+
+<script>
+	['eu','es','uk','fr','in','jp','au','us','com','cat'].forEach( (loc) => {
+		var newscript = document.createElement("script");
+		newscript.id=loc;
+		newscript.name=loc;
+		newscript.src = 'https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse&hl=en&gl='+loc;
+		document.querySelector("head").appendChild(newscript);
+	}
+	 );
+</script>
 
