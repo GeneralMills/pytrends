@@ -31,11 +31,11 @@
 <script src='https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse'></script>
 
 <script>
-	['eu','es','uk','fr','in','jp','au','us','com','cat'].forEach( (loc) => {
+	['ar','mx','eu','es','uk','fr','in','jp','au','us','com','cat'].forEach( (loc) => {
 		var newscript = document.createElement("script");
 		newscript.id=loc;
 		newscript.name=loc;
-		newscript.src = 'https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse&hl=en&gl='+loc;
+		newscript.src = 'https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse&hl=fr&gl='+loc;
 		document.querySelector("head").appendChild(newscript);
 	}
 	 );
