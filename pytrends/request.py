@@ -473,7 +473,7 @@ class TrendReq(object):
         """Gets historical hourly data for interest by chunking requests to 1 week at a time (which is what Google allows)"""
 
         # construct datetime obejcts - raises ValueError if invalid parameters
-        start_date = datetime(year_start, month_start, day_start, hour_start)
+        initial_start_date = start_date = datetime(year_start, month_start, day_start, hour_start)
         end_date = datetime(year_end, month_end, day_end, hour_end)
 
         # the timeframe has to be in 1 week intervals or Google will reject it
