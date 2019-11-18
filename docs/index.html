@@ -1,34 +1,32 @@
-<p>this page is to test api calls from javascript clients</p>
+<h1>Google search /complete for trends</h1>
 
-<p>complete, client: asbl<p>
-<h1 id="asblquery">If you can not see anything here, is because answer is opaque. Still you can see the network traffic in the debugger</h1>
+<h2>As seen in the Google App android quicksearchbox</h2>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<div id="app">
+	<li v-for="answer in answers">
+		<ul>
+			<li v-for="item in answer[1]">
+				({{item[3].zc}}) {{item[0]}}
+			</li>
+		</ul>
+	</li>
+</ul>
+</div>
 
 <script>
+	var app = new Vue({
+		el: '#app',
+		data: {
+			answers:[]
+		}})
+
   function asblResponse(myJson) {
     console.log(myJson);
-    document.querySelector('#asblquery').innerHTML=JSON.stringify(myJson)
+    app.answers.push(myJson)
+    //document.querySelector('#asblquery').innerHTML=JSON.stringify(myJson)
   }
 </script>
 
-<script src='https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse'></script>
+<script src='https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse&gl=es'></script>
 
-<!-- script
-  fetch('https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse', {mode: "no-cors"})
-  .then(function(response) {
-    console.log(response);
-    
-    //return response.json();
-  }).catch(function(error) {
-  console.log('Hubo un problema con la petición Fetch:' + error.message);
-})  
-    fetch('https://www.google.com/complete/search?client=qsb-android&q=',{mode: "no-cors"})
-  .then(function(response) {
-    console.log(response);
-    return response.json();
-  })
-  .then(function(myJson) {
-    console.log(myJson);
-  }).catch(function(error) {
-  console.log('Hubo un problema con la petición Fetch:' + error.message);
-}) 
-</script-->
