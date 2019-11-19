@@ -1,9 +1,28 @@
 <h1>Google search /complete for trends</h1>
 
 <h2>As seen in the Google App android quicksearchbox</h2>
+<h3>Reload to generate other random combinations</h3>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
 <div id="app">
+<table border=1>
+<tbody>
+<tr v-for="row in hls">
+   <td v-for="column in gls">
+          <center>q={{row}}{{column}}</center>
+          <hr/>
+          <ul>
+              <li v-for="item in answerDict['q='+row+column]">
+                    ({{item[3].zc}}) <div v-html="item[0]"></div>
+               </li>
+           <ul>
+   </td>
+</tr>
+</tbody>
+</table>
+
+<hr/>
+<h3>same thing, list ordered</h3>
 	<li v-for="answer in answers">
                 {{answer[0]}}
 		<ul>
@@ -16,21 +35,22 @@
 </div>
 
 <script>
-	var app = new Vue({
+  var app = new Vue({
 		el: '#app',
 		data: {
-			answers:[]
+                        answerDict:{},
+			answers:[],
+                        hls:[1,2],
+                        gls:[3,4,5]
 		}})
 
   function asblResponse(myJson) {
     console.log(document.currentScript.text,myJson);
     myJson[0]=document.currentScript.text;
+    app.answerDict[document.currentScript.text]=myJson[1];
     app.answers.push(myJson)
     //document.querySelector('#asblquery').innerHTML=JSON.stringify(myJson)
   }
-</script>
-
-<script>
 
 	//see https://sites.google.com/site/tomihasa/google-language-codes or authoritative:
 	//   https://developers.google.com/custom-search/docs/xml_results_appendices
@@ -46,7 +66,7 @@ pt-PT, qu, rm, rn, ro, ru, rw, sd, sh, si, sk, sl, sn, sm, so, sq, sr, \
 sr-Latn, sr-ME, st, su, sv, sw, ta, te, tg, th, ti, tk, tl, tlh, tn, to, tr, tt, \
 tum, tw, ug, uk, ur, uz, vi, wo, xh, xx-bork, xx-elmer, xx-hacker, \
 xx-klingon, xx-pirate, yi, yo, zh-CN, zh-TW, zu".split(",").map(item => "&hl="+item.trim());
-	langcodes = [""].concat(_.shuffle(langcodes).slice(0,5));
+	langcodes = [""].concat(_.shuffle(langcodes).slice(0,8));
 	
 	//opcional gl=
 	countrycodes="AD,AE,AF,AG,AI,AL,AM,AO,AQ,AR,AS,AT,AU,AW,AZ,BA,BB,BD,BE,BF,BG,\
@@ -60,6 +80,9 @@ TC,TD,TF,TG,TH,TJ,TK,TL,TM,TN,TO,TR,TT,TV,TW,TZ,UA,UG,UM,US,UY,UZ,VA,VC,VE,VG,VI
 WF,WS,XK,YE,YT,ZA,ZM,ZW".split(",").map(item => "&gl="+item.trim());   
 	countrycodes = [""].concat(_.shuffle(countrycodes).slice(0,5));
 	
+        app.hls=langcodes;
+        app.gls=countrycodes;
+
 	langcodes.forEach( (hl) => {
 		countrycodes.forEach( (gl) => {
 		var newscript = document.createElement("script");
