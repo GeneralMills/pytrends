@@ -22,7 +22,7 @@
 		}})
 
   function asblResponse(myJson) {
-    console.log(this,myJson);
+    console.log(document.currentscript.text,myJson);
     app.answers.push(myJson)
     //document.querySelector('#asblquery').innerHTML=JSON.stringify(myJson)
   }
@@ -66,6 +66,7 @@ WF,WS,XK,YE,YT,ZA,ZM,ZW".split(",").map(item => "&gl="+item.trim());
 		var newscript = document.createElement("script");
 		newscript.id="id00"+hl;
 		newscript.name="name00"+gl;	
+		newscript.text="q="+hl+gl;
 		newscript.src = 'https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse'+hl+gl;
 		document.querySelector("head").appendChild(newscript);
 	   });
