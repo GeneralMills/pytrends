@@ -5,6 +5,7 @@
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
 <div id="app">
 	<li v-for="answer in answers">
+                {{answer[0]}}
 		<ul>
 			<li v-for="item in answer[1]">
 				({{item[3].zc}}) {{item[0]}}
@@ -23,6 +24,7 @@
 
   function asblResponse(myJson) {
     console.log(document.currentScript.text,myJson);
+    myJson[0]=document.currentScript.text;
     app.answers.push(myJson)
     //document.querySelector('#asblquery').innerHTML=JSON.stringify(myJson)
   }
