@@ -2,7 +2,7 @@
 
 <h2>As seen in the Google App android quicksearchbox</h2>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js></script>
 <div id="app">
 	<li v-for="answer in answers">
 		<ul>
@@ -28,16 +28,48 @@
   }
 </script>
 
+
 <script src='https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse'></script>
 
 <script>
-	['ar','mx','eu','es','uk','fr','in','jp','au','us','com','cat'].forEach( (loc) => {
+
+	//see https://sites.google.com/site/tomihasa/google-language-codes or authoritative:
+	//   https://developers.google.com/custom-search/docs/xml_results_appendices
+	
+	//optional hl=
+	langcodes="af, ach, ak, am, ar, az, ban, be, bem, bg, bh, bn, br, bs, ca, ceb, chr, ckb, \
+co, crs, cs, cy, da, de, ee, el, en, eo, es, es-419, et, eu, fa, fi, \
+fo, fr, fy, ga, gaa, gd, gl, gn, gu, ha, haw, hi, hr, ht, hu, hy, ia, \
+id, ig, is, it, iw, ja, jw, ka, kg, kk, km, kn, ko, kri, ku?, ky, la, \
+lg, ln, lo, loz, lt, lua, lv, mfe, mg, mi, mk, ml, mn, mo, mr, ms, mt, my, \
+ne, nl, nn, no, nso, ny, nyn, oc, om, or, pa, pcm, pl, ps, pt-BR, \
+pt-PT, qu, rm, rn, ro, ru, rw, sd, sh, si, sk, sl, sn, sm, so, sq, sr, \
+sr-Latn, sr-ME, st, su, sv, sw, ta, te, tg, th, ti, tk, tl, tlh, tn, to, tr, tt, \
+tum, tw, ug, uk, ur, uz, vi, wo, xh, xx-bork, xx-elmer, xx-hacker, \
+xx-klingon, xx-pirate, yi, yo, zh-CN, zh-TW, zu".split(",").map(item => "&hl="+item.trim());
+	langcodes = [""].concat(_.shuffle(langcodes).slice(0,5));
+	
+	//opcional gl=
+	countrycodes="AD,AE,AF,AG,AI,AL,AM,AO,AQ,AR,AS,AT,AU,AW,AZ,BA,BB,BD,BE,BF,BG,\
+BH,BI,BJ,BM,BN,BO,BQ,BR,BS,BT,BV,BW,BY,BZ,CA,CC,CD,CF,CG,CH,CI,CK,CL,CM,CN,CO,CR,CV,CW,CX,\
+CY,CZ,DE,DJ,DK,DM,DO,DZ,EC,EE,EG,EH,ER,ES,ET,FI,FJ,FK,FM,FO,FR,GA,GB,GD,GE,GF,GG,GH,GI,GL,\
+GM,GN,GP,GQ,GR,GS,GT,GU,GW,GY,HK,HM,HN,HR,HT,HU,ID,IE,IL,IN,IO,IQ,IS,IT,JE,JM,JO,JP,KE,KG,KH,\
+KI,KM,KN,KR,KW,KY,KZ,LA,LB,LC,LI,LK,LR,LS,LT,LU,LV,LY,MA,MC,MD,ME,MG,MH,MK,ML,MM,MN,MO,MP,MQ,\
+MR,MS,MT,MU,MV,MW,MX,MY,MZ,NA,NC,NE,NF,NG,NI,NL,NO,NP,NR,NU,NZ,OM,PA,PE,PF,PG,PH,PK,PL,PM,PN,\
+PR,PS,PT,PW,PY,QA,RE,RO,RS,RU,RW,SA,SB,SC,SE,SG,SH,SI,SJ,SK,SL,SM,SN,SO,SR,ST,SV,SX,SZ,\
+TC,TD,TF,TG,TH,TJ,TK,TL,TM,TN,TO,TR,TT,TV,TW,TZ,UA,UG,UM,US,UY,UZ,VA,VC,VE,VG,VI,VN,VU,\
+WF,WS,XK,YE,YT,ZA,ZM,ZW".split(",").map(item => "&gl="+item.trim());   
+	countrycodes = [""].concat(_.shuffle(countrycodes).slice(0,5));
+	
+	langcodes.forEach( (hl) => {
+		countrycodes.forEach( (gl) => {
 		var newscript = document.createElement("script");
-		newscript.id=loc;
-		newscript.name=loc;
-		newscript.src = 'https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse&hl=fr&gl='+loc;
+		newscript.id="id00"+hl;
+		newscript.name="name00"+gl;	
+		newscript.src = 'https://www.google.com/complete/search?client=qsb-android-asbl&q=&callback=asblResponse"+hl+gl;
 		document.querySelector("head").appendChild(newscript);
-	}
-	 );
+	   }
+	 }
+    );
 </script>
 
