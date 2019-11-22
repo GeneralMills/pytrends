@@ -100,8 +100,9 @@ def get_daily_data(word: str,
                             kw_list=[word], cat=0, geo=geo, gprop='')
 
     # Obtain monthly data for all months in years [start_year, stop_year]
+    early_date = min(datetime.date(2014, 1, 1), start_date)
     monthly = _fetch_data(pytrends, build_payload,
-                         convert_dates_to_timeframe(start_date, stop_date))
+                         convert_dates_to_timeframe(early_date, stop_date))
 
     # Get daily data, month by month
     results = {}
