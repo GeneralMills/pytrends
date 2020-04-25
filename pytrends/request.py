@@ -279,14 +279,21 @@ class TrendReq(object):
         df = pd.DataFrame(req_json['default']['geoMapData'])
         if (df.empty):
             return df
-
+    
         # rename the column with the search keyword
-        df = df[['geoName', 'geoCode', 'value']].set_index(
-            ['geoName']).sort_index()
+        # only if the json has 'geoCode' 
+        has_geo = False
+        if 'geoCode' in df.columns:
+            df = df[['geoName', 'geoCode', 'value']].set_index(['geoName']).sort_index()
+            has_geo = True
+        # if not, do not use it
+        else:
+            df = df[['geoName', 'value']].set_index(['geoName']).sort_index()
         # split list columns into seperate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(
             str(x).replace('[', '').replace(']', '').split(',')))
-        if inc_geo_code:
+        # if 'geoCode' exists, add it here
+        if inc_geo_code and has_geo:
             result_df['geoCode'] = df['geoCode']
 
         # rename each column with its search term
