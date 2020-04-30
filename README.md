@@ -282,8 +282,8 @@ Parameters
 * `date`
 
   - *Required*
-  - YYYY or YYYYMM integer
-  - Example `201611` for November 2016 Top Chart data
+  - YYYY or YYYY-MM integer
+  - Example `2016-11` for November 2016 Top Chart data
 
 Returns pandas.DataFrame
 
