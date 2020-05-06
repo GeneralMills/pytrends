@@ -9,7 +9,6 @@ import pandas as pd
 import requests
 
 
-
 from pandas.io.json._normalize import nested_to_record
 from requests.packages.urllib3.util.retry import Retry
 
@@ -38,7 +37,7 @@ class TrendReq(object):
     TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
 
     def __init__(self, hl='en-US', tz=360, geo='', timeout=(2, 5), proxies='',
-                 retries=0, backoff_factor=0):
+                 retries=0, backoff_factor=0, requests_args=None):
         """
         Initialize default values for params
         """
@@ -55,6 +54,7 @@ class TrendReq(object):
         self.retries = retries
         self.backoff_factor = backoff_factor
         self.proxy_index = 0
+        self.requests_args = requests_args or {}
         self.cookies = self.GetGoogleCookie()
         # intialize widget payloads
         self.token_payload = dict()
@@ -78,14 +78,16 @@ class TrendReq(object):
                     'https://trends.google.com/?geo={geo}'.format(
                         geo=self.hl[-2:]),
                     timeout=self.timeout,
-                    proxies=proxy
+                    proxies=proxy,
+                    **self.requests_args
                 ).cookies.items()))
             except requests.exceptions.ProxyError:
                 print('Proxy error. Changing IP')
-                if len(self.proxies) > 0:
+                if len(self.proxies) > 1:
                     self.proxies.remove(self.proxies[self.proxy_index])
                 else:
-                    print('Proxy list is empty. Bye!')
+                    print('No more proxies available. Bye!')
+                    raise
                 continue
 
     def GetNewProxy(self):
@@ -119,10 +121,10 @@ class TrendReq(object):
             s.proxies.update({'https': self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
             response = s.post(url, timeout=self.timeout,
-                              cookies=self.cookies, **kwargs)  # DO NOT USE retries or backoff_factor here
+                              cookies=self.cookies, **kwargs, **self.requests_args)  # DO NOT USE retries or backoff_factor here
         else:
             response = s.get(url, timeout=self.timeout, cookies=self.cookies,
-                             **kwargs)  # DO NOT USE retries or backoff_factor here
+                             **kwargs, **self.requests_args)   # DO NOT USE retries or backoff_factor here
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
@@ -400,7 +402,8 @@ class TrendReq(object):
         # forms = {'ajax': 1, 'pn': pn, 'htd': '', 'htv': 'l'}
         req_json = self._get_data(
             url=TrendReq.TRENDING_SEARCHES_URL,
-            method=TrendReq.GET_METHOD
+            method=TrendReq.GET_METHOD,
+            **self.requests_args
         )[pn]
         result_df = pd.DataFrame(req_json)
         return result_df
@@ -412,7 +415,8 @@ class TrendReq(object):
             url=TrendReq.TODAY_SEARCHES_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            params=forms
+            params=forms,
+            **self.requests_args
         )['default']['trendingSearchesDays'][0]['trendingSearches']
         result_df = pd.DataFrame()
         # parse the returned json
@@ -434,6 +438,7 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=chart_payload,
+            **self.requests_args
         )['topCharts'][0]['listItems']
         df = pd.DataFrame(req_json)
         return df
@@ -450,6 +455,7 @@ class TrendReq(object):
             params=parameters,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
+            **self.requests_args
         )['default']['topics']
         return req_json
 
@@ -463,6 +469,7 @@ class TrendReq(object):
             params=params,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
+            **self.requests_args
         )
         return req_json
 
