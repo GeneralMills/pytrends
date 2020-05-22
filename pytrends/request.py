@@ -69,7 +69,7 @@ class TrendReq(object):
         Removes proxy from the list on proxy error
         """
         while True:
-            if "proxies" in self.request_args:
+            if "proxies" in self.requests_args:
                 try:
                     return dict(filter(lambda i: i[0] == 'NID', requests.get(
                         'https://trends.google.com/?geo={geo}'.format(
