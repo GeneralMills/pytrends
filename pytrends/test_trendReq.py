@@ -83,7 +83,8 @@ class TestTrendReq(TestCase):
         # Interest by country (default resolution) only works for world.
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='CA')
-        self.assertIsNotNone(pytrend.interest_by_region(resolution='COUNTRY'))
+        with self.assertRaises(ValueError):
+            pytrend.interest_by_region()
 
     def test_interest_by_subregion_ca(self):
         pytrend = TrendReq()
