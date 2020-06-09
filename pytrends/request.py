@@ -248,6 +248,8 @@ class TrendReq(object):
                            inc_geo_code=False):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
+        if resolution not in ['DMA', 'CITY', 'REGION', 'COUNTRY']:
+            raise ValueError('resolution must be DMA, CITY, REGION, or COUNTRY')
         # make the request
         region_payload = dict()
         if self.geo == '':
