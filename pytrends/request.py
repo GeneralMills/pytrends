@@ -55,7 +55,10 @@ class TrendReq(object):
         self.backoff_factor = backoff_factor
         self.proxy_index = 0
         self.requests_args = requests_args or {}
-        self.cookies = self.GetGoogleCookie()
+        try:
+            self.cookies = self.GetGoogleCookie()
+        except Exception:
+            raise
         # intialize widget payloads
         self.token_payload = dict()
         self.interest_over_time_widget = dict()
@@ -89,6 +92,8 @@ class TrendReq(object):
                     print('No more proxies available. Bye!')
                     raise
                 continue
+            except Exception:
+                raise
 
     def GetNewProxy(self):
         """
@@ -120,11 +125,17 @@ class TrendReq(object):
             self.cookies = self.GetGoogleCookie()
             s.proxies.update({'https': self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
-            response = s.post(url, timeout=self.timeout,
+            try:
+                response = s.post(url, timeout=self.timeout,
                               cookies=self.cookies, **kwargs, **self.requests_args)  # DO NOT USE retries or backoff_factor here
+            except Exception:
+                raise
         else:
-            response = s.get(url, timeout=self.timeout, cookies=self.cookies,
+            try:
+                response = s.get(url, timeout=self.timeout, cookies=self.cookies,
                              **kwargs, **self.requests_args)   # DO NOT USE retries or backoff_factor here
+            except Exception:
+                raise    
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
@@ -166,18 +177,24 @@ class TrendReq(object):
         # requests will mangle this if it is not a string
         self.token_payload['req'] = json.dumps(self.token_payload['req'])
         # get tokens
-        self._tokens()
+        try:
+            self._tokens()
+        except Exception:
+            raise
         return
 
     def _tokens(self):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
         # make the request and parse the returned json
-        widget_dict = self._get_data(
+        try:
+            widget_dict = self._get_data(
             url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
             params=self.token_payload,
             trim_chars=4,
-        )['widgets']
+            )['widgets']
+        except Exception:
+            raise
         # order of the json matters...
         first_region_token = True
         # clear self.related_queries_widget_list and self.related_topics_widget_list
@@ -209,12 +226,15 @@ class TrendReq(object):
         }
 
         # make the request and parse the returned json
-        req_json = self._get_data(
-            url=TrendReq.INTEREST_OVER_TIME_URL,
-            method=TrendReq.GET_METHOD,
-            trim_chars=5,
-            params=over_time_payload,
-        )
+        try:
+            req_json = self._get_data(
+                url=TrendReq.INTEREST_OVER_TIME_URL,
+                method=TrendReq.GET_METHOD,
+                trim_chars=5,
+                params=over_time_payload,
+                )
+        except Exception:
+            raise
 
         df = pd.DataFrame(req_json['default']['timelineData'])
         if (df.empty):
@@ -272,12 +292,15 @@ class TrendReq(object):
         region_payload['tz'] = self.tz
 
         # parse returned json
-        req_json = self._get_data(
-            url=TrendReq.INTEREST_BY_REGION_URL,
-            method=TrendReq.GET_METHOD,
-            trim_chars=5,
-            params=region_payload,
-        )
+        try:
+            req_json = self._get_data(
+                url=TrendReq.INTEREST_BY_REGION_URL,
+                method=TrendReq.GET_METHOD,
+                trim_chars=5,
+                params=region_payload,
+            )
+        except Exception:
+            raise
         df = pd.DataFrame(req_json['default']['geoMapData'])
         if (df.empty):
             return df
@@ -317,12 +340,15 @@ class TrendReq(object):
             related_payload['tz'] = self.tz
 
             # parse the returned json
-            req_json = self._get_data(
-                url=TrendReq.RELATED_QUERIES_URL,
-                method=TrendReq.GET_METHOD,
-                trim_chars=5,
-                params=related_payload,
-            )
+            try:
+                req_json = self._get_data(
+                    url=TrendReq.RELATED_QUERIES_URL,
+                    method=TrendReq.GET_METHOD,
+                    trim_chars=5,
+                    params=related_payload,
+                )
+            except Exception:
+                raise
 
             # top topics
             try:
@@ -366,12 +392,15 @@ class TrendReq(object):
             related_payload['tz'] = self.tz
 
             # parse the returned json
-            req_json = self._get_data(
-                url=TrendReq.RELATED_QUERIES_URL,
-                method=TrendReq.GET_METHOD,
-                trim_chars=5,
-                params=related_payload,
-            )
+            try:
+                req_json = self._get_data(
+                    url=TrendReq.RELATED_QUERIES_URL,
+                    method=TrendReq.GET_METHOD,
+                    trim_chars=5,
+                    params=related_payload,
+                )
+            except Exception:
+                raise
 
             # top queries
             try:
@@ -400,24 +429,30 @@ class TrendReq(object):
         # make the request
         # forms become obsolute due to the new TRENDING_SEACHES_URL
         # forms = {'ajax': 1, 'pn': pn, 'htd': '', 'htv': 'l'}
-        req_json = self._get_data(
-            url=TrendReq.TRENDING_SEARCHES_URL,
-            method=TrendReq.GET_METHOD,
-            **self.requests_args
-        )[pn]
+        try:
+            req_json = self._get_data(
+                url=TrendReq.TRENDING_SEARCHES_URL,
+                method=TrendReq.GET_METHOD,
+                **self.requests_args
+            )[pn]
+        except Exception:
+            raise
         result_df = pd.DataFrame(req_json)
         return result_df
 
     def today_searches(self, pn='US'):
         """Request data from Google Daily Trends section and returns a dataframe"""
         forms = {'ns': 15, 'geo': pn, 'tz': '-180', 'hl': 'en-US'}
-        req_json = self._get_data(
-            url=TrendReq.TODAY_SEARCHES_URL,
-            method=TrendReq.GET_METHOD,
-            trim_chars=5,
-            params=forms,
-            **self.requests_args
-        )['default']['trendingSearchesDays'][0]['trendingSearches']
+        try:
+            req_json = self._get_data(
+                url=TrendReq.TODAY_SEARCHES_URL,
+                method=TrendReq.GET_METHOD,
+                trim_chars=5,
+                params=forms,
+                **self.requests_args
+            )['default']['trendingSearchesDays'][0]['trendingSearches']
+        except Exception:
+            raise
         result_df = pd.DataFrame()
         # parse the returned json
         sub_df = pd.DataFrame()
@@ -433,13 +468,16 @@ class TrendReq(object):
                          'isMobile': False}
 
         # make the request and parse the returned json
-        req_json = self._get_data(
-            url=TrendReq.TOP_CHARTS_URL,
-            method=TrendReq.GET_METHOD,
-            trim_chars=5,
-            params=chart_payload,
-            **self.requests_args
-        )['topCharts'][0]['listItems']
+        try:
+            req_json = self._get_data(
+                url=TrendReq.TOP_CHARTS_URL,
+                method=TrendReq.GET_METHOD,
+                trim_chars=5,
+                params=chart_payload,
+                **self.requests_args
+            )['topCharts'][0]['listItems']
+        except Exception:
+            raise
         df = pd.DataFrame(req_json)
         return df
 
@@ -449,28 +487,32 @@ class TrendReq(object):
         # make the request
         kw_param = quote(keyword)
         parameters = {'hl': self.hl}
-
-        req_json = self._get_data(
-            url=TrendReq.SUGGESTIONS_URL + kw_param,
-            params=parameters,
-            method=TrendReq.GET_METHOD,
-            trim_chars=5,
-            **self.requests_args
-        )['default']['topics']
+        try:
+            req_json = self._get_data(
+                url=TrendReq.SUGGESTIONS_URL + kw_param,
+                params=parameters,
+                method=TrendReq.GET_METHOD,
+                trim_chars=5,
+                **self.requests_args
+            )['default']['topics']
+        except Exception:
+            raise
         return req_json
 
     def categories(self):
         """Request available categories data from Google's API and return a dictionary"""
 
         params = {'hl': self.hl}
-
-        req_json = self._get_data(
-            url=TrendReq.CATEGORIES_URL,
-            params=params,
-            method=TrendReq.GET_METHOD,
-            trim_chars=5,
-            **self.requests_args
-        )
+        try:
+            req_json = self._get_data(
+                url=TrendReq.CATEGORIES_URL,
+                params=params,
+                method=TrendReq.GET_METHOD,
+                trim_chars=5,
+                **self.requests_args
+            )
+        except Exception:
+            raise
         return req_json
 
     def get_historical_interest(self, keywords, year_start=2018, month_start=1,
