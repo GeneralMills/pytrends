@@ -52,7 +52,7 @@ class TestTrendReq(TestCase):
     def test_top_charts(self):
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.top_charts())
+        self.assertIsNotNone(pytrend.top_charts(date=2019))
 
     def test_suggestions(self):
         pytrend = TrendReq()
