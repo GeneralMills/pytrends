@@ -35,24 +35,28 @@ class TestTrendReq(TestCase):
         self.assertIsNotNone(pytrend.interest_by_region())
 
     def test_interest_by_badregion(self):
+        # Test an invalid resolution.
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         with self.assertRaises(ValueError):
             pytrend.interest_by_region(resolution='BADREGION')
 
-    def test_interest_by_dma(self):
+    def test_interest_by_dma_world(self):
         # DMA is only available for US and US states (subregions).
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         with self.assertRaises(ValueError):
             pytrend.interest_by_region(resolution='DMA')
 
-    def test_interest_by_subregion(self):
+    def test_interest_by_subregion_world(self):
+        # Subregion isn't available for world.
+        # Note: The UI calls it region in world view, but it's actually country.
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.interest_by_region(resolution='REGION'))
+        with self.assertRaises(ValueError):
+            pytrend.interest_by_region(resolution='REGION')
 
-    def test_interest_by_city(self):
+    def test_interest_by_city_world(self):
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         self.assertIsNotNone(pytrend.interest_by_region(resolution='CITY'))
