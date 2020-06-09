@@ -236,6 +236,8 @@ class TrendReq(object):
             result_df2 = df['isPartial'].apply(lambda x: pd.Series(
                 str(x).replace('[', '').replace(']', '').split(',')))
             result_df2.columns = ['isPartial']
+            # Change to a bool type.
+            result_df2.isPartial = result_df2.isPartial == 'True'
             # concatenate the two dataframes
             final = pd.concat([result_df, result_df2], axis=1)
         else:
