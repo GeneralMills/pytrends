@@ -145,6 +145,8 @@ class TrendReq(object):
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='',
                       gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
+        if gprop not in ['', 'images', 'news', 'youtube', 'froogle']:
+            raise ValueError('gprop must be empty (to indicate web), images, news, youtube, or froogle')
         self.kw_list = kw_list
         self.geo = geo or self.geo
         self.token_payload = {
