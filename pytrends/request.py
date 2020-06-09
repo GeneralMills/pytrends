@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import json
 import sys
 import time
@@ -14,10 +12,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 from pytrends import exceptions
 
-if sys.version_info[0] == 2:  # Python 2
-    from urllib import quote
-else:  # Python 3
-    from urllib.parse import quote
+from urllib.parse import quote
 
 
 class TrendReq(object):
