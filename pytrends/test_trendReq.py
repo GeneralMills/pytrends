@@ -51,9 +51,8 @@ class TestTrendReq(TestCase):
 
     def test_interest_over_time_bad_gprop(self):
         pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
         with self.assertRaises(ValueError):
-            pytrend.interest_over_time()
+            pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
 
     def test_interest_by_region(self):
         pytrend = TrendReq()
