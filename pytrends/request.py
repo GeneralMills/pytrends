@@ -252,12 +252,9 @@ class TrendReq(object):
             raise ValueError('resolution must be DMA, CITY, REGION, or COUNTRY')
         # make the request
         region_payload = dict()
-        if self.geo == '':
-            self.interest_by_region_widget['request'][
-                'resolution'] = resolution
-        elif self.geo == 'US' and resolution in ['DMA', 'CITY', 'REGION']:
-            self.interest_by_region_widget['request'][
-                'resolution'] = resolution
+        if resolution == 'DMA' and self.geo[:2] != 'US':
+            raise ValueError('DMA can only be provided for US and US states')
+        self.interest_by_region_widget['request']['resolution'] = resolution
 
         self.interest_by_region_widget['request'][
             'includeLowSearchVolumeGeos'] = inc_low_vol
