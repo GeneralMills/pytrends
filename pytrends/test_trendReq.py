@@ -38,7 +38,7 @@ class TestTrendReq(TestCase):
         # DMA is only available for US and US states (subregions).
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertRaises(InvalidGeoException, pytrend.interest_by_region(resolution='DMA'))
+        self.assertRaises(ValueError, pytrend.interest_by_region(resolution='DMA'))
 
     def test_interest_by_subregion(self):
         pytrend = TrendReq()
@@ -74,7 +74,7 @@ class TestTrendReq(TestCase):
         # DMA is only available for US and US states (subregions).
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='CA')
-        self.assertRaises(InvalidGeoException, pytrend.interest_by_region(resolution='DMA'))
+        self.assertRaises(ValueError, pytrend.interest_by_region(resolution='DMA'))
 
     def test_interest_by_subregion_ca(self):
         pytrend = TrendReq()
