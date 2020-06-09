@@ -1,4 +1,5 @@
 from unittest import TestCase
+import pandas.api.types as ptypes
 
 from pytrends.request import TrendReq
 
@@ -58,3 +59,16 @@ class TestTrendReq(TestCase):
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         self.assertIsNotNone(pytrend.suggestions(keyword='pizza'))
+
+    def test_ispartial_dtype(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'])
+        df = pytrend.interest_over_time()
+        assert ptypes.is_bool_dtype(df.isPartial)
+
+    def test_ispartial_dtype_timeframe_all(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'],
+                              timeframe='all')
+        df = pytrend.interest_over_time()
+        assert ptypes.is_bool_dtype(df.isPartial)
