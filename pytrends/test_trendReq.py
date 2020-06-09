@@ -29,7 +29,7 @@ class TestTrendReq(TestCase):
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         self.assertIsNotNone(pytrend.interest_over_time())
 
-    def test_interest_by_region(self):
+    def test_interest_by_country_world(self):
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         self.assertIsNotNone(pytrend.interest_by_region())
@@ -57,10 +57,12 @@ class TestTrendReq(TestCase):
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         self.assertIsNotNone(pytrend.interest_by_region(resolution='CITY'))
 
-    def test_interest_by_region_us(self):
+    def test_interest_by_country_us(self):
+        # Interest by country (default resolution) only works for world.
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='US')
-        self.assertIsNotNone(pytrend.interest_by_region())
+        with self.assertRaises(ValueError):
+            pytrend.interest_by_region()
 
     def test_interest_by_dma_us(self):
         pytrend = TrendReq()
@@ -77,17 +79,23 @@ class TestTrendReq(TestCase):
         pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='US')
         self.assertIsNotNone(pytrend.interest_by_region(resolution='CITY'))
 
+    def test_interest_by_country_ca(self):
+        # Interest by country (default resolution) only works for world.
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='CA')
+        self.assertIsNotNone(pytrend.interest_by_region(resolution='COUNTRY'))
+
+    def test_interest_by_subregion_ca(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='CA')
+        self.assertIsNotNone(pytrend.interest_by_region(resolution='REGION'))
+
     def test_interest_by_dma_ca(self):
         # DMA is only available for US and US states (subregions).
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='CA')
         with self.assertRaises(ValueError):
             pytrend.interest_by_region(resolution='DMA')
-
-    def test_interest_by_subregion_ca(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='CA')
-        self.assertIsNotNone(pytrend.interest_by_region(resolution='REGION'))
 
     def test_interest_by_city_ca(self):
         pytrend = TrendReq()

@@ -252,8 +252,10 @@ class TrendReq(object):
             raise ValueError('resolution must be DMA, CITY, REGION, or COUNTRY')
         # make the request
         region_payload = dict()
+        if resolution == 'COUNTRY' and self.geo != '':
+            raise ValueError('COUNTRY resolution is only available for worldwide queries')
         if resolution == 'DMA' and self.geo[:2] != 'US':
-            raise ValueError('DMA can only be provided for US and US states')
+            raise ValueError('DMA resolution is only available for US and US states')
         self.interest_by_region_widget['request']['resolution'] = resolution
 
         self.interest_by_region_widget['request'][
