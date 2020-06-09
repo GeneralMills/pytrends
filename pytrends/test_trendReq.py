@@ -35,9 +35,10 @@ class TestTrendReq(TestCase):
         self.assertIsNotNone(pytrend.interest_by_region())
 
     def test_interest_by_dma(self):
+        # DMA is only available for US and US states (subregions).
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.interest_by_region(resolution='DMA'))
+        self.assertRaises(InvalidGeoException, pytrend.interest_by_region(resolution='DMA'))
 
     def test_interest_by_subregion(self):
         pytrend = TrendReq()
@@ -70,7 +71,7 @@ class TestTrendReq(TestCase):
         self.assertIsNotNone(pytrend.interest_by_region(resolution='CITY'))
 
     def test_interest_by_dma_ca(self):
-        # DMA don't exist in Canada, so this should return an error.
+        # DMA is only available for US and US states (subregions).
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'], geo='CA')
         self.assertRaises(InvalidGeoException, pytrend.interest_by_region(resolution='DMA'))
