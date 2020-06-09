@@ -29,6 +29,32 @@ class TestTrendReq(TestCase):
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         self.assertIsNotNone(pytrend.interest_over_time())
 
+    def test_interest_over_time_images(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='images')
+        self.assertIsNotNone(pytrend.interest_over_time())
+
+    def test_interest_over_time_news(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='news')
+        self.assertIsNotNone(pytrend.interest_over_time())
+
+    def test_interest_over_time_youtube(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='youtube')
+        self.assertIsNotNone(pytrend.interest_over_time())
+
+    def test_interest_over_time_froogle(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='froogle')
+        self.assertIsNotNone(pytrend.interest_over_time())
+
+    def test_interest_over_time_bad_gprop(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
+        with self.assertRaises(ValueError):
+            pytrend.interest_over_time()
+
     def test_interest_by_region(self):
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
