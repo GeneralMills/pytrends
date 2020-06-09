@@ -280,7 +280,7 @@ class TrendReq(object):
         # rename the column with the search keyword
         df = df[['geoName', 'geoCode', 'value']].set_index(
             ['geoName']).sort_index()
-        # split list columns into seperate ones, remove brackets and split on comma
+        # split list columns into separate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(
             str(x).replace('[', '').replace(']', '').split(',')))
         if inc_geo_code:
@@ -393,7 +393,7 @@ class TrendReq(object):
         """Request data from Google's Hot Searches section and return a dataframe"""
 
         # make the request
-        # forms become obsolute due to the new TRENDING_SEACHES_URL
+        # forms become obsolete due to the new TRENDING_SEARCHES_URL
         # forms = {'ajax': 1, 'pn': pn, 'htd': '', 'htv': 'l'}
         req_json = self._get_data(
             url=TrendReq.TRENDING_SEARCHES_URL,
@@ -474,7 +474,7 @@ class TrendReq(object):
                                 geo='', gprop='', sleep=0):
         """Gets historical hourly data for interest by chunking requests to 1 week at a time (which is what Google allows)"""
 
-        # construct datetime obejcts - raises ValueError if invalid parameters
+        # construct datetime objects - raises ValueError if invalid parameters
         initial_start_date = start_date = datetime(year_start, month_start,
                                                    day_start, hour_start)
         end_date = datetime(year_end, month_end, day_end, hour_end)
