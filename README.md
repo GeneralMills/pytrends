@@ -39,7 +39,7 @@ Only good until Google changes their backend again :-P. When that happens feel f
 
 ## Requirements
 
-* Written for both Python 2.7+ and Python 3.3+
+* Written for Python 3.3+
 * Requires Requests, lxml, Pandas
 
 <sub><sup>[back to top](#pytrends)</sub></sup>
