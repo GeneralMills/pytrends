@@ -427,6 +427,12 @@ class TrendReq(object):
 
     def top_charts(self, date, hl='en-US', tz=300, geo='GLOBAL'):
         """Request data from Google's Top Charts section and return a dataframe"""
+
+        try:
+            date = int(date)
+        except:
+            raise ValueError('The date must be a year with format YYYY. See https://github.com/GeneralMills/pytrends/issues/355')
+        
         # create the payload
         chart_payload = {'hl': hl, 'tz': tz, 'date': date, 'geo': geo,
                          'isMobile': False}
@@ -438,8 +444,11 @@ class TrendReq(object):
             trim_chars=5,
             params=chart_payload,
             **self.requests_args
-        )['topCharts'][0]['listItems']
-        df = pd.DataFrame(req_json)
+        )
+        try:
+            df = pd.DataFrame(req_json['topCharts'][0]['listItems'])
+        except IndexError:
+            df = None
         return df
 
     def suggestions(self, keyword):

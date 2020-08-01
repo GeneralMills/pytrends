@@ -287,8 +287,10 @@ Parameters
 * `date`
 
   - *Required*
-  - YYYY or YYYY-MM integer
-  - Example `2016-11` for November 2016 Top Chart data
+  - YYYY integer
+  - Example `2019` for the year 2019 Top Chart data
+  - **Note** Google removed support for monthly queries (e.g. YYYY-MM)
+  - **Note** Google does not return data for the current year
 
 Returns pandas.DataFrame
 
