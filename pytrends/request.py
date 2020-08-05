@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 import requests
 
-
 from pandas.io.json._normalize import nested_to_record
+from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 from pytrends import exceptions
@@ -30,6 +30,7 @@ class TrendReq(object):
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
     TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
+    ERROR_CODES = (500, 502, 504, 429)
 
     def __init__(self, hl='en-US', tz=360, geo='', timeout=(2, 5), proxies='',
                  retries=0, backoff_factor=0, requests_args=None):
@@ -108,7 +109,10 @@ class TrendReq(object):
         if self.retries > 0 or self.backoff_factor > 0:
             retry = Retry(total=self.retries, read=self.retries,
                           connect=self.retries,
-                          backoff_factor=self.backoff_factor)
+                          backoff_factor=self.backoff_factor,
+                          status_forcelist=TrendReq.ERROR_CODES,
+                          method_whitelist=frozenset(['GET', 'POST']))
+            s.mount('https://', HTTPAdapter(max_retries=retry))
 
         s.headers.update({'accept-language': self.hl})
         if len(self.proxies) > 0:
@@ -116,10 +120,11 @@ class TrendReq(object):
             s.proxies.update({'https': self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
             response = s.post(url, timeout=self.timeout,
-                              cookies=self.cookies, **kwargs, **self.requests_args)  # DO NOT USE retries or backoff_factor here
+                              cookies=self.cookies, **kwargs,
+                              **self.requests_args)  # DO NOT USE retries or backoff_factor here
         else:
             response = s.get(url, timeout=self.timeout, cookies=self.cookies,
-                             **kwargs, **self.requests_args)   # DO NOT USE retries or backoff_factor here
+                             **kwargs, **self.requests_args)  # DO NOT USE retries or backoff_factor here
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
@@ -431,8 +436,9 @@ class TrendReq(object):
         try:
             date = int(date)
         except:
-            raise ValueError('The date must be a year with format YYYY. See https://github.com/GeneralMills/pytrends/issues/355')
-        
+            raise ValueError(
+                'The date must be a year with format YYYY. See https://github.com/GeneralMills/pytrends/issues/355')
+
         # create the payload
         chart_payload = {'hl': hl, 'tz': tz, 'date': date, 'geo': geo,
                          'isMobile': False}
