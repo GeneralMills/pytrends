@@ -10,7 +10,7 @@ with io.open(os.path.join(dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pytrends',
-    version='4.7.3',
+    version='4.7.4',
     description='Pseudo API for Google Trends',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -28,7 +28,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: MIT License'
     ],
-    install_requires=['requests', 'pandas>=0.25', 'lxml'],
+    install_requires=['requests>=2.0', 'pandas>=0.25', 'lxml'],
     keywords='google trends api search',
     packages=['pytrends'],
 )
