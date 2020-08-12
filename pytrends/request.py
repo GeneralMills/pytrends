@@ -195,7 +195,7 @@ class TrendReq(object):
                 self.related_queries_widget_list.append(widget)
         return
 
-    def interest_over_time(self):
+    def interest_over_time(self,returnType=''):
         """Request data from Google's Interest Over Time section and return a dataframe"""
 
         over_time_payload = {
@@ -212,44 +212,47 @@ class TrendReq(object):
             trim_chars=5,
             params=over_time_payload,
         )
-
-        df = pd.DataFrame(req_json['default']['timelineData'])
-        if (df.empty):
-            return df
-
-        df['date'] = pd.to_datetime(df['time'].astype(dtype='float64'),
-                                    unit='s')
-        df = df.set_index(['date']).sort_index()
-        # split list columns into seperate ones, remove brackets and split on comma
-        result_df = df['value'].apply(lambda x: pd.Series(
-            str(x).replace('[', '').replace(']', '').split(',')))
-        # rename each column with its search term, relying on order that google provides...
-        for idx, kw in enumerate(self.kw_list):
-            # there is currently a bug with assigning columns that may be
-            # parsed as a date in pandas: use explicit insert column method
-            result_df.insert(len(result_df.columns), kw,
-                             result_df[idx].astype('int'))
-            del result_df[idx]
-
-        if 'isPartial' in df:
-            # make other dataframe from isPartial key data
-            # split list columns into seperate ones, remove brackets and split on comma
-            df = df.fillna(False)
-            result_df2 = df['isPartial'].apply(lambda x: pd.Series(
-                str(x).replace('[', '').replace(']', '').split(',')))
-            result_df2.columns = ['isPartial']
-            # Change to a bool type.
-            result_df2.isPartial = result_df2.isPartial == 'True'
-            # concatenate the two dataframes
-            final = pd.concat([result_df, result_df2], axis=1)
+        # return JSON if selected
+        if returnType == 'json':
+            return req_json
         else:
-            final = result_df
-            final['isPartial'] = False
+            df = pd.DataFrame(req_json['default']['timelineData'])
+            if (df.empty):
+                return df
 
-        return final
+            df['date'] = pd.to_datetime(df['time'].astype(dtype='float64'),
+                                        unit='s')
+            df = df.set_index(['date']).sort_index()
+            # split list columns into seperate ones, remove brackets and split on comma
+            result_df = df['value'].apply(lambda x: pd.Series(
+                str(x).replace('[', '').replace(']', '').split(',')))
+            # rename each column with its search term, relying on order that google provides...
+            for idx, kw in enumerate(self.kw_list):
+                # there is currently a bug with assigning columns that may be
+                # parsed as a date in pandas: use explicit insert column method
+                result_df.insert(len(result_df.columns), kw,
+                                 result_df[idx].astype('int'))
+                del result_df[idx]
+
+            if 'isPartial' in df:
+                # make other dataframe from isPartial key data
+                # split list columns into seperate ones, remove brackets and split on comma
+                df = df.fillna(False)
+                result_df2 = df['isPartial'].apply(lambda x: pd.Series(
+                    str(x).replace('[', '').replace(']', '').split(',')))
+                result_df2.columns = ['isPartial']
+                # Change to a bool type.
+                result_df2.isPartial = result_df2.isPartial == 'True'
+                # concatenate the two dataframes
+                final = pd.concat([result_df, result_df2], axis=1)
+            else:
+                final = result_df
+                final['isPartial'] = False
+
+            return final
 
     def interest_by_region(self, resolution='COUNTRY', inc_low_vol=False,
-                           inc_geo_code=False):
+                           inc_geo_code=False, returnType=''):
         """Request data from Google's Interest by Region section and return a dataframe"""
 
         # make the request
@@ -277,27 +280,31 @@ class TrendReq(object):
             trim_chars=5,
             params=region_payload,
         )
-        df = pd.DataFrame(req_json['default']['geoMapData'])
-        if (df.empty):
-            return df
+        # return JSON if selected
+        if returnType == 'json':
+            return req_json
+        else:
+            df = pd.DataFrame(req_json['default']['geoMapData'])
+            if (df.empty):
+                return df
 
-        # rename the column with the search keyword
-        df = df[['geoName', 'geoCode', 'value']].set_index(
-            ['geoName']).sort_index()
-        # split list columns into separate ones, remove brackets and split on comma
-        result_df = df['value'].apply(lambda x: pd.Series(
-            str(x).replace('[', '').replace(']', '').split(',')))
-        if inc_geo_code:
-            result_df['geoCode'] = df['geoCode']
+            # rename the column with the search keyword
+            df = df[['geoName', 'geoCode', 'value']].set_index(
+                ['geoName']).sort_index()
+            # split list columns into separate ones, remove brackets and split on comma
+            result_df = df['value'].apply(lambda x: pd.Series(
+                str(x).replace('[', '').replace(']', '').split(',')))
+            if inc_geo_code:
+                result_df['geoCode'] = df['geoCode']
 
-        # rename each column with its search term
-        for idx, kw in enumerate(self.kw_list):
-            result_df[kw] = result_df[idx].astype('int')
-            del result_df[idx]
+            # rename each column with its search term
+            for idx, kw in enumerate(self.kw_list):
+                result_df[kw] = result_df[idx].astype('int')
+                del result_df[idx]
 
-        return result_df
+            return result_df
 
-    def related_topics(self):
+    def related_topics(self, returnType=''):
         """Request data from Google's Related Topics section and return a dictionary of dataframes
 
         If no top and/or rising related topics are found, the value for the key "top" and/or "rising" will be None
@@ -322,31 +329,34 @@ class TrendReq(object):
                 trim_chars=5,
                 params=related_payload,
             )
+            # return JSON if selected
+            if returnType == 'json':
+                return req_json
+            else:
+                # top topics
+                try:
+                    top_list = req_json['default']['rankedList'][0][
+                        'rankedKeyword']
+                    df_top = pd.DataFrame(
+                        [nested_to_record(d, sep='_') for d in top_list])
+                except KeyError:
+                    # in case no top topics are found, the lines above will throw a KeyError
+                    df_top = None
 
-            # top topics
-            try:
-                top_list = req_json['default']['rankedList'][0][
-                    'rankedKeyword']
-                df_top = pd.DataFrame(
-                    [nested_to_record(d, sep='_') for d in top_list])
-            except KeyError:
-                # in case no top topics are found, the lines above will throw a KeyError
-                df_top = None
+                # rising topics
+                try:
+                    rising_list = req_json['default']['rankedList'][1][
+                        'rankedKeyword']
+                    df_rising = pd.DataFrame(
+                        [nested_to_record(d, sep='_') for d in rising_list])
+                except KeyError:
+                    # in case no rising topics are found, the lines above will throw a KeyError
+                    df_rising = None
 
-            # rising topics
-            try:
-                rising_list = req_json['default']['rankedList'][1][
-                    'rankedKeyword']
-                df_rising = pd.DataFrame(
-                    [nested_to_record(d, sep='_') for d in rising_list])
-            except KeyError:
-                # in case no rising topics are found, the lines above will throw a KeyError
-                df_rising = None
+                result_dict[kw] = {'rising': df_rising, 'top': df_top}
+            return result_dict
 
-            result_dict[kw] = {'rising': df_rising, 'top': df_top}
-        return result_dict
-
-    def related_queries(self):
+    def related_queries(self, returnType=''):
         """Request data from Google's Related Queries section and return a dictionary of dataframes
 
         If no top and/or rising related queries are found, the value for the key "top" and/or "rising" will be None
@@ -371,29 +381,32 @@ class TrendReq(object):
                 trim_chars=5,
                 params=related_payload,
             )
+            # return JSON if selected
+            if returnType == 'json':
+                return req_json
+            else:
+                # top queries
+                try:
+                    top_df = pd.DataFrame(
+                        req_json['default']['rankedList'][0]['rankedKeyword'])
+                    top_df = top_df[['query', 'value']]
+                except KeyError:
+                    # in case no top queries are found, the lines above will throw a KeyError
+                    top_df = None
 
-            # top queries
-            try:
-                top_df = pd.DataFrame(
-                    req_json['default']['rankedList'][0]['rankedKeyword'])
-                top_df = top_df[['query', 'value']]
-            except KeyError:
-                # in case no top queries are found, the lines above will throw a KeyError
-                top_df = None
+                # rising queries
+                try:
+                    rising_df = pd.DataFrame(
+                        req_json['default']['rankedList'][1]['rankedKeyword'])
+                    rising_df = rising_df[['query', 'value']]
+                except KeyError:
+                    # in case no rising queries are found, the lines above will throw a KeyError
+                    rising_df = None
 
-            # rising queries
-            try:
-                rising_df = pd.DataFrame(
-                    req_json['default']['rankedList'][1]['rankedKeyword'])
-                rising_df = rising_df[['query', 'value']]
-            except KeyError:
-                # in case no rising queries are found, the lines above will throw a KeyError
-                rising_df = None
+                result_dict[kw] = {'top': top_df, 'rising': rising_df}
+                return result_dict
 
-            result_dict[kw] = {'top': top_df, 'rising': rising_df}
-        return result_dict
-
-    def trending_searches(self, pn='united_states'):
+    def trending_searches(self, pn='united_states', returnType=''):
         """Request data from Google's Hot Searches section and return a dataframe"""
 
         # make the request
@@ -404,10 +417,14 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             **self.requests_args
         )[pn]
-        result_df = pd.DataFrame(req_json)
-        return result_df
+        # return JSON if selected
+        if returnType == 'json':
+            return req_json
+        else:
+            result_df = pd.DataFrame(req_json)
+            return result_df
 
-    def today_searches(self, pn='US'):
+    def today_searches(self, pn='US', returnType=''):
         """Request data from Google Daily Trends section and returns a dataframe"""
         forms = {'ns': 15, 'geo': pn, 'tz': '-180', 'hl': 'en-US'}
         req_json = self._get_data(
@@ -417,15 +434,19 @@ class TrendReq(object):
             params=forms,
             **self.requests_args
         )['default']['trendingSearchesDays'][0]['trendingSearches']
-        result_df = pd.DataFrame()
-        # parse the returned json
-        sub_df = pd.DataFrame()
-        for trend in req_json:
-            sub_df = sub_df.append(trend['title'], ignore_index=True)
-        result_df = pd.concat([result_df, sub_df])
-        return result_df.iloc[:, -1]
+        # return JSON if selected
+        if returnType == 'json':
+            return req_json
+        else:
+            result_df = pd.DataFrame()
+            # parse the returned json
+            sub_df = pd.DataFrame()
+            for trend in req_json:
+                sub_df = sub_df.append(trend['title'], ignore_index=True)
+            result_df = pd.concat([result_df, sub_df])
+            return result_df.iloc[:, -1]
 
-    def top_charts(self, date, hl='en-US', tz=300, geo='GLOBAL'):
+    def top_charts(self, date, hl='en-US', tz=300, geo='GLOBAL', returnType=''):
         """Request data from Google's Top Charts section and return a dataframe"""
 
         try:
@@ -445,11 +466,15 @@ class TrendReq(object):
             params=chart_payload,
             **self.requests_args
         )
-        try:
-            df = pd.DataFrame(req_json['topCharts'][0]['listItems'])
-        except IndexError:
-            df = None
-        return df
+        # return JSON if selected
+        if returnType == 'json':
+            return req_json
+        else:
+            try:
+                df = pd.DataFrame(req_json['topCharts'][0]['listItems'])
+            except IndexError:
+                df = None
+            return df
 
     def suggestions(self, keyword):
         """Request data from Google's Keyword Suggestion dropdown and return a dictionary"""
