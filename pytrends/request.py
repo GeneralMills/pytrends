@@ -304,7 +304,6 @@ class TrendReq(object):
 
     def related_topics(self):
         """Request data from Google's Related Topics section and return a dictionary of dataframes
-
         If no top and/or rising related topics are found, the value for the key "top" and/or "rising" will be None
         """
 
@@ -344,13 +343,17 @@ class TrendReq(object):
             except KeyError:
                 # in case no rising topics are found, the lines above will throw a KeyError
                 df_rising = None
-
-            result_dict = {'rising': df_rising, 'top': df_top}
+            if len(self.kw_list) > 0:
+                # ensure we know which keyword we are looking at rather than relying on order
+                kw = request_json['request']['restriction'][
+                    'complexKeywordsRestriction']['keyword'][0]['value']                
+                result_dict[kw] = {'rising': df_rising, 'top': df_top}
+            else:
+                result_dict = {'rising': df_rising, 'top': df_top}
         return result_dict
 
     def related_queries(self):
         """Request data from Google's Related Queries section and return a dictionary of dataframes
-
         If no top and/or rising related queries are found, the value for the key "top" and/or "rising" will be None
         """
 
@@ -388,8 +391,13 @@ class TrendReq(object):
             except KeyError:
                 # in case no rising queries are found, the lines above will throw a KeyError
                 rising_df = None
-
-            result_dict = {'top': top_df, 'rising': rising_df}
+            if len(self.kw_list) > 0:
+                # ensure we know which keyword we are looking at rather than relying on order
+                kw = request_json['request']['restriction'][
+                    'complexKeywordsRestriction']['keyword'][0]['value']
+                result_dict[kw] = {'top': top_df, 'rising': rising_df}
+            else:
+                result_dict = {'top': top_df, 'rising': rising_df}
         return result_dict
 
     def trending_searches(self, pn='united_states'):
