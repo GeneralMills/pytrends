@@ -148,7 +148,7 @@ class TrendReq(object):
         if gprop not in ['', 'images', 'news', 'youtube', 'froogle']:
             raise ValueError('gprop must be empty (to indicate web), images, news, youtube, or froogle')
         self.kw_list = kw_list
-        self.geo = geo or self.geo
+        self.geo = geo
         self.token_payload = {
             'hl': self.hl,
             'tz': self.tz,
