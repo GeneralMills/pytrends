@@ -64,26 +64,37 @@ class TrendReq(object):
         Removes proxy from the list on proxy error
         """
         while True:
-            if len(self.proxies) > 0:
-                proxy = {'https': self.proxies[self.proxy_index]}
+            if "proxies" in self.requests_args:
+                try:
+                    return dict(filter(lambda i: i[0] == 'NID', requests.get(
+                        'https://trends.google.com/?geo={geo}'.format(
+                            geo=self.hl[-2:]),
+                        timeout=self.timeout,
+                        **self.requests_args
+                    ).cookies.items()))
+                except:
+                    continue
             else:
-                proxy = ''
-            try:
-                return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                    'https://trends.google.com/?geo={geo}'.format(
-                        geo=self.hl[-2:]),
-                    timeout=self.timeout,
-                    proxies=proxy,
-                    **self.requests_args
-                ).cookies.items()))
-            except requests.exceptions.ProxyError:
-                print('Proxy error. Changing IP')
-                if len(self.proxies) > 1:
-                    self.proxies.remove(self.proxies[self.proxy_index])
+                if len(self.proxies) > 0:
+                    proxy = {'https': self.proxies[self.proxy_index]}
                 else:
-                    print('No more proxies available. Bye!')
-                    raise
-                continue
+                    proxy = ''
+                try:
+                    return dict(filter(lambda i: i[0] == 'NID', requests.get(
+                        'https://trends.google.com/?geo={geo}'.format(
+                            geo=self.hl[-2:]),
+                        timeout=self.timeout,
+                        proxies=proxy,
+                        **self.requests_args
+                    ).cookies.items()))
+                except requests.exceptions.ProxyError:
+                    print('Proxy error. Changing IP')
+                    if len(self.proxies) > 1:
+                        self.proxies.remove(self.proxies[self.proxy_index])
+                    else:
+                        print('No more proxies available. Bye!')
+                        raise
+                    continue
 
     def GetNewProxy(self):
         """
