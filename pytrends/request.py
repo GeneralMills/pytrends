@@ -435,11 +435,13 @@ class TrendReq(object):
         )['default']['trendingSearchesDays'][0]['trendingSearches']
         result_df = pd.DataFrame()
         # parse the returned json
-        sub_df = pd.DataFrame()
+        title_df = pd.DataFrame()
+        traffic_df = pd.DataFrame()
         for trend in req_json:
-            sub_df = sub_df.append(trend['title'], ignore_index=True)
-        result_df = pd.concat([result_df, sub_df])
-        return result_df.iloc[:, -1]
+            title_df = title_df.append(trend['title'], ignore_index=True)
+            traffic_df = traffic_df.append({'searches': trend['formattedTraffic']}, ignore_index=True)
+        result_df = pd.concat([result_df, title_df, traffic_df], axis=1)
+        return result_df.iloc[:, 1:]
 
     def top_charts(self, date, hl='en-US', tz=300, geo='GLOBAL'):
         """Request data from Google's Top Charts section and return a dataframe"""
