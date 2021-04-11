@@ -185,7 +185,7 @@ class TrendReq(object):
     def _tokens(self):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
         # make the request and parse the returned json
-        widget_dict = self._get_data(
+        widget_dicts = self._get_data(
             url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
             params=self.token_payload,
@@ -198,7 +198,7 @@ class TrendReq(object):
         self.related_queries_widget_list[:] = []
         self.related_topics_widget_list[:] = []
         # assign requests
-        for widget in widget_dict:
+        for widget in widget_dicts:
             if widget['id'] == 'TIMESERIES':
                 self.interest_over_time_widget = widget
             if widget['id'] == 'GEO_MAP' and first_region_token:
