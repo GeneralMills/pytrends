@@ -418,7 +418,7 @@ class TrendReq(object):
         req_json = self._get_data(
             url=TrendReq.TRENDING_SEARCHES_URL,
             method=TrendReq.GET_METHOD,
-            **self.requests_args
+            #**self.requests_args
         )[pn]
         result_df = pd.DataFrame(req_json)
         return result_df
@@ -431,7 +431,7 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=forms,
-            **self.requests_args
+            #**self.requests_args
         )['default']['trendingSearchesDays'][0]['trendingSearches']
         result_df = pd.DataFrame()
         # parse the returned json
@@ -460,7 +460,7 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=chart_payload,
-            **self.requests_args
+            #**self.requests_args
         )
         try:
             df = pd.DataFrame(req_json['topCharts'][0]['listItems'])
@@ -480,7 +480,7 @@ class TrendReq(object):
             params=parameters,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            **self.requests_args
+            #**self.requests_args
         )['default']['topics']
         return req_json
 
@@ -494,7 +494,7 @@ class TrendReq(object):
             params=params,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            **self.requests_args
+            #**self.requests_args
         )
         return req_json
 
