@@ -1,0 +1,7 @@
+{
+    "name": "supermetrics/pytrends",
+    "description": "Pytrends is a Python library that allows fetching Google Trends data",
+    "type": "library",
+    "license": "proprietary",
+    "require": {}
+}
