@@ -324,8 +324,12 @@ class TrendReq(object):
         result_dict = dict()
         for request_json in self.related_topics_widget_list:
             # ensure we know which keyword we are looking at rather than relying on order
-            kw = request_json['request']['restriction'][
-                'complexKeywordsRestriction']['keyword'][0]['value']
+            try:
+                kw = request_json['request']['restriction'][
+                    'complexKeywordsRestriction']['keyword'][0]['value']
+            except KeyError:
+                # this accounts for blank seed keyword
+                kw=''
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
             related_payload['token'] = request_json['token']
