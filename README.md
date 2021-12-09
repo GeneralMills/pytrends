@@ -10,7 +10,7 @@ Only good until Google changes their backend again :-P. When that happens feel f
 **Looking for maintainers!**
 
 
-## Table of contens
+## Table of contents
 
 * [Installation](#installation)
 
