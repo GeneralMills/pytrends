@@ -137,13 +137,13 @@ Many API methods use the following:
       - For example ```"iron"``` will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```.
       - Find the encoded topic by using the get_suggestions() function and choose the most relevant one for you.
       - For example: ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
-      - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends
+      - ```"/m/025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends
       - You can also use `pytrends.suggestions()` to automate this.
 
 * `cat`
 
   - Category to narrow results
-  - Find available cateogies by inspecting the url when manually using Google Trends. The category starts after ```cat=``` and ends before the next ```&``` or view this [wiki page containing all available categories](https://github.com/pat310/google-trends-api/wiki/Google-Trends-Categories)
+  - Find available categories by inspecting the url when manually using Google Trends. The category starts after ```cat=``` and ends before the next ```&``` or view this [wiki page containing all available categories](https://github.com/pat310/google-trends-api/wiki/Google-Trends-Categories)
   - For example: ```"https://www.google.com/trends/explore#q=pizza&cat=71"```
   - ```'71'``` is the category
   - Defaults to no category
@@ -153,7 +153,7 @@ Many API methods use the following:
   - Two letter country abbreviation
   - For example United States is ```'US'```
   - Defaults to World
-  - More detail available for States/Provinces by specifying additonal abbreviations
+  - More detail available for States/Provinces by specifying additional abbreviations
   - For example: Alabama would be ```'US-AL'```
   - For example: England would be ```'GB-ENG'```
 
