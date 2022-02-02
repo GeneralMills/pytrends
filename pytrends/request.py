@@ -546,7 +546,7 @@ class TrendReq(object):
     def get_historical_interest(self, keywords, year_start=2018, month_start=1,
                                 day_start=1, hour_start=0, year_end=2018,
                                 month_end=2, day_end=1, hour_end=0, cat=0,
-                                geo='', gprop='', sleep=0):
+                                geo='', gprop='', sleep=0, frequency='hourly'):
         """Gets historical hourly data for interest by chunking requests to 1 week at a time (which is what Google allows)"""
 
         # construct datetime objects - raises ValueError if invalid parameters
@@ -554,8 +554,17 @@ class TrendReq(object):
                                                    day_start, hour_start)
         end_date = datetime(year_end, month_end, day_end, hour_end)
 
-        # the timeframe has to be in 1 week intervals or Google will reject it
-        delta = timedelta(days=7)
+        # Timedeltas:
+        # 7 days for hourly
+        # ~250 days for daily (270 seems to be max but sometimes breaks?)
+        # For weekly can pull any date range so no method required here
+        
+        if frequency == 'hourly':
+            delta = timedelta(days=7)
+        elif frequency == 'daily':
+            delta = timedelta(days=250)
+        else:
+            raise(ValueError('Frequency must be hourly or daily'))
 
         df = pd.DataFrame()
 
@@ -563,10 +572,14 @@ class TrendReq(object):
         date_iterator += delta
 
         while True:
-            # format date to comply with API call
+            # format date to comply with API call (different for hourly/daily)
 
-            start_date_str = start_date.strftime('%Y-%m-%dT%H')
-            date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+            if frequency == 'hourly':
+                start_date_str = start_date.strftime('%Y-%m-%dT%H')
+                date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+            elif frequency == 'daily':
+                start_date_str = start_date.strftime('%Y-%m-%d')
+                date_iterator_str = date_iterator.strftime('%Y-%m-%d')
 
             tf = start_date_str + ' ' + date_iterator_str
 
@@ -582,10 +595,13 @@ class TrendReq(object):
             date_iterator += delta
 
             if (date_iterator > end_date):
-                # Run for 7 more days to get remaining data that would have been truncated if we stopped now
-                # This is needed because google requires 7 days yet we may end up with a week result less than a full week
-                start_date_str = start_date.strftime('%Y-%m-%dT%H')
-                date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+                # Run more days to get remaining data that would have been truncated if we stopped now
+                if frequency == 'hourly':
+                    start_date_str = start_date.strftime('%Y-%m-%dT%H')
+                    date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+                elif frequency == 'daily':
+                    start_date_str = start_date.strftime('%Y-%m-%d')
+                    date_iterator_str = date_iterator.strftime('%Y-%m-%d')
 
                 tf = start_date_str + ' ' + date_iterator_str
 
