@@ -30,6 +30,7 @@ class TrendReq(object):
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
     TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
+    REALTIME_TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/api/realtimetrends'
     ERROR_CODES = (500, 502, 504, 429)
 
     def __init__(self, hl='en-US', tz=360, geo='', timeout=(2, 5), proxies='',
@@ -440,6 +441,44 @@ class TrendReq(object):
             sub_df = sub_df.append(trend['title'], ignore_index=True)
         result_df = pd.concat([result_df, sub_df])
         return result_df.iloc[:, -1]
+
+    def realtime_trending_searches(self, pn='US', cat='all', count =300):
+        """Request data from Google Realtime Search Trends section and returns a dataframe"""
+        # Don't know what some of the params mean here, followed the nodejs library
+        # https://github.com/pat310/google-trends-api/ 's implemenration
+
+
+        #sort: api accepts only 0 as the value, optional parameter
+
+        # ri: number of trending stories IDs returned,
+        # max value of ri supported is 300, based on emperical evidence
+
+        ri_value = 300
+        if count < ri_value:
+            ri_value = count
+
+        # rs : don't know what is does but it's max value is never more than the ri_value based on emperical evidence
+        # max value of ri supported is 200, based on emperical evidence
+        rs_value = 200
+        if count < rs_value:
+            rs_value = count-1
+
+        forms = {'ns': 15, 'geo': pn, 'tz': '300', 'hl': 'en-US', 'cat': cat, 'fi' : '0', 'fs' : '0', 'ri' : ri_value, 'rs' : rs_value, 'sort' : 0}
+        req_json = self._get_data(
+            url=TrendReq.REALTIME_TRENDING_SEARCHES_URL,
+            method=TrendReq.GET_METHOD,
+            trim_chars=5,
+            params=forms
+        )['storySummaries']['trendingStories']
+
+        # parse the returned json
+        wanted_keys = ["entityNames", "title"]
+
+        final_json = [{ key: ts[key] for key in ts.keys() if key in wanted_keys} for ts in req_json ]
+
+        result_df = pd.DataFrame(final_json)
+
+        return result_df
 
     def top_charts(self, date, hl='en-US', tz=300, geo='GLOBAL'):
         """Request data from Google's Top Charts section and return a dataframe"""
