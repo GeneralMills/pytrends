@@ -30,6 +30,7 @@ class TrendReq(object):
     SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
     TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
+    REALTIME_TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/api/realtimetrends'
     ERROR_CODES = (500, 502, 504, 429)
 
     def __init__(self, hl='en-US', tz=360, geo='', timeout=(2, 5), proxies='',
@@ -185,7 +186,7 @@ class TrendReq(object):
     def _tokens(self):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
         # make the request and parse the returned json
-        widget_dict = self._get_data(
+        widget_dicts = self._get_data(
             url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
             params=self.token_payload,
@@ -198,7 +199,7 @@ class TrendReq(object):
         self.related_queries_widget_list[:] = []
         self.related_topics_widget_list[:] = []
         # assign requests
-        for widget in widget_dict:
+        for widget in widget_dicts:
             if widget['id'] == 'TIMESERIES':
                 self.interest_over_time_widget = widget
             if widget['id'] == 'GEO_MAP' and first_region_token:
@@ -324,8 +325,11 @@ class TrendReq(object):
         result_dict = dict()
         for request_json in self.related_topics_widget_list:
             # ensure we know which keyword we are looking at rather than relying on order
-            kw = request_json['request']['restriction'][
-                'complexKeywordsRestriction']['keyword'][0]['value']
+            try:
+                kw = request_json['request']['restriction'][
+                    'complexKeywordsRestriction']['keyword'][0]['value']
+            except KeyError:
+                kw = ''
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
             related_payload['token'] = request_json['token']
@@ -373,8 +377,11 @@ class TrendReq(object):
         result_dict = dict()
         for request_json in self.related_queries_widget_list:
             # ensure we know which keyword we are looking at rather than relying on order
-            kw = request_json['request']['restriction'][
-                'complexKeywordsRestriction']['keyword'][0]['value']
+            try:
+                kw = request_json['request']['restriction'][
+                    'complexKeywordsRestriction']['keyword'][0]['value']
+            except KeyError:
+                kw = ''
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
             related_payload['token'] = request_json['token']
@@ -443,6 +450,44 @@ class TrendReq(object):
         result_df = pd.concat([result_df, title_df, traffic_df], axis=1)
         return result_df.iloc[:, 1:]
 
+    def realtime_trending_searches(self, pn='US', cat='all', count =300):
+        """Request data from Google Realtime Search Trends section and returns a dataframe"""
+        # Don't know what some of the params mean here, followed the nodejs library
+        # https://github.com/pat310/google-trends-api/ 's implemenration
+
+
+        #sort: api accepts only 0 as the value, optional parameter
+
+        # ri: number of trending stories IDs returned,
+        # max value of ri supported is 300, based on emperical evidence
+
+        ri_value = 300
+        if count < ri_value:
+            ri_value = count
+
+        # rs : don't know what is does but it's max value is never more than the ri_value based on emperical evidence
+        # max value of ri supported is 200, based on emperical evidence
+        rs_value = 200
+        if count < rs_value:
+            rs_value = count-1
+
+        forms = {'ns': 15, 'geo': pn, 'tz': '300', 'hl': 'en-US', 'cat': cat, 'fi' : '0', 'fs' : '0', 'ri' : ri_value, 'rs' : rs_value, 'sort' : 0}
+        req_json = self._get_data(
+            url=TrendReq.REALTIME_TRENDING_SEARCHES_URL,
+            method=TrendReq.GET_METHOD,
+            trim_chars=5,
+            params=forms
+        )['storySummaries']['trendingStories']
+
+        # parse the returned json
+        wanted_keys = ["entityNames", "title"]
+
+        final_json = [{ key: ts[key] for key in ts.keys() if key in wanted_keys} for ts in req_json ]
+
+        result_df = pd.DataFrame(final_json)
+
+        return result_df
+
     def top_charts(self, date, hl='en-US', tz=300, geo='GLOBAL'):
         """Request data from Google's Top Charts section and return a dataframe"""
 
@@ -503,7 +548,7 @@ class TrendReq(object):
     def get_historical_interest(self, keywords, year_start=2018, month_start=1,
                                 day_start=1, hour_start=0, year_end=2018,
                                 month_end=2, day_end=1, hour_end=0, cat=0,
-                                geo='', gprop='', sleep=0):
+                                geo='', gprop='', sleep=0, frequency='hourly'):
         """Gets historical hourly data for interest by chunking requests to 1 week at a time (which is what Google allows)"""
 
         # construct datetime objects - raises ValueError if invalid parameters
@@ -511,8 +556,17 @@ class TrendReq(object):
                                                    day_start, hour_start)
         end_date = datetime(year_end, month_end, day_end, hour_end)
 
-        # the timeframe has to be in 1 week intervals or Google will reject it
-        delta = timedelta(days=7)
+        # Timedeltas:
+        # 7 days for hourly
+        # ~250 days for daily (270 seems to be max but sometimes breaks?)
+        # For weekly can pull any date range so no method required here
+        
+        if frequency == 'hourly':
+            delta = timedelta(days=7)
+        elif frequency == 'daily':
+            delta = timedelta(days=250)
+        else:
+            raise(ValueError('Frequency must be hourly or daily'))
 
         df = pd.DataFrame()
 
@@ -520,10 +574,14 @@ class TrendReq(object):
         date_iterator += delta
 
         while True:
-            # format date to comply with API call
+            # format date to comply with API call (different for hourly/daily)
 
-            start_date_str = start_date.strftime('%Y-%m-%dT%H')
-            date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+            if frequency == 'hourly':
+                start_date_str = start_date.strftime('%Y-%m-%dT%H')
+                date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+            elif frequency == 'daily':
+                start_date_str = start_date.strftime('%Y-%m-%d')
+                date_iterator_str = date_iterator.strftime('%Y-%m-%d')
 
             tf = start_date_str + ' ' + date_iterator_str
 
@@ -539,10 +597,13 @@ class TrendReq(object):
             date_iterator += delta
 
             if (date_iterator > end_date):
-                # Run for 7 more days to get remaining data that would have been truncated if we stopped now
-                # This is needed because google requires 7 days yet we may end up with a week result less than a full week
-                start_date_str = start_date.strftime('%Y-%m-%dT%H')
-                date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+                # Run more days to get remaining data that would have been truncated if we stopped now
+                if frequency == 'hourly':
+                    start_date_str = start_date.strftime('%Y-%m-%dT%H')
+                    date_iterator_str = date_iterator.strftime('%Y-%m-%dT%H')
+                elif frequency == 'daily':
+                    start_date_str = start_date.strftime('%Y-%m-%d')
+                    date_iterator_str = date_iterator.strftime('%Y-%m-%d')
 
                 tf = start_date_str + ' ' + date_iterator_str
 

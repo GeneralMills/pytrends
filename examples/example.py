@@ -33,3 +33,8 @@ print(top_charts_df.head())
 # Get Google Keyword Suggestions
 suggestions_dict = pytrend.suggestions(keyword='pizza')
 print(suggestions_dict)
+
+# Get Google Realtime Search Trends
+
+realtime_searches = pytrend.realtime_trending_searches(pn='IN')
+print(realtime_searches.head())

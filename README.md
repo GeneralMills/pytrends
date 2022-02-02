@@ -7,10 +7,10 @@ Unofficial API for Google Trends
 Allows simple interface for automating downloading of reports from Google Trends. 
 Only good until Google changes their backend again :-P. When that happens feel free to contribute!
 
-**Looking for maintainers!**
+**Looking for maintainers!** Please open an issue with a method of contacting you if you're interested.
 
 
-## Table of contens
+## Table of Contents
 
 * [Installation](#installation)
 
@@ -18,7 +18,7 @@ Only good until Google changes their backend again :-P. When that happens feel f
 
   * [API Methods](#api-methods)
 
-  * [Common API parameters](#common-api-parameters)
+  * [Common API Parameters](#common-api-parameters)
 
     * [Interest Over Time](#interest-over-time)
     * [Historical Hourly Interest](#historical-hourly-interest)
@@ -27,6 +27,7 @@ Only good until Google changes their backend again :-P. When that happens feel f
     * [Related Queries](#related-queries)
     * [Trending Searches](#trending-searches)
     * [Today Searches](#today-searches)
+    * [Realtime Search Trends](#realtime-search-trends)
     * [Top Charts](#top-charts)
     * [Suggestions](#suggestions)
 
@@ -139,13 +140,13 @@ Many API methods use the following:
       - For example ```"iron"``` will have a drop down of ```"Iron Chemical Element, Iron Cross, Iron Man, etc"```.
       - Find the encoded topic by using the get_suggestions() function and choose the most relevant one for you.
       - For example: ```https://www.google.com/trends/explore#q=%2Fm%2F025rw19&cmpt=q```
-      - ```"%2Fm%2F025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends
+      - ```"/m/025rw19"``` is the topic "Iron Chemical Element" to use this with pytrends
       - You can also use `pytrends.suggestions()` to automate this.
 
 * `cat`
 
   - Category to narrow results
-  - Find available cateogies by inspecting the url when manually using Google Trends. The category starts after ```cat=``` and ends before the next ```&``` or view this [wiki page containing all available categories](https://github.com/pat310/google-trends-api/wiki/Google-Trends-Categories)
+  - Find available categories by inspecting the url when manually using Google Trends. The category starts after ```cat=``` and ends before the next ```&``` or view this [wiki page containing all available categories](https://github.com/pat310/google-trends-api/wiki/Google-Trends-Categories)
   - For example: ```"https://www.google.com/trends/explore#q=pizza&cat=71"```
   - ```'71'``` is the category
   - Defaults to no category
@@ -155,7 +156,7 @@ Many API methods use the following:
   - Two letter country abbreviation
   - For example United States is ```'US'```
   - Defaults to World
-  - More detail available for States/Provinces by specifying additonal abbreviations
+  - More detail available for States/Provinces by specifying additional abbreviations
   - For example: Alabama would be ```'US-AL'```
   - For example: England would be ```'GB-ENG'```
 
@@ -290,6 +291,15 @@ Returns pandas.DataFrame
 
 <sub><sup>[back to top](#trending_searches)</sub></sup>
 
+### Realtime Search Trends
+
+	pytrends.realtime_trending_searches(pn='US') # realtime search trends for United States
+	pytrends.realtime_trending_searches(pn='IN') # India
+
+Returns pandas.DataFrame
+
+<sub><sup>[back to top](#realtime-search-trends)</sub></sup>
+
 ### Top Charts
 
     pytrends.top_charts(date, hl='en-US', tz=300, geo='GLOBAL')
@@ -337,7 +347,7 @@ Returns dictionary
 * Google may change aggregation level for items with very large or very small search volume
 * Rate Limit is not publicly known, let me know if you have a consistent estimate
   * One user reports that 1,400 sequential requests of a 4 hours timeframe got them to the limit. (Replicated on 2 networks)
-  * It has been tested, and 60 seconds of sleep between requests (successful or not) is the correct amount once you reach the limit.
+  * It has been tested, and 60 seconds of sleep between requests (successful or not) appears to be the correct amount once you reach the limit.
 * For certain configurations the dependency lib certifi requires the environment variable REQUESTS_CA_BUNDLE to be explicitly set and exported. This variable must contain the path where the ca-certificates are saved or a SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] error is given at runtime. 
 
 # Credits
