@@ -4,12 +4,13 @@
 
 Unofficial API for Google Trends
 
-Allows simple interface for automating downloading of reports from Google Trends. Main feature is to allow the script to login to Google on your behalf to enable a higher rate limit. Only good until Google changes their backend again :-P. When that happens feel free to contribute!
+Allows simple interface for automating downloading of reports from Google Trends. 
+Only good until Google changes their backend again :-P. When that happens feel free to contribute!
 
-**Looking for maintainers!**
+**Looking for maintainers!** Please open an issue with a method of contacting you if you're interested.
 
 
-## Table of contens
+## Table of Contents
 
 * [Installation](#installation)
 
@@ -17,7 +18,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 
   * [API Methods](#api-methods)
 
-  * [Common API parameters](#common-api-parameters)
+  * [Common API Parameters](#common-api-parameters)
 
     * [Interest Over Time](#interest-over-time)
     * [Historical Hourly Interest](#historical-hourly-interest)
@@ -39,7 +40,7 @@ Allows simple interface for automating downloading of reports from Google Trends
 
 ## Requirements
 
-* Written for both Python 2.7+ and Python 3.3+
+* Written for Python 3.3+
 * Requires Requests, lxml, Pandas
 
 <sub><sup>[back to top](#pytrends)</sub></sup>
@@ -57,12 +58,13 @@ or if you want to use proxies as you are blocked due to Google rate limit:
 
     from pytrends.request import TrendReq
 
-    pytrends = TrendReq(hl='en-US', tz=360, timeout=(10,25), proxies=['https://34.203.233.13:80',], retries=2, backoff_factor=0.1)
+    pytrends = TrendReq(hl='en-US', tz=360, timeout=(10,25), proxies=['https://34.203.233.13:80',], retries=2, backoff_factor=0.1, requests_args={'verify':False})
 
 * `timeout(connect, read)`
-
+  - See explantation on this on [requests docs](https://requests.readthedocs.io/en/master/user/advanced/#timeouts)
+* tz
   - Timezone Offset
-  - For example US CST is ```'360'```
+  - For example US CST is ```'360'``` (note **NOT** -360, Google uses timezone this way...)
 
 * `proxies`
 
@@ -76,6 +78,9 @@ or if you want to use proxies as you are blocked due to Google rate limit:
 * `backoff_factor`
 
   - A backoff factor to apply between attempts after the second try (most errors are resolved immediately by a second try without a delay). urllib3 will sleep for: ```{backoff factor} * (2 ^ ({number of total retries} - 1))``` seconds. If the backoff_factor is 0.1, then sleep() will sleep for [0.0s, 0.2s, 0.4s, …] between retries. It will never be longer than Retry.BACKOFF_MAX. By default, backoff is disabled (set to 0).
+
+* `requests_args`
+  - A dict with additional parameters to pass along to the underlying requests library, for example verify=False to ignore SSL errors
 
 Note: the parameter `hl` specifies host language for accessing Google Trends. 
 Note: only https proxies will work, and you need to add the port number after the proxy ip address
@@ -172,15 +177,15 @@ Many API methods use the following:
     - By Month: ```'today #-m'``` where # is the number of months from that date to pull data for
       - For example: ``'today 3-m'`` would get data from today to 3months ago
       - **NOTE** Google uses UTC date as *'today'*
-      - Seems to only work for 1, 2, 3 months only
+      - **Works for 1, 3, 12 months only!**
 
     - Daily: ```'now #-d'``` where # is the number of days from that date to pull data for
       - For example: ``'now 7-d'`` would get data from the last week
-      - Seems to only work for 1, 7 days only
+      - **Works for 1, 7 days only!**
 
     - Hourly: ```'now #-H'``` where # is the number of hours from that date to pull data for
       - For example: ``'now 1-H'`` would get data from the last hour
-      - Seems to only work for 1, 4 hours only
+      - **Works for 1, 4 hours only!**
 
 * `gprop`
 
@@ -292,8 +297,10 @@ Parameters
 * `date`
 
   - *Required*
-  - YYYY or YYYYMM integer
-  - Example `201611` for November 2016 Top Chart data
+  - YYYY integer
+  - Example `2019` for the year 2019 Top Chart data
+  - **Note** Google removed support for monthly queries (e.g. YYYY-MM)
+  - **Note** Google does not return data for the current year
 
 Returns pandas.DataFrame
 
@@ -326,10 +333,9 @@ Returns dictionary
 
 * This is not an official or supported API
 * Google may change aggregation level for items with very large or very small search volume
-* Google will send you an email saying that you had a new login after running this.
 * Rate Limit is not publicly known, let me know if you have a consistent estimate
   * One user reports that 1,400 sequential requests of a 4 hours timeframe got them to the limit. (Replicated on 2 networks)
-  * It has been tested, and 60 seconds of sleep between requests (successful or not) is the correct amount once you reach the limit.
+  * It has been tested, and 60 seconds of sleep between requests (successful or not) appears to be the correct amount once you reach the limit.
 * For certain configurations the dependency lib certifi requires the environment variable REQUESTS_CA_BUNDLE to be explicitly set and exported. This variable must contain the path where the ca-certificates are saved or a SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] error is given at runtime. 
 
 # Credits

@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import json
 import sys
 import time
@@ -7,16 +5,14 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 import requests
-from pandas.io.json.normalize import nested_to_record
+
+from pandas.io.json._normalize import nested_to_record
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 from pytrends import exceptions
 
-if sys.version_info[0] == 2:  # Python 2
-    from urllib import quote
-else:  # Python 3
-    from urllib.parse import quote
+from urllib.parse import quote
 
 
 class TrendReq(object):
@@ -35,9 +31,10 @@ class TrendReq(object):
     CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
     TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
     REALTIME_TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/api/realtimetrends'
+    ERROR_CODES = (500, 502, 504, 429)
 
     def __init__(self, hl='en-US', tz=360, geo='', timeout=(2, 5), proxies='',
-                 retries=0, backoff_factor=0):
+                 retries=0, backoff_factor=0, requests_args=None):
         """
         Initialize default values for params
         """
@@ -54,6 +51,7 @@ class TrendReq(object):
         self.retries = retries
         self.backoff_factor = backoff_factor
         self.proxy_index = 0
+        self.requests_args = requests_args or {}
         self.cookies = self.GetGoogleCookie()
         # intialize widget payloads
         self.token_payload = dict()
@@ -68,30 +66,43 @@ class TrendReq(object):
         Removes proxy from the list on proxy error
         """
         while True:
-            if len(self.proxies) > 0:
-                proxy = {'https': self.proxies[self.proxy_index]}
+            if "proxies" in self.requests_args:
+                try:
+                    return dict(filter(lambda i: i[0] == 'NID', requests.get(
+                        'https://trends.google.com/?geo={geo}'.format(
+                            geo=self.hl[-2:]),
+                        timeout=self.timeout,
+                        **self.requests_args
+                    ).cookies.items()))
+                except:
+                    continue
             else:
-                proxy = ''
-            try:
-                return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                    'https://trends.google.com/?geo={geo}'.format(
-                        geo=self.hl[-2:]),
-                    timeout=self.timeout,
-                    proxies=proxy
-                ).cookies.items()))
-            except requests.exceptions.ProxyError:
-                print('Proxy error. Changing IP')
                 if len(self.proxies) > 0:
-                    self.proxies.remove(self.proxies[self.proxy_index])
+                    proxy = {'https': self.proxies[self.proxy_index]}
                 else:
-                    print('Proxy list is empty. Bye!')
-                continue
+                    proxy = ''
+                try:
+                    return dict(filter(lambda i: i[0] == 'NID', requests.get(
+                        'https://trends.google.com/?geo={geo}'.format(
+                            geo=self.hl[-2:]),
+                        timeout=self.timeout,
+                        proxies=proxy,
+                        **self.requests_args
+                    ).cookies.items()))
+                except requests.exceptions.ProxyError:
+                    print('Proxy error. Changing IP')
+                    if len(self.proxies) > 1:
+                        self.proxies.remove(self.proxies[self.proxy_index])
+                    else:
+                        print('No more proxies available. Bye!')
+                        raise
+                    continue
 
     def GetNewProxy(self):
         """
         Increment proxy INDEX; zero on overflow
         """
-        if self.proxy_index > len(self.proxies) - 1:
+        if self.proxy_index < (len(self.proxies) - 1):
             self.proxy_index += 1
         else:
             self.proxy_index = 0
@@ -110,18 +121,22 @@ class TrendReq(object):
         if self.retries > 0 or self.backoff_factor > 0:
             retry = Retry(total=self.retries, read=self.retries,
                           connect=self.retries,
-                          backoff_factor=self.backoff_factor)
-            adapter = HTTPAdapter(max_retries=retry)
+                          backoff_factor=self.backoff_factor,
+                          status_forcelist=TrendReq.ERROR_CODES,
+                          method_whitelist=frozenset(['GET', 'POST']))
+            s.mount('https://', HTTPAdapter(max_retries=retry))
+
         s.headers.update({'accept-language': self.hl})
         if len(self.proxies) > 0:
             self.cookies = self.GetGoogleCookie()
             s.proxies.update({'https': self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
             response = s.post(url, timeout=self.timeout,
-                              cookies=self.cookies, **kwargs)  # DO NOT USE retries or backoff_factor here
+                              cookies=self.cookies, **kwargs,
+                              **self.requests_args)  # DO NOT USE retries or backoff_factor here
         else:
             response = s.get(url, timeout=self.timeout, cookies=self.cookies,
-                             **kwargs)  # DO NOT USE retries or backoff_factor here
+                             **kwargs, **self.requests_args)  # DO NOT USE retries or backoff_factor here
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
@@ -147,8 +162,10 @@ class TrendReq(object):
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='',
                       gprop=''):
         """Create the payload for related queries, interest over time and interest by region"""
+        if gprop not in ['', 'images', 'news', 'youtube', 'froogle']:
+            raise ValueError('gprop must be empty (to indicate web), images, news, youtube, or froogle')
         self.kw_list = kw_list
-        self.geo = geo
+        self.geo = geo or self.geo
         self.token_payload = {
             'hl': self.hl,
             'tz': self.tz,
@@ -169,7 +186,7 @@ class TrendReq(object):
     def _tokens(self):
         """Makes request to Google to get API tokens for interest over time, interest by region and related queries"""
         # make the request and parse the returned json
-        widget_dict = self._get_data(
+        widget_dicts = self._get_data(
             url=TrendReq.GENERAL_URL,
             method=TrendReq.GET_METHOD,
             params=self.token_payload,
@@ -182,7 +199,7 @@ class TrendReq(object):
         self.related_queries_widget_list[:] = []
         self.related_topics_widget_list[:] = []
         # assign requests
-        for widget in widget_dict:
+        for widget in widget_dicts:
             if widget['id'] == 'TIMESERIES':
                 self.interest_over_time_widget = widget
             if widget['id'] == 'GEO_MAP' and first_region_token:
@@ -238,6 +255,8 @@ class TrendReq(object):
             result_df2 = df['isPartial'].apply(lambda x: pd.Series(
                 str(x).replace('[', '').replace(']', '').split(',')))
             result_df2.columns = ['isPartial']
+            # Change to a bool type.
+            result_df2.isPartial = result_df2.isPartial == 'True'
             # concatenate the two dataframes
             final = pd.concat([result_df, result_df2], axis=1)
         else:
@@ -282,7 +301,7 @@ class TrendReq(object):
         # rename the column with the search keyword
         df = df[['geoName', 'geoCode', 'value']].set_index(
             ['geoName']).sort_index()
-        # split list columns into seperate ones, remove brackets and split on comma
+        # split list columns into separate ones, remove brackets and split on comma
         result_df = df['value'].apply(lambda x: pd.Series(
             str(x).replace('[', '').replace(']', '').split(',')))
         if inc_geo_code:
@@ -395,11 +414,12 @@ class TrendReq(object):
         """Request data from Google's Hot Searches section and return a dataframe"""
 
         # make the request
-        # forms become obsolute due to the new TRENDING_SEACHES_URL
+        # forms become obsolete due to the new TRENDING_SEARCHES_URL
         # forms = {'ajax': 1, 'pn': pn, 'htd': '', 'htv': 'l'}
         req_json = self._get_data(
             url=TrendReq.TRENDING_SEARCHES_URL,
-            method=TrendReq.GET_METHOD
+            method=TrendReq.GET_METHOD,
+            **self.requests_args
         )[pn]
         result_df = pd.DataFrame(req_json)
         return result_df
@@ -411,7 +431,8 @@ class TrendReq(object):
             url=TrendReq.TODAY_SEARCHES_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            params=forms
+            params=forms,
+            **self.requests_args
         )['default']['trendingSearchesDays'][0]['trendingSearches']
         result_df = pd.DataFrame()
         # parse the returned json
@@ -461,6 +482,13 @@ class TrendReq(object):
 
     def top_charts(self, date, hl='en-US', tz=300, geo='GLOBAL'):
         """Request data from Google's Top Charts section and return a dataframe"""
+
+        try:
+            date = int(date)
+        except:
+            raise ValueError(
+                'The date must be a year with format YYYY. See https://github.com/GeneralMills/pytrends/issues/355')
+
         # create the payload
         chart_payload = {'hl': hl, 'tz': tz, 'date': date, 'geo': geo,
                          'isMobile': False}
@@ -471,8 +499,12 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=chart_payload,
-        )['topCharts'][0]['listItems']
-        df = pd.DataFrame(req_json)
+            **self.requests_args
+        )
+        try:
+            df = pd.DataFrame(req_json['topCharts'][0]['listItems'])
+        except IndexError:
+            df = None
         return df
 
     def suggestions(self, keyword):
@@ -487,6 +519,7 @@ class TrendReq(object):
             params=parameters,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
+            **self.requests_args
         )['default']['topics']
         return req_json
 
@@ -500,6 +533,7 @@ class TrendReq(object):
             params=params,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
+            **self.requests_args
         )
         return req_json
 
@@ -509,7 +543,7 @@ class TrendReq(object):
                                 geo='', gprop='', sleep=0):
         """Gets historical hourly data for interest by chunking requests to 1 week at a time (which is what Google allows)"""
 
-        # construct datetime obejcts - raises ValueError if invalid parameters
+        # construct datetime objects - raises ValueError if invalid parameters
         initial_start_date = start_date = datetime(year_start, month_start,
                                                    day_start, hour_start)
         end_date = datetime(year_end, month_end, day_end, hour_end)
