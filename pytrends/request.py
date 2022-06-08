@@ -1,6 +1,6 @@
 import json
-import sys
 import time
+from typing import Dict
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -452,7 +452,7 @@ class TrendReq(object):
         result_df = pd.concat([result_df, sub_df])
         return result_df.iloc[:, -1]
 
-    def realtime_trending_searches(self, pn='US', cat='all', count =300):
+    def realtime_trending_searches(self, pn='US', cat='all', count =300) -> Dict:
         """Request data from Google Realtime Search Trends section and returns a dataframe"""
         # Don't know what some of the params mean here, followed the nodejs library
         # https://github.com/pat310/google-trends-api/ 's implemenration
@@ -479,16 +479,9 @@ class TrendReq(object):
             method=TrendReq.GET_METHOD,
             trim_chars=5,
             params=forms
-        )['storySummaries']['trendingStories']
+        )
 
-        # parse the returned json
-        wanted_keys = ["entityNames", "title"]
-
-        final_json = [{ key: ts[key] for key in ts.keys() if key in wanted_keys} for ts in req_json ]
-
-        result_df = pd.DataFrame(final_json)
-
-        return result_df
+        return req_json
 
     def top_charts(self, date, hl='en-US', tz=300, geo='GLOBAL'):
         """Request data from Google's Top Charts section and return a dataframe"""
