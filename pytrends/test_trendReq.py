@@ -85,6 +85,15 @@ class TestTrendReq(TestCase):
         pytrend.build_payload(kw_list=['pizza', 'bagel'])
         self.assertIsNotNone(pytrend.realtime_trending_searches(pn='IN'))
 
+    def test_request_args_passing(self):
+        requests_args = {'headers': {
+            'User-Agent': 'pytrends',
+        }}
+        pytrend = TrendReq(requests_args=requests_args)
+        pytrend.build_payload(kw_list=['bananas'])
+        self.assertIsNotNone(pytrend.suggestions('bananas'))
+        self.assertIsNotNone(pytrend.trending_searches())
+
     def test_top_charts(self):
         pytrend = TrendReq()
         pytrend.build_payload(kw_list=['pizza', 'bagel'])

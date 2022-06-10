@@ -428,8 +428,7 @@ class TrendReq(object):
         # forms = {'ajax': 1, 'pn': pn, 'htd': '', 'htv': 'l'}
         req_json = self._get_data(
             url=TrendReq.TRENDING_SEARCHES_URL,
-            method=TrendReq.GET_METHOD,
-            **self.requests_args
+            method=TrendReq.GET_METHOD
         )[pn]
         result_df = pd.DataFrame(req_json)
         return result_df
@@ -441,8 +440,7 @@ class TrendReq(object):
             url=TrendReq.TODAY_SEARCHES_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            params=forms,
-            **self.requests_args
+            params=forms
         )['default']['trendingSearchesDays'][0]['trendingSearches']
         result_df = pd.DataFrame()
         # parse the returned json
@@ -508,8 +506,7 @@ class TrendReq(object):
             url=TrendReq.TOP_CHARTS_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            params=chart_payload,
-            **self.requests_args
+            params=chart_payload
         )
         try:
             df = pd.DataFrame(req_json['topCharts'][0]['listItems'])
@@ -528,8 +525,7 @@ class TrendReq(object):
             url=TrendReq.SUGGESTIONS_URL + kw_param,
             params=parameters,
             method=TrendReq.GET_METHOD,
-            trim_chars=5,
-            **self.requests_args
+            trim_chars=5
         )['default']['topics']
         return req_json
 
@@ -542,8 +538,7 @@ class TrendReq(object):
             url=TrendReq.CATEGORIES_URL,
             params=params,
             method=TrendReq.GET_METHOD,
-            trim_chars=5,
-            **self.requests_args
+            trim_chars=5
         )
         return req_json
 
@@ -562,7 +557,7 @@ class TrendReq(object):
         # 7 days for hourly
         # ~250 days for daily (270 seems to be max but sometimes breaks?)
         # For weekly can pull any date range so no method required here
-        
+
         if frequency == 'hourly':
             delta = timedelta(days=7)
         elif frequency == 'daily':
