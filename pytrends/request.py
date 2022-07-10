@@ -435,7 +435,7 @@ class TrendReq(object):
 
     def today_searches(self, pn='US'):
         """Request data from Google Daily Trends section and returns a dataframe"""
-        forms = {'ns': 15, 'geo': pn, 'tz': '-180', 'hl': 'en-US'}
+        forms = {'ns': 15, 'geo': pn, 'tz': '-180', 'hl': self.hl}
         req_json = self._get_data(
             url=TrendReq.TODAY_SEARCHES_URL,
             method=TrendReq.GET_METHOD,
@@ -471,7 +471,7 @@ class TrendReq(object):
         if count < rs_value:
             rs_value = count-1
 
-        forms = {'ns': 15, 'geo': pn, 'tz': '300', 'hl': 'en-US', 'cat': cat, 'fi' : '0', 'fs' : '0', 'ri' : ri_value, 'rs' : rs_value, 'sort' : 0}
+        forms = {'ns': 15, 'geo': pn, 'tz': '300', 'hl': self.hl, 'cat': cat, 'fi' : '0', 'fs' : '0', 'ri' : ri_value, 'rs' : rs_value, 'sort' : 0}
         req_json = self._get_data(
             url=TrendReq.REALTIME_TRENDING_SEARCHES_URL,
             method=TrendReq.GET_METHOD,
