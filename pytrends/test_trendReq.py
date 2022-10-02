@@ -51,6 +51,25 @@ class TestTrendReq(TestCase):
         pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='froogle')
         self.assertIsNotNone(pytrend.interest_over_time())
 
+<<<<<<< HEAD
+=======
+    def test_interest_over_time_multiple_regions(self):
+        pytrend = TrendReq()
+        pytrend.build_payload(kw_list=['pizza'], geo=['US-NY', 'US-IL'])
+        df = pytrend.interest_over_time()
+        self.assertIsNotNone(df)
+        pd.testing.assert_index_equal(
+            df.columns, pd.MultiIndex.from_tuples(
+                [('pizza', 'US-NY'), ('pizza', 'US-IL'), ('isPartial', )],
+                names=['keyword', 'region']
+            )
+        )
+        self.assertTrue(df[('pizza', 'US-NY')].notna().all())
+        self.assertTrue(df[('pizza', 'US-IL')].notna().all())
+        self.assertTrue((df[('pizza', 'US-NY')] >= 0).all())
+        self.assertTrue((df[('pizza', 'US-IL')] >= 0).all())
+
+>>>>>>> 126116a (Fix test)
     def test_interest_over_time_bad_gprop(self):
         pytrend = TrendReq()
         with self.assertRaises(ValueError):
