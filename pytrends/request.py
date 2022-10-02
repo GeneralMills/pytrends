@@ -277,12 +277,11 @@ class TrendReq(object):
             final = result_df
             final['isPartial'] = False
 
-        # The tuples are not automatically converted to a multiindex. Do it manually
-        final.columns = pd.MultiIndex.from_tuples(
-            [c if isinstance(c, tuple) else (c, ) for c in final]
-        )
-        if isinstance(final.columns, pd.MultiIndex):
-            final.columns.names = ['keyword', 'region']
+        if len(self.geo) > 1:
+            final.columns = pd.MultiIndex.from_tuples(
+                [c if isinstance(c, tuple) else (c, ) for c in final],
+                names=['keyword', 'region']
+            )
         return final
 
     def multirange_interest_over_time(self):
