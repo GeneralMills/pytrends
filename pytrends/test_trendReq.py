@@ -55,12 +55,19 @@ class TestTrendReq(TestCase):
 =======
     def test_interest_over_time_multiple_regions(self):
         pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza'], geo=['US-NY', 'US-IL'])
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], geo=['US-NY', 'US-IL'])
         df = pytrend.interest_over_time()
         self.assertIsNotNone(df)
         pd.testing.assert_index_equal(
-            df.columns, pd.MultiIndex.from_tuples(
-                [('pizza', 'US-NY'), ('pizza', 'US-IL'), ('isPartial', )],
+            df.columns,
+            pd.MultiIndex.from_tuples(
+                [
+                    ('pizza', 'US-NY'),
+                    ('pizza', 'US-IL'),
+                    ('bagel', 'US-NY'),
+                    ('bagel', 'US-IL'),
+                    ('isPartial', ),
+                ],
                 names=['keyword', 'region']
             )
         )

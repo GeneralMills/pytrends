@@ -159,7 +159,7 @@ Many API methods use the following:
   - More detail available for States/Provinces by specifying additional abbreviations
   - For example: Alabama would be ```'US-AL'```
   - For example: England would be ```'GB-ENG'```
-  - Can also be a list of up to five regions. Then only one keyword is supported.
+  - Can also be a list of up to five regions
 
 * `tz`
 

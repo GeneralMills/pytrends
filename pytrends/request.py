@@ -178,16 +178,14 @@ class TrendReq(object):
 
         # Check if timeframe is a list
         if isinstance(timeframe, list):
-            for index, kw in enumerate(self.kw_list):
-                for geo in self.geo:
-                    keyword_payload = {'keyword': kw, 'time': timeframe[index], 'geo': geo}
-                    self.token_payload['req']['comparisonItem'].append(keyword_payload)
+            for index, (kw, geo) in enumerate(product(self.kw_list, self.geo)):
+                keyword_payload = {'keyword': kw, 'time': timeframe[index], 'geo': geo}
+                self.token_payload['req']['comparisonItem'].append(keyword_payload)
         else:
             # build out json for each keyword with
-            for kw in self.kw_list:
-                for geo in self.geo:
-                    keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': geo}
-                    self.token_payload['req']['comparisonItem'].append(keyword_payload)
+            for kw, geo in product(self.kw_list, self.geo):
+                keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': geo}
+                self.token_payload['req']['comparisonItem'].append(keyword_payload)
 
         # requests will mangle this if it is not a string
         self.token_payload['req'] = json.dumps(self.token_payload['req'])
