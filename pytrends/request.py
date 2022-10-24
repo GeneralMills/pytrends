@@ -585,7 +585,7 @@ class TrendReq(object):
             try:
                 self.build_payload(keywords, cat, tf, geo, gprop)
                 week_df = self.interest_over_time()
-                df = df.append(week_df)
+                df = pd.concat([df,week_df])
             except Exception as e:
                 print(e)
                 pass
@@ -607,7 +607,7 @@ class TrendReq(object):
                 try:
                     self.build_payload(keywords, cat, tf, geo, gprop)
                     week_df = self.interest_over_time()
-                    df = df.append(week_df)
+                    df = pd.concat([df,week_df])
                 except Exception as e:
                     print(e)
                     pass
