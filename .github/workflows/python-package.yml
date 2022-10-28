@@ -28,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install build
         python -m build --wheel
-        python -m pip install flake8 pytest
+        python -m pip install -r requirements-dev.txt
         python -m pip install dist/pytrends-*.whl
     - name: Lint with flake8
       run: |
