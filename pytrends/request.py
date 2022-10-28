@@ -9,6 +9,7 @@ import requests
 from pandas.io.json._normalize import nested_to_record
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+from requests import status_codes
 
 from pytrends import exceptions
 
@@ -153,11 +154,9 @@ class TrendReq(object):
             self.GetNewProxy()
             return json.loads(content)
         else:
-            # error
-            raise exceptions.ResponseError(
-                'The request failed: Google returned a '
-                'response with code {0}.'.format(response.status_code),
-                response=response)
+            if response.status_code == status_codes.codes.too_many_requests:
+                raise exceptions.TooManyRequestsError.from_response(response)
+            raise exceptions.ResponseError.from_response(response)
 
     def build_payload(self, kw_list, cat=0, timeframe='today 5-y', geo='',
                       gprop=''):
