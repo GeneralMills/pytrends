@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytrends"
+version = "4.7.4"
+description = "Pseudo API for Google Trends"
+urls = {homepage = "https://github.com/dreyco676/pytrends"}
+authors = [
+    {name = "John Hogue"},
+    {name = "Burton DeWilde"},
+    {email = "dreyco676@gmail.com"}
+]
+license = {text = "Apache 2.0"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.3",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "License :: OSI Approved :: MIT License"
+]
+dependencies = [
+    "requests>=2.0",
+    "pandas>=0.25",
+    "lxml"
+]
+keywords = [
+    "google trends api search"
+]
+dynamic = ["readme"]
+
+# Taken from https://github.com/pypa/setuptools/blob/d138ec08efc2dbaebb8752e215e324f38bd807a2/setuptools/tests/config/test_pyprojecttoml.py#L68
+[tool.setuptools.dynamic.readme]
+file = ["README.md"]
+content-type = "text/markdown"
