@@ -7,6 +7,7 @@ name = "pytrends"
 version = "4.7.4"
 description = "Pseudo API for Google Trends"
 urls = {homepage = "https://github.com/dreyco676/pytrends"}
+requires-python = ">=3.7"
 authors = [
     {name = "John Hogue"},
     {name = "Burton DeWilde"},
