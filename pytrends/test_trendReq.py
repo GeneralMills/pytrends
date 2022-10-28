@@ -1,118 +1,157 @@
-from unittest import TestCase
 import pandas.api.types as ptypes
+import pytest
 
 from pytrends.request import TrendReq
 
 
-class TestTrendReq(TestCase):
+def test_get_data():
+    """Should use same values as in the documentation"""
+    pytrend = TrendReq()
+    assert pytrend.hl == 'en-US'
+    assert pytrend.tz == 360
+    assert pytrend.geo == ''
+    assert bool(pytrend.cookies['NID']) is True
 
-    def test__get_data(self):
-        """Should use same values as in the documentation"""
-        pytrend = TrendReq()
-        self.assertEqual(pytrend.hl, 'en-US')
-        self.assertEqual(pytrend.tz, 360)
-        self.assertEqual(pytrend.geo, '')
-        self.assertTrue(pytrend.cookies['NID'])
 
-    def test_build_payload(self):
-        """Should return the widgets to get data"""
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.token_payload)
+def test_build_payload():
+    """Should return the widgets to get data"""
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    assert pytrend.token_payload is not None
 
-    def test__tokens(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.related_queries_widget_list)
 
-    def test_interest_over_time(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.interest_over_time())
+def test_tokens():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    assert pytrend.related_queries_widget_list is not None
 
-    def test_interest_over_time_images(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='images')
-        self.assertIsNotNone(pytrend.interest_over_time())
 
-    def test_interest_over_time_news(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='news')
-        self.assertIsNotNone(pytrend.interest_over_time())
+def test_interest_over_time():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.interest_over_time()
+    assert result is not None
 
-    def test_interest_over_time_youtube(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='youtube')
-        self.assertIsNotNone(pytrend.interest_over_time())
 
-    def test_interest_over_time_froogle(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='froogle')
-        self.assertIsNotNone(pytrend.interest_over_time())
+def test_interest_over_time_images():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='images')
+    result = pytrend.interest_over_time()
+    assert result is not None
 
-    def test_interest_over_time_bad_gprop(self):
-        pytrend = TrendReq()
-        with self.assertRaises(ValueError):
-            pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
 
-    def test_interest_by_region(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.interest_by_region())
+def test_interest_over_time_news():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='news')
+    result = pytrend.interest_over_time()
+    assert result is not None
 
-    def test_interest_by_region_city_resolution(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.interest_by_region(resolution='CITY'))
 
-    def test_related_topics(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.related_topics())
+def test_interest_over_time_youtube():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='youtube')
+    result = pytrend.interest_over_time()
+    assert result is not None
 
-    def test_related_queries(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.related_queries())
 
-    def test_trending_searches(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.trending_searches())
+def test_interest_over_time_froogle():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='froogle')
+    result = pytrend.interest_over_time()
+    assert result is not None
 
-    def test_realtime_trending_searches(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.realtime_trending_searches(pn='IN'))
 
-    def test_request_args_passing(self):
-        requests_args = {'headers': {
-            'User-Agent': 'pytrends',
-        }}
-        pytrend = TrendReq(requests_args=requests_args)
-        pytrend.build_payload(kw_list=['bananas'])
-        self.assertIsNotNone(pytrend.suggestions('bananas'))
-        self.assertIsNotNone(pytrend.trending_searches())
+def test_interest_over_time_bad_gprop():
+    pytrend = TrendReq()
+    with pytest.raises(ValueError):
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
 
-    def test_top_charts(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.top_charts(date=2019))
 
-    def test_suggestions(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        self.assertIsNotNone(pytrend.suggestions(keyword='pizza'))
+def test_interest_by_region():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.interest_by_region()
+    assert result is not None
 
-    def test_ispartial_dtype(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'])
-        df = pytrend.interest_over_time()
-        assert ptypes.is_bool_dtype(df.isPartial)
 
-    def test_ispartial_dtype_timeframe_all(self):
-        pytrend = TrendReq()
-        pytrend.build_payload(kw_list=['pizza', 'bagel'],
-                              timeframe='all')
-        df = pytrend.interest_over_time()
-        assert ptypes.is_bool_dtype(df.isPartial)
+def test_interest_by_region_city_resolution():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.interest_by_region(resolution='CITY')
+    assert result is not None
+
+
+def test_related_topics():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.related_topics()
+    assert result is not None
+
+
+def test_related_queries():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.related_queries()
+    assert result is not None
+
+
+def test_trending_searches():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.trending_searches()
+    assert result is not None
+
+
+def test_realtime_trending_searches():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.realtime_trending_searches(pn='IN')
+    assert result is not None
+
+
+def test_request_args_passing_suggestions():
+    requests_args = {'headers': {
+        'User-Agent': 'pytrends',
+    }}
+    pytrend = TrendReq(requests_args=requests_args)
+    pytrend.build_payload(kw_list=['bananas'])
+    result = pytrend.suggestions('bananas')
+    assert result is not None
+
+
+def test_request_args_passing_trending_searches():
+    requests_args = {'headers': {
+        'User-Agent': 'pytrends',
+    }}
+    pytrend = TrendReq(requests_args=requests_args)
+    pytrend.build_payload(kw_list=['bananas'])
+    result = pytrend.trending_searches()
+    assert result is not None
+
+
+def test_top_charts():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.top_charts(date=2019)
+    assert result is not None
+
+
+def test_suggestions():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    result = pytrend.suggestions(keyword='pizza')
+    assert result is not None
+
+
+def test_ispartial_dtype():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    df = pytrend.interest_over_time()
+    assert ptypes.is_bool_dtype(df.isPartial)
+
+
+def test_ispartial_dtype_timeframe_all():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='all')
+    df = pytrend.interest_over_time()
+    assert ptypes.is_bool_dtype(df.isPartial)
