@@ -39,3 +39,5 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+          --cov-report term
+          --cov pytrends/

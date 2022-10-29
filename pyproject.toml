@@ -34,7 +34,23 @@ keywords = [
 ]
 dynamic = ["readme"]
 
+[tool.setuptools]
+packages = ["pytrends"]
+
 # Taken from https://github.com/pypa/setuptools/blob/d138ec08efc2dbaebb8752e215e324f38bd807a2/setuptools/tests/config/test_pyprojecttoml.py#L68
 [tool.setuptools.dynamic.readme]
 file = ["README.md"]
 content-type = "text/markdown"
+
+[tool.coverage.run]
+branch = true
+source = [
+    "pytrends/"
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+
+[html]
+directory = "htmlcov/"
