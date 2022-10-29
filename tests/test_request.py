@@ -142,3 +142,37 @@ def test_interest_over_time():
     ))
     df_result_tail = df_result.tail(3)
     assert_frame_equal(df_result_tail, df_expected_tail)
+
+
+@pytest.mark.vcr
+def test_interest_over_time_images():
+    pytrend = TrendReq()
+    pytrend.build_payload(
+        kw_list=['pizza', 'bagel'],
+        gprop='images',
+        timeframe='2021-01-01 2021-12-31'
+    )
+    df_result = pytrend.interest_over_time()
+    assert len(df_result) == 52
+
+    df_expected_head = pd.DataFrame({
+        'pizza': [91, 96, 91],
+        'bagel': [4, 4, 3],
+        'isPartial': [False, False, False],
+    }, index=pd.Index(
+        data=pd.to_datetime(['2021-01-03', '2021-01-10', '2021-01-17']),
+        name='date'
+    ))
+    df_result_head = df_result.head(3)
+    assert_frame_equal(df_result_head, df_expected_head)
+
+    df_expected_tail = pd.DataFrame({
+        'pizza': [84, 80, 84],
+        'bagel': [3, 3, 3],
+        'isPartial': [False, False, False],
+    }, index=pd.Index(
+        data=pd.to_datetime(['2021-12-12', '2021-12-19', '2021-12-26']),
+        name='date'
+    ))
+    df_result_tail = df_result.tail(3)
+    assert_frame_equal(df_result_tail, df_expected_tail)
