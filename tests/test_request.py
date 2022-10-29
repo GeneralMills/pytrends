@@ -1,6 +1,8 @@
 from unittest.mock import ANY
 
+import pandas as pd
 import pytest
+from pandas.testing import assert_frame_equal
 
 from pytrends.request import TrendReq
 
@@ -110,3 +112,33 @@ def test_tokens():
         },
     ]
     assert pytrend.related_queries_widget_list == expected
+
+
+@pytest.mark.vcr
+def test_interest_over_time():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.interest_over_time()
+    assert len(df_result) == 52
+
+    df_expected_head = pd.DataFrame({
+        'pizza': [81, 79, 79],
+        'bagel': [2, 2, 2],
+        'isPartial': [False, False, False],
+    }, index=pd.Index(
+        data=pd.to_datetime(['2021-01-03', '2021-01-10', '2021-01-17']),
+        name='date'
+    ))
+    df_result_head = df_result.head(3)
+    assert_frame_equal(df_result_head, df_expected_head)
+
+    df_expected_tail = pd.DataFrame({
+        'pizza': [83, 83, 100],
+        'bagel': [2, 2, 2],
+        'isPartial': [False, False, False],
+    }, index=pd.Index(
+        data=pd.to_datetime(['2021-12-12', '2021-12-19', '2021-12-26']),
+        name='date'
+    ))
+    df_result_tail = df_result.tail(3)
+    assert_frame_equal(df_result_tail, df_expected_tail)
