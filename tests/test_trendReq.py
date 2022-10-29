@@ -12,14 +12,6 @@ too_many_requests_mark = pytest.mark.xfail(
 
 
 @too_many_requests_mark
-def test_interest_over_time_news():
-    pytrend = TrendReq()
-    pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='news')
-    result = pytrend.interest_over_time()
-    assert result is not None
-
-
-@too_many_requests_mark
 def test_interest_over_time_youtube():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop='youtube')
