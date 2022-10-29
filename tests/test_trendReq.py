@@ -12,16 +12,6 @@ too_many_requests_mark = pytest.mark.xfail(
 
 
 @too_many_requests_mark
-def test_get_data():
-    """Should use same values as in the documentation"""
-    pytrend = TrendReq()
-    assert pytrend.hl == 'en-US'
-    assert pytrend.tz == 360
-    assert pytrend.geo == ''
-    assert bool(pytrend.cookies['NID']) is True
-
-
-@too_many_requests_mark
 def test_build_payload():
     """Should return the widgets to get data"""
     pytrend = TrendReq()
