@@ -12,13 +12,6 @@ too_many_requests_mark = pytest.mark.xfail(
 
 
 @too_many_requests_mark
-def test_tokens():
-    pytrend = TrendReq()
-    pytrend.build_payload(kw_list=['pizza', 'bagel'])
-    assert pytrend.related_queries_widget_list is not None
-
-
-@too_many_requests_mark
 def test_interest_over_time():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'])
