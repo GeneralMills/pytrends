@@ -12,14 +12,6 @@ too_many_requests_mark = pytest.mark.xfail(
 
 
 @too_many_requests_mark
-def test_interest_by_region_city_resolution():
-    pytrend = TrendReq()
-    pytrend.build_payload(kw_list=['pizza', 'bagel'])
-    result = pytrend.interest_by_region(resolution='CITY')
-    assert result is not None
-
-
-@too_many_requests_mark
 def test_related_topics():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'])

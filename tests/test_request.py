@@ -303,3 +303,24 @@ def test_interest_by_region():
         }, index=pd.Index(['Algeria', 'Albania', 'Afghanistan'], name='geoName'))
     )
     expected_result.assert_equals(df_result)
+
+
+@pytest.mark.vcr
+def test_interest_by_region_city_resolution():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.interest_by_region(resolution='CITY')
+    # Both head and tail have all 0's in both values, sort the result to test more meaningful values
+    df_result = df_result.sort_values(by=['bagel', 'pizza', 'geoName'], ascending=False)
+    expected_result = ExpectedResult(
+        length=200,
+        df_head=pd.DataFrame({
+            'pizza': [95, 97, 97],
+            'bagel': [5, 3, 3],
+        }, index=pd.Index(['Grafton', 'Raleigh', 'Philadelphia'], name='geoName')),
+        df_tail=pd.DataFrame({
+            'pizza': [0, 0, 0],
+            'bagel': [0, 0, 0],
+        }, index=pd.Index(['Ahmedabad', 'Abu Dhabi', 'Aarhus'], name='geoName'))
+    )
+    expected_result.assert_equals(df_result)
