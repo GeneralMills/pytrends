@@ -396,3 +396,81 @@ def test_related_topics_result_rising():
         'topic_type': ['Retail company', 'Food', 'Topic', '1988 film']
     }, index=pd.Index([0, 1, 2, 3]))
     assert_frame_equal(df_result, df_expected)
+
+
+@pytest.mark.vcr
+def test_related_queries_result_keys():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.related_queries()
+    assert set(df_result.keys()) == {'pizza', 'bagel'}
+    df_result_pizza = df_result['pizza']
+    assert set(df_result_pizza.keys()) == {'top', 'rising'}
+    df_result_bagel = df_result['bagel']
+    assert set(df_result_bagel.keys()) == {'top', 'rising'}
+
+
+@pytest.mark.vcr
+def test_related_queries_result_top():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.related_queries()
+
+    expected_pizza = ExpectedResult(
+        length=25,
+        df_head=pd.DataFrame({
+            'query': ['pizza hut', 'pizza near me', 'pizza pizza near me'],
+            'value': [100, 64, 64]
+        }, index=pd.Index([0, 1, 2])),
+        df_tail=pd.DataFrame({
+            'query': ['cheese pizza', 'little caesars', 'pizza little caesars'],
+            'value': [5, 5, 5]
+        }, index=pd.Index([22, 23, 24]))
+    )
+    expected_pizza.assert_equals(df_result['pizza']['top'])
+
+    expected_bagel = ExpectedResult(
+        length=25,
+        df_head=pd.DataFrame({
+            'query': ['the bagel', 'bagel me', 'bagel near me'],
+            'value': [100, 99, 93]
+        }, index=pd.Index([0, 1, 2])),
+        df_tail=pd.DataFrame({
+            'query': ['coffee meets bagel', 'bagel bread', 'what a bagel'],
+            'value': [23, 22, 21]
+        }, index=pd.Index([22, 23, 24]))
+    )
+    expected_bagel.assert_equals(df_result['bagel']['top'])
+
+
+@pytest.mark.vcr
+def test_related_queries_result_rising():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.related_queries()
+
+    expected_pizza = ExpectedResult(
+        length=11,
+        df_head=pd.DataFrame({
+            'query': ['licorice pizza', 'history of pizza', 'stoned pizza'],
+            'value': [8850, 400, 300]
+        }, index=pd.Index([0, 1, 2])),
+        df_tail=pd.DataFrame({
+            'query': ['pizza cosy', 'incredible pizza', 'andys pizza'],
+            'value': [50, 50, 50]
+        }, index=pd.Index([8, 9, 10]))
+    )
+    expected_pizza.assert_equals(df_result['pizza']['rising'])
+
+    expected_bagel = ExpectedResult(
+        length=19,
+        df_head=pd.DataFrame({
+            'query': ['rover bagel', 'kettlemans bagel', 'bagel karen'],
+            'value': [400, 250, 170]
+        }, index=pd.Index([0, 1, 2])),
+        df_tail=pd.DataFrame({
+            'query': ['brugger bagel', 'the bagel nook', 'best bagel near me'],
+            'value': [50, 40, 40]
+        }, index=pd.Index([16, 17, 18]))
+    )
+    expected_bagel.assert_equals(df_result['bagel']['rising'])

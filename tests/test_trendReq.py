@@ -12,14 +12,6 @@ too_many_requests_mark = pytest.mark.xfail(
 
 
 @too_many_requests_mark
-def test_related_queries():
-    pytrend = TrendReq()
-    pytrend.build_payload(kw_list=['pizza', 'bagel'])
-    result = pytrend.related_queries()
-    assert result is not None
-
-
-@too_many_requests_mark
 def test_trending_searches():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'])
