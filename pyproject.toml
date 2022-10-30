@@ -44,13 +44,10 @@ content-type = "text/markdown"
 
 [tool.coverage.run]
 branch = true
-source = [
-    "pytrends/"
-]
 
 [tool.coverage.report]
 precision = 2
 show_missing = true
 
-[html]
-directory = "htmlcov/"
+[tool.pytest.ini_options]
+addopts = "--cov pytrends/"
