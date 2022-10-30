@@ -570,3 +570,18 @@ def test_top_charts():
         'exploreQuery': ['', '', '', '', '', 'Copa America', '', '', '', '']
     })
     assert_frame_equal(df_result, df_expected)
+
+
+@pytest.mark.vcr
+def test_suggestions():
+    pytrend = TrendReq()
+    # suggestions doesn't need to call build_payload.
+    result = pytrend.suggestions(keyword='pizza')
+    expected = [
+        {'mid': '/m/0663v', 'title': 'Pizza', 'type': 'Dish'},
+        {'mid': '/g/11k19hmrkk', 'title': 'Licorice Pizza', 'type': '2021 film'},
+        {'mid': '/m/0dfxdnc', 'title': 'Pizza dough', 'type': 'Food'},
+        {'mid': '/g/11hdxfw7c0', 'title': 'history of pizza', 'type': 'Food'},
+        {'mid': '/g/11fl7dydwb', 'title': 'Pizza Oven', 'type': 'Topic'},
+    ]
+    assert result == expected

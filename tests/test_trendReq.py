@@ -34,14 +34,6 @@ def test_request_args_passing_trending_searches():
 
 
 @too_many_requests_mark
-def test_suggestions():
-    pytrend = TrendReq()
-    pytrend.build_payload(kw_list=['pizza', 'bagel'])
-    result = pytrend.suggestions(keyword='pizza')
-    assert result is not None
-
-
-@too_many_requests_mark
 def test_ispartial_dtype():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'])
