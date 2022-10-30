@@ -227,3 +227,26 @@ def test_interest_over_time_news():
         }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
     )
     expected_result.assert_equals(df_result)
+
+
+@pytest.mark.vcr
+def test_interest_over_time_youtube():
+    pytrend = TrendReq()
+    pytrend.build_payload(
+        kw_list=['pizza', 'bagel'],
+        gprop='youtube',
+        timeframe='2021-01-01 2021-12-31'
+    )
+    df_result = pytrend.interest_over_time()
+    expected_result = ExpectedResult(
+        length=52,
+        df_head=build_interest_over_time_df({
+            'pizza': [93, 92, 85],
+            'bagel': [1, 1, 1]
+        }, dates=['2021-01-03', '2021-01-10', '2021-01-17']),
+        df_tail=build_interest_over_time_df({
+            'pizza': [72, 73, 81],
+            'bagel': [1, 1, 1]
+        }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
+    )
+    expected_result.assert_equals(df_result)
