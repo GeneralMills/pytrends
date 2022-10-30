@@ -250,3 +250,26 @@ def test_interest_over_time_youtube():
         }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
     )
     expected_result.assert_equals(df_result)
+
+
+@pytest.mark.vcr
+def test_interest_over_time_froogle():
+    pytrend = TrendReq()
+    pytrend.build_payload(
+        kw_list=['pizza', 'bagel'],
+        gprop='froogle',
+        timeframe='2021-01-01 2021-12-31'
+    )
+    df_result = pytrend.interest_over_time()
+    expected_result = ExpectedResult(
+        length=52,
+        df_head=build_interest_over_time_df({
+            'pizza': [87, 80, 87],
+            'bagel': [4, 4, 3]
+        }, dates=['2021-01-03', '2021-01-10', '2021-01-17']),
+        df_tail=build_interest_over_time_df({
+            'pizza': [80, 82, 99],
+            'bagel': [1, 0, 2]
+        }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
+    )
+    expected_result.assert_equals(df_result)
