@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from unittest.mock import ANY
+import re
 
 import pandas as pd
 import pytest
@@ -273,3 +274,11 @@ def test_interest_over_time_froogle():
         }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
     )
     expected_result.assert_equals(df_result)
+
+
+@pytest.mark.vcr
+def test_interest_over_time_bad_gprop():
+    pytrend = TrendReq()
+    expected_message = re.compile(r'^gprop must be.+$')
+    with pytest.raises(ValueError, match=expected_message):
+        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')

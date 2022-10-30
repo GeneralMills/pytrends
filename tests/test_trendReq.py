@@ -12,13 +12,6 @@ too_many_requests_mark = pytest.mark.xfail(
 
 
 @too_many_requests_mark
-def test_interest_over_time_bad_gprop():
-    pytrend = TrendReq()
-    with pytest.raises(ValueError):
-        pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
-
-
-@too_many_requests_mark
 def test_interest_by_region():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'])
