@@ -282,3 +282,24 @@ def test_interest_over_time_bad_gprop():
     expected_message = re.compile(r'^gprop must be.+$')
     with pytest.raises(ValueError, match=expected_message):
         pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
+
+
+@pytest.mark.vcr
+def test_interest_by_region():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.interest_by_region()
+    # Both head and tail have all 0's in both values, sort the result to test more meaningful values
+    df_result = df_result.sort_values(by=['bagel', 'pizza', 'geoName'], ascending=False)
+    expected_result = ExpectedResult(
+        length=250,
+        df_head=pd.DataFrame({
+            'pizza': [93, 94, 96],
+            'bagel': [7, 6, 4],
+        }, index=pd.Index(['Singapore', 'Hong Kong', 'Taiwan'], name='geoName')),
+        df_tail=pd.DataFrame({
+            'pizza': [0, 0, 0],
+            'bagel': [0, 0, 0],
+        }, index=pd.Index(['Algeria', 'Albania', 'Afghanistan'], name='geoName'))
+    )
+    expected_result.assert_equals(df_result)
