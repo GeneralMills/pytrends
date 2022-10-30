@@ -12,28 +12,6 @@ too_many_requests_mark = pytest.mark.xfail(
 
 
 @too_many_requests_mark
-def test_request_args_passing_suggestions():
-    requests_args = {'headers': {
-        'User-Agent': 'pytrends',
-    }}
-    pytrend = TrendReq(requests_args=requests_args)
-    pytrend.build_payload(kw_list=['bananas'])
-    result = pytrend.suggestions('bananas')
-    assert result is not None
-
-
-@too_many_requests_mark
-def test_request_args_passing_trending_searches():
-    requests_args = {'headers': {
-        'User-Agent': 'pytrends',
-    }}
-    pytrend = TrendReq(requests_args=requests_args)
-    pytrend.build_payload(kw_list=['bananas'])
-    result = pytrend.trending_searches()
-    assert result is not None
-
-
-@too_many_requests_mark
 def test_ispartial_dtype():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'])

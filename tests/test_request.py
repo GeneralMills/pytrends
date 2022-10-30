@@ -4,6 +4,7 @@ import re
 
 import pandas as pd
 import pytest
+import responses
 from pandas.testing import assert_frame_equal
 
 from pytrends.request import TrendReq
@@ -585,3 +586,25 @@ def test_suggestions():
         {'mid': '/g/11fl7dydwb', 'title': 'Pizza Oven', 'type': 'Topic'},
     ]
     assert result == expected
+
+
+@responses.activate
+def test_request_args_passing():
+    responses.add(
+        url='https://trends.google.com/?geo=US',
+        method='GET',
+        match=[responses.matchers.header_matcher({'User-Agent': 'pytrends'})]
+    )
+    responses.add(
+        url='https://trends.google.com/trends/hottrends/visualize/internal/data',
+        method='GET',
+        match=[responses.matchers.header_matcher({'User-Agent': 'pytrends'})],
+        json={
+            'united_states': ['term 1', 'term 2']
+        }
+    )
+    requests_args = {'headers': {
+        'User-Agent': 'pytrends',
+    }}
+    pytrend = TrendReq(requests_args=requests_args)
+    pytrend.trending_searches()
