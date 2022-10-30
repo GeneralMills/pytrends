@@ -39,5 +39,6 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+          --block-network
           --cov-report term
           --cov pytrends/
