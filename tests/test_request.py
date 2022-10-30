@@ -170,20 +170,13 @@ def test_tokens():
 @pytest.mark.vcr
 def test_interest_over_time():
     pytrend = TrendReq()
-    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-12-31')
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-01-05')
     df_result = pytrend.interest_over_time()
-    expected_result = ExpectedResult(
-        length=52,
-        df_head=build_interest_over_time_df({
-            'pizza': [81, 79, 79],
-            'bagel': [2, 2, 2]
-        }, dates=['2021-01-03', '2021-01-10', '2021-01-17']),
-        df_tail=build_interest_over_time_df({
-            'pizza': [83, 83, 100],
-            'bagel': [2, 2, 2]
-        }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
-    )
-    expected_result.assert_equals(df_result)
+    df_expected = build_interest_over_time_df({
+        'pizza': [100, 87, 78, 51, 52],
+        'bagel': [2, 2, 2, 1, 1]
+    }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
+    assert_frame_equal(df_result, df_expected)
 
 
 @pytest.mark.vcr
@@ -192,21 +185,14 @@ def test_interest_over_time_images():
     pytrend.build_payload(
         kw_list=['pizza', 'bagel'],
         gprop='images',
-        timeframe='2021-01-01 2021-12-31'
+        timeframe='2021-01-01 2021-01-05'
     )
     df_result = pytrend.interest_over_time()
-    expected_result = ExpectedResult(
-        length=52,
-        df_head=build_interest_over_time_df({
-            'pizza': [91, 96, 91],
-            'bagel': [4, 4, 3]
-        }, dates=['2021-01-03', '2021-01-10', '2021-01-17']),
-        df_tail=build_interest_over_time_df({
-            'pizza': [84, 80, 84],
-            'bagel': [3, 3, 3],
-        }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
-    )
-    expected_result.assert_equals(df_result)
+    df_expected = build_interest_over_time_df({
+        'pizza': [82, 100, 89, 92, 92],
+        'bagel': [2, 2, 5, 5, 5],
+    }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
+    assert_frame_equal(df_result, df_expected)
 
 
 @pytest.mark.vcr
@@ -215,21 +201,14 @@ def test_interest_over_time_news():
     pytrend.build_payload(
         kw_list=['pizza', 'bagel'],
         gprop='news',
-        timeframe='2021-01-01 2021-12-31'
+        timeframe='2021-01-01 2021-01-05'
     )
     df_result = pytrend.interest_over_time()
-    expected_result = ExpectedResult(
-        length=52,
-        df_head=build_interest_over_time_df({
-            'pizza': [53, 60, 65],
-            'bagel': [0, 0, 2]
-        }, dates=['2021-01-03', '2021-01-10', '2021-01-17']),
-        df_tail=build_interest_over_time_df({
-            'pizza': [62, 64, 70],
-            'bagel': [0, 7, 3]
-        }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
-    )
-    expected_result.assert_equals(df_result)
+    df_expected = build_interest_over_time_df({
+        'pizza': [88, 66, 100, 32, 53],
+        'bagel': [0, 10, 10, 10, 0],
+    }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
+    assert_frame_equal(df_result, df_expected)
 
 
 @pytest.mark.vcr
@@ -238,21 +217,14 @@ def test_interest_over_time_youtube():
     pytrend.build_payload(
         kw_list=['pizza', 'bagel'],
         gprop='youtube',
-        timeframe='2021-01-01 2021-12-31'
+        timeframe='2021-01-01 2021-01-05'
     )
     df_result = pytrend.interest_over_time()
-    expected_result = ExpectedResult(
-        length=52,
-        df_head=build_interest_over_time_df({
-            'pizza': [93, 92, 85],
-            'bagel': [1, 1, 1]
-        }, dates=['2021-01-03', '2021-01-10', '2021-01-17']),
-        df_tail=build_interest_over_time_df({
-            'pizza': [72, 73, 81],
-            'bagel': [1, 1, 1]
-        }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
-    )
-    expected_result.assert_equals(df_result)
+    df_expected = build_interest_over_time_df({
+        'pizza': [93, 98, 100, 93, 98],
+        'bagel': [1, 2, 1, 2, 1],
+    }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
+    assert_frame_equal(df_result, df_expected)
 
 
 @pytest.mark.vcr
@@ -261,21 +233,14 @@ def test_interest_over_time_froogle():
     pytrend.build_payload(
         kw_list=['pizza', 'bagel'],
         gprop='froogle',
-        timeframe='2021-01-01 2021-12-31'
+        timeframe='2021-01-01 2021-01-05'
     )
     df_result = pytrend.interest_over_time()
-    expected_result = ExpectedResult(
-        length=52,
-        df_head=build_interest_over_time_df({
-            'pizza': [87, 80, 87],
-            'bagel': [4, 4, 3]
-        }, dates=['2021-01-03', '2021-01-10', '2021-01-17']),
-        df_tail=build_interest_over_time_df({
-            'pizza': [80, 82, 99],
-            'bagel': [1, 0, 2]
-        }, dates=['2021-12-12', '2021-12-19', '2021-12-26'])
-    )
-    expected_result.assert_equals(df_result)
+    df_expected = build_interest_over_time_df({
+        'pizza': [88, 100, 86, 57, 85],
+        'bagel': [0, 0, 0, 4, 0],
+    }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
+    assert_frame_equal(df_result, df_expected)
 
 
 @pytest.mark.vcr
@@ -335,8 +300,8 @@ def test_related_topics_result_keys():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza'], timeframe='2021-01-01 2021-12-31')
     df_result = pytrend.related_topics()
-    # Since the result dict contains pd.DataFrame's we can't create an expected dict and compare.
-    # Fuck you Pandas and your "oops, the truth value of a DataFrame is ambiguous, let's error out".
+    # Since the result dict contains pd.DataFrame's we can't create an expected dict and compare
+    # because PAndas raises an error "the truth value of a DataFrame is ambiguous".
     assert set(df_result.keys()) == {'pizza'}
     df_result = df_result['pizza']
     assert set(df_result.keys()) == {'top', 'rising'}
