@@ -359,7 +359,7 @@ def test_related_topics_result_top():
             'topic_mid': ['/m/0663v', '/m/09cfq', '/m/03clwm'],
             'topic_title': ['Pizza', 'Pizza Hut', "Domino's Pizza"],
             'topic_type': ['Dish', 'Restaurant company', 'Restaurant company']
-        }, index=pd.Index([0, 1, 2])),
+        }),
         df_tail=pd.DataFrame({
             'value': [0, 0, 0],
             'formattedValue': ['<1', '<1', '<1'],
@@ -394,7 +394,7 @@ def test_related_topics_result_rising():
         'topic_mid': ['/m/09nghg', '/m/0gwh_4', '/g/11g6qhxwmd', '/m/02hvyj'],
         'topic_title': ['Sam Goody', 'Detroit-style pizza', 'Ooni', 'Mystic Pizza'],
         'topic_type': ['Retail company', 'Food', 'Topic', '1988 film']
-    }, index=pd.Index([0, 1, 2, 3]))
+    })
     assert_frame_equal(df_result, df_expected)
 
 
@@ -421,7 +421,7 @@ def test_related_queries_result_top():
         df_head=pd.DataFrame({
             'query': ['pizza hut', 'pizza near me', 'pizza pizza near me'],
             'value': [100, 64, 64]
-        }, index=pd.Index([0, 1, 2])),
+        }),
         df_tail=pd.DataFrame({
             'query': ['cheese pizza', 'little caesars', 'pizza little caesars'],
             'value': [5, 5, 5]
@@ -434,7 +434,7 @@ def test_related_queries_result_top():
         df_head=pd.DataFrame({
             'query': ['the bagel', 'bagel me', 'bagel near me'],
             'value': [100, 99, 93]
-        }, index=pd.Index([0, 1, 2])),
+        }),
         df_tail=pd.DataFrame({
             'query': ['coffee meets bagel', 'bagel bread', 'what a bagel'],
             'value': [23, 22, 21]
@@ -454,7 +454,7 @@ def test_related_queries_result_rising():
         df_head=pd.DataFrame({
             'query': ['licorice pizza', 'history of pizza', 'stoned pizza'],
             'value': [8850, 400, 300]
-        }, index=pd.Index([0, 1, 2])),
+        }),
         df_tail=pd.DataFrame({
             'query': ['pizza cosy', 'incredible pizza', 'andys pizza'],
             'value': [50, 50, 50]
@@ -467,7 +467,7 @@ def test_related_queries_result_rising():
         df_head=pd.DataFrame({
             'query': ['rover bagel', 'kettlemans bagel', 'bagel karen'],
             'value': [400, 250, 170]
-        }, index=pd.Index([0, 1, 2])),
+        }),
         df_tail=pd.DataFrame({
             'query': ['brugger bagel', 'the bagel nook', 'best bagel near me'],
             'value': [50, 40, 40]
@@ -485,10 +485,7 @@ def test_trending_searches():
     # They're time-dependent.
     expected_result = ExpectedResult(
         length=20,
-        df_head=pd.DataFrame(
-            {0: ['Michigan football', 'Seoul', 'Penn State football']},
-            index=pd.Index([0, 1, 2])
-        ),
+        df_head=pd.DataFrame({0: ['Michigan football', 'Seoul', 'Penn State football']}),
         df_tail=pd.DataFrame(
             {0: ['Myositis', 'Dogecoin', 'Deion Sanders']},
             index=pd.Index([17, 18, 19])
@@ -526,7 +523,7 @@ def test_realtime_trending_searches():
                     'Big Ten Conference'
                 ],
             ]
-        }, index=pd.Index([0])),
+        }),
         df_tail=pd.DataFrame({
             'title': [
                 ('Florida Gulf Coast University, '
