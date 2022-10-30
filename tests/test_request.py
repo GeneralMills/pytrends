@@ -474,3 +474,24 @@ def test_related_queries_result_rising():
         }, index=pd.Index([16, 17, 18]))
     )
     expected_bagel.assert_equals(df_result['bagel']['rising'])
+
+
+@pytest.mark.vcr
+def test_trending_searches():
+    pytrend = TrendReq()
+    # trending_searches doesn't need to call build_payload.
+    df_result = pytrend.trending_searches()
+    # NOTE: This expected result needs to be rebuilt from scratch every time the cassette is rewritten.
+    # They're time-dependent.
+    expected_result = ExpectedResult(
+        length=20,
+        df_head=pd.DataFrame(
+            {0: ['Michigan football', 'Seoul', 'Penn State football']},
+            index=pd.Index([0, 1, 2])
+        ),
+        df_tail=pd.DataFrame(
+            {0: ['Myositis', 'Dogecoin', 'Deion Sanders']},
+            index=pd.Index([17, 18, 19])
+        )
+    )
+    expected_result.assert_equals(df_result)
