@@ -3,6 +3,7 @@ from unittest.mock import ANY
 import re
 
 import pandas as pd
+import numpy as np
 import pytest
 import responses
 from pandas.testing import assert_frame_equal
@@ -586,6 +587,16 @@ def test_suggestions():
         {'mid': '/g/11fl7dydwb', 'title': 'Pizza Oven', 'type': 'Topic'},
     ]
     assert result == expected
+
+
+@pytest.mark.vcr
+def test_interest_over_time_partial():
+    # NOTE: This test may fails if regenerate the cassette on Mondays because the last week will not be partial
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    df_result = pytrend.interest_over_time()
+    s_last_row = df_result.iloc[-1]
+    assert s_last_row.isPartial is np.bool_(True)
 
 
 @responses.activate
