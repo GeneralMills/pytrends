@@ -547,3 +547,26 @@ def test_realtime_trending_searches():
         }, index=pd.Index([130]))
     )
     expected_result.assert_equals(df_result)
+
+
+@pytest.mark.vcr
+def test_top_charts():
+    pytrend = TrendReq()
+    # top_chars doesn't need to call build_payload.
+    df_result = pytrend.top_charts(date=2021)
+    df_expected = pd.DataFrame({
+        'title': [
+            'Australia vs India',
+            'India vs England',
+            'IPL',
+            'NBA',
+            'Euro 2021',
+            'Copa América',
+            'India vs New Zealand',
+            'T20 World Cup',
+            'Squid Game',
+            'DMX'
+        ],
+        'exploreQuery': ['', '', '', '', '', 'Copa America', '', '', '', '']
+    })
+    assert_frame_equal(df_result, df_expected)
