@@ -495,3 +495,58 @@ def test_trending_searches():
         )
     )
     expected_result.assert_equals(df_result)
+
+
+@pytest.mark.vcr
+def test_realtime_trending_searches():
+    pytrend = TrendReq()
+    # realtime_trending_searches doesn't need to call build_payload.
+    df_result = pytrend.realtime_trending_searches()
+    # NOTE: This expected result needs to be rebuilt from scratch every time the cassette is rewritten.
+    # They're time-dependent.
+    # NOTE: The result returned by this function is a monster.
+    # Strings of almost 200 characters, lists of strings, lists of lists of strings...
+    # Rebuilding a full 3-head-tail result from scratch is a chore, with a single record for head
+    # and tail is more than enough.
+    expected_result = ExpectedResult(
+        length=131,
+        head_tail_length=1,
+        df_head=pd.DataFrame({
+            'title': [
+                ('Michigan Wolverines football, '
+                 'Michigan State Spartans football, '
+                 'American football, '
+                 'Big Ten Conference'),
+            ],
+            'entityNames': [
+                [
+                    'Michigan Wolverines football',
+                    'Michigan State Spartans football',
+                    'American football',
+                    'Big Ten Conference'
+                ],
+            ]
+        }, index=pd.Index([0])),
+        df_tail=pd.DataFrame({
+            'title': [
+                ('Florida Gulf Coast University, '
+                 'ASUN Conference, '
+                 'Kennesaw State University, '
+                 'Cross country running, '
+                 'Volleyball, '
+                 "Florida Gulf Coast Eagles men's basketball, "
+                 'NCAA Division I')
+            ], 'entityNames': [
+                [
+                    'Florida Gulf Coast University',
+                    'ASUN Conference',
+                    'Kennesaw State University',
+                    'Cross country running',
+                    'Volleyball',
+                    "Florida Gulf Coast Eagles men's basketball",
+                    'NCAA Division I'
+                ]
+            ]
+        }, index=pd.Index([130]))
+    )
+    expected_result.assert_equals(df_result)

@@ -12,14 +12,6 @@ too_many_requests_mark = pytest.mark.xfail(
 
 
 @too_many_requests_mark
-def test_realtime_trending_searches():
-    pytrend = TrendReq()
-    pytrend.build_payload(kw_list=['pizza', 'bagel'])
-    result = pytrend.realtime_trending_searches(pn='IN')
-    assert result is not None
-
-
-@too_many_requests_mark
 def test_request_args_passing_suggestions():
     requests_args = {'headers': {
         'User-Agent': 'pytrends',
