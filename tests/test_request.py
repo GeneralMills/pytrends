@@ -324,3 +324,75 @@ def test_interest_by_region_city_resolution():
         }, index=pd.Index(['Ahmedabad', 'Abu Dhabi', 'Aarhus'], name='geoName'))
     )
     expected_result.assert_equals(df_result)
+
+
+# FIXME: With more than one term the result is always an empty dict.
+# In the web we can get related topics using ['Torvalds', 'Dijkstra'] but not here, something's wrong.
+@pytest.mark.vcr
+def test_related_topics_result_keys():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.related_topics()
+    # Since the result dict contains pd.DataFrame's we can't create an expected dict and compare.
+    # Fuck you Pandas and your "oops, the truth value of a DataFrame is ambiguous, let's error out".
+    assert set(df_result.keys()) == {'pizza'}
+    df_result = df_result['pizza']
+    assert set(df_result.keys()) == {'top', 'rising'}
+
+
+@pytest.mark.vcr
+def test_related_topics_result_top():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.related_topics()['pizza']['top']
+    expected_result = ExpectedResult(
+        length=22,
+        df_head=pd.DataFrame({
+            'value': [100, 25, 14],
+            'formattedValue': ['100', '25', '14'],
+            'hasData': [True, True, True],
+            'link': [
+                '/trends/explore?q=/m/0663v&date=2021-01-01+2021-12-31',
+                '/trends/explore?q=/m/09cfq&date=2021-01-01+2021-12-31',
+                '/trends/explore?q=/m/03clwm&date=2021-01-01+2021-12-31',
+            ],
+            'topic_mid': ['/m/0663v', '/m/09cfq', '/m/03clwm'],
+            'topic_title': ['Pizza', 'Pizza Hut', "Domino's Pizza"],
+            'topic_type': ['Dish', 'Restaurant company', 'Restaurant company']
+        }, index=pd.Index([0, 1, 2])),
+        df_tail=pd.DataFrame({
+            'value': [0, 0, 0],
+            'formattedValue': ['<1', '<1', '<1'],
+            'hasData': [True, True, True],
+            'link': [
+                '/trends/explore?q=/g/11g6qhxwmd&date=2021-01-01+2021-12-31',
+                '/trends/explore?q=/g/11b7c9w1y6&date=2021-01-01+2021-12-31',
+                '/trends/explore?q=/m/09nghg&date=2021-01-01+2021-12-31',
+            ],
+            'topic_mid': ['/g/11g6qhxwmd', '/g/11b7c9w1y6', '/m/09nghg'],
+            'topic_title': ['Ooni', "Roman's Pizza", 'Sam Goody'],
+            'topic_type': ['Topic', 'Topic', 'Retail company']
+        }, index=pd.Index([19, 20, 21]))
+    )
+    expected_result.assert_equals(df_result)
+
+
+@pytest.mark.vcr
+def test_related_topics_result_rising():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza'], timeframe='2021-01-01 2021-12-31')
+    df_result = pytrend.related_topics()['pizza']['rising']
+    df_expected = pd.DataFrame({
+        'value': [11800, 170, 90, 80],
+        'formattedValue': ['Breakout', '+170%', '+90%', '+80%'],
+        'link': [
+            '/trends/explore?q=/m/09nghg&date=2021-01-01+2021-12-31',
+            '/trends/explore?q=/m/0gwh_4&date=2021-01-01+2021-12-31',
+            '/trends/explore?q=/g/11g6qhxwmd&date=2021-01-01+2021-12-31',
+            '/trends/explore?q=/m/02hvyj&date=2021-01-01+2021-12-31',
+        ],
+        'topic_mid': ['/m/09nghg', '/m/0gwh_4', '/g/11g6qhxwmd', '/m/02hvyj'],
+        'topic_title': ['Sam Goody', 'Detroit-style pizza', 'Ooni', 'Mystic Pizza'],
+        'topic_type': ['Retail company', 'Food', 'Topic', '1988 film']
+    }, index=pd.Index([0, 1, 2, 3]))
+    assert_frame_equal(df_result, df_expected)
