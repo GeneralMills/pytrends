@@ -632,11 +632,21 @@ def test_request_args_passing(mocked_responses):
 @pytest.mark.vcr
 def test_interest_over_time_multiple_regions():
     pytrend = TrendReq()
-    pytrend.build_payload(kw_list=['pizza'], geo=['US-NY', 'US-IL'])
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], geo=['US-NY', 'US-IL'])
     df = pytrend.interest_over_time()
     assert df is not None
-    pd.testing.assert_index_equal(df.columns, pd.MultiIndex.from_tuples(
-        [('pizza', 'US-NY'), ('pizza', 'US-IL'), ('isPartial', )])
+    pd.testing.assert_index_equal(
+        df.columns,
+        pd.MultiIndex.from_tuples(
+            [
+                ('pizza', 'US-NY'),
+                ('pizza', 'US-IL'),
+                ('bagel', 'US-NY'),
+                ('bagel', 'US-IL'),
+                ('isPartial', ),
+            ],
+            names=['keyword', 'region']
+        )
     )
     assert df[('pizza', 'US-NY')].notna().all()
     assert df[('pizza', 'US-IL')].notna().all()
