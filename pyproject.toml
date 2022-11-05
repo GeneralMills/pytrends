@@ -49,3 +49,26 @@ show_missing = true
 
 [tool.pytest.ini_options]
 addopts = "--cov pytrends/"
+
+[tool.poetry]
+name = "pytrends"
+version = "4.8.0"
+description = "Pseudo API for Google Trends"
+authors = [
+    "John Hogue",
+    "Burton DeWilde"
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.28.1"
+responses = "^0.22.0"
+pytest = "^7.2.0"
+flake8 = "^5.0.4"
+pytest-cov = "^4.0.0"
+pytest-recording = "^0.12.1"
+pandas = "^1.5.1"
+lxml = "^4.9.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
