@@ -338,6 +338,10 @@ Returns dictionary
   * It has been tested, and 60 seconds of sleep between requests (successful or not) appears to be the correct amount once you reach the limit.
 * For certain configurations the dependency lib certifi requires the environment variable REQUESTS_CA_BUNDLE to be explicitly set and exported. This variable must contain the path where the ca-certificates are saved or a SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] error is given at runtime. 
 
+# Contributing
+
+See the [CONTRIBUTING](CONTRIBUTING.md) file.
+
 # Credits
 
 * Major JSON revision ideas taken from pat310's JavaScript library
