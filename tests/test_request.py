@@ -168,7 +168,7 @@ def test_tokens():
 
 
 @pytest.mark.vcr
-def test_interest_over_time():
+def test_interest_over_time_ok():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-01-05')
     df_result = pytrend.interest_over_time()
@@ -252,7 +252,7 @@ def test_interest_over_time_bad_gprop():
 
 
 @pytest.mark.vcr
-def test_interest_by_region():
+def test_interest_by_region_ok():
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-12-31')
     df_result = pytrend.interest_by_region()
@@ -444,7 +444,7 @@ def test_related_queries_result_rising():
 
 
 @pytest.mark.vcr
-def test_trending_searches():
+def test_trending_searches_ok():
     pytrend = TrendReq()
     # trending_searches doesn't need to call build_payload.
     df_result = pytrend.trending_searches()
@@ -462,7 +462,7 @@ def test_trending_searches():
 
 
 @pytest.mark.vcr
-def test_realtime_trending_searches():
+def test_realtime_trending_searches_ok():
     pytrend = TrendReq()
     # realtime_trending_searches doesn't need to call build_payload.
     df_result = pytrend.realtime_trending_searches()
@@ -517,7 +517,7 @@ def test_realtime_trending_searches():
 
 
 @pytest.mark.vcr
-def test_top_charts():
+def test_top_charts_ok():
     pytrend = TrendReq()
     # top_chars doesn't need to call build_payload.
     df_result = pytrend.top_charts(date=2021)
@@ -540,7 +540,7 @@ def test_top_charts():
 
 
 @pytest.mark.vcr
-def test_suggestions():
+def test_suggestions_ok():
     pytrend = TrendReq()
     # suggestions doesn't need to call build_payload.
     result = pytrend.suggestions(keyword='pizza')
