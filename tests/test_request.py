@@ -564,14 +564,13 @@ def test_interest_over_time_partial():
     assert s_last_row.isPartial is np.bool_(True)
 
 
-@responses.activate
-def test_request_args_passing():
-    responses.add(
+def test_request_args_passing(mocked_responses):
+    mocked_responses.add(
         url='https://trends.google.com/?geo=US',
         method='GET',
         match=[responses.matchers.header_matcher({'User-Agent': 'pytrends'})]
     )
-    responses.add(
+    mocked_responses.add(
         url='https://trends.google.com/trends/hottrends/visualize/internal/data',
         method='GET',
         match=[responses.matchers.header_matcher({'User-Agent': 'pytrends'})],
