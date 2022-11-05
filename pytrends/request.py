@@ -540,3 +540,12 @@ class TrendReq(object):
             trim_chars=5
         )
         return req_json
+
+    def get_historical_interest(self, *args, **kwargs):
+        raise NotImplementedError(
+            """This method has been removed for incorrectness. It will be removed completely in v5.
+If you'd like similar functionality, please try implementing it yourself and consider submitting a pull request to add it to pytrends.
+          
+There is discussion at:
+https://github.com/GeneralMills/pytrends/pull/542"""
+        )
