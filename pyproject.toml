@@ -24,15 +24,10 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: Apache Software License"
 ]
-dependencies = [
-    "requests>=2.0",
-    "pandas>=0.25",
-    "lxml"
-]
 keywords = [
     "google trends api search"
 ]
-dynamic = ["readme"]
+dynamic = ["readme", "dependencies"]
 
 [tool.setuptools]
 packages = ["pytrends"]
@@ -41,6 +36,9 @@ packages = ["pytrends"]
 [tool.setuptools.dynamic.readme]
 file = ["README.md"]
 content-type = "text/markdown"
+
+[tool.setuptools.dynamic.dependencies]
+file = ["requirements.txt"]
 
 [tool.coverage.run]
 branch = true
