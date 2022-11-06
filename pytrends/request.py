@@ -618,3 +618,64 @@ class TrendReq(object):
 
         # Return the dataframe with results from our timeframe
         return df.loc[initial_start_date:end_date]
+
+    def month_end_date(self, year, month):
+        switcher = {
+            1: 31,
+            2: 28,
+            3: 31,
+            4: 30,
+            5: 31,
+            6: 30,
+            7: 31,
+            8: 31,
+            9: 30,
+            10: 31,
+            11: 30,
+            12: 31,
+        }
+
+        # Check for leap year
+        if month == 2 and year % 4 == 0:
+            if year % 100 == 0:
+                if year % 400 == 0:
+                    switcher[2] = 29
+            else:
+                switcher[2] = 29
+
+        return switcher.get(month)
+
+    def get_monthly_interest(self, keywords, year_start=2019, month_start=1, year_end=2020, month_end=1, cat=0, geo='', gprop='', sleep=0):
+        """Gets historical monthly average data for interest over a range of geopoltical regions"""
+
+        # construct datetime objects - raises ValueError if invalid parameters
+        initial_start_date = start_date = datetime(year_start, month_start, 1)
+        end_date = datetime(year_end, month_end, 1)
+
+        df = pd.DataFrame()
+
+        for y in range(year_start, year_end + 1):
+            for m in range(1, 13):
+                if y == year_end and m > month_end:
+                    break
+                if y == year_start and m >= month_start:
+                    while True:
+                        try:
+                            date_start = str(y) + '-' + str(m) + '-01'
+                            date_end = str(y) + '-' + str(m) + "-" + str(self.month_end_date(y, m))
+                            tf = date_start + ' ' + date_end
+                            self.build_payload(keywords, cat, tf, geo, gprop)
+                            month_df = self.interest_by_region()
+                            month_df['dateStart']=date_start
+                            month_df['dateEnd']=date_end
+                            df = df.append(month_df)
+                        except Exception as e:
+                            print(e)
+                            pass
+                        break
+
+                        if sleep > 0:
+                            time.sleep(sleep)
+        
+        # Return the dataframe with results
+        return df
