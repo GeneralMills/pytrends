@@ -13,22 +13,25 @@ from pytrends import exceptions
 from urllib.parse import quote
 
 
+BASE_TRENDS_URL = 'https://trends.google.com/trends'
+
+
 class TrendReq(object):
     """
     Google Trends API
     """
     GET_METHOD = 'get'
     POST_METHOD = 'post'
-    GENERAL_URL = 'https://trends.google.com/trends/api/explore'
-    INTEREST_OVER_TIME_URL = 'https://trends.google.com/trends/api/widgetdata/multiline'
-    INTEREST_BY_REGION_URL = 'https://trends.google.com/trends/api/widgetdata/comparedgeo'
-    RELATED_QUERIES_URL = 'https://trends.google.com/trends/api/widgetdata/relatedsearches'
-    TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/hottrends/visualize/internal/data'
-    TOP_CHARTS_URL = 'https://trends.google.com/trends/api/topcharts'
-    SUGGESTIONS_URL = 'https://trends.google.com/trends/api/autocomplete/'
-    CATEGORIES_URL = 'https://trends.google.com/trends/api/explore/pickers/category'
-    TODAY_SEARCHES_URL = 'https://trends.google.com/trends/api/dailytrends'
-    REALTIME_TRENDING_SEARCHES_URL = 'https://trends.google.com/trends/api/realtimetrends'
+    GENERAL_URL = f'{BASE_TRENDS_URL}/api/explore'
+    INTEREST_OVER_TIME_URL = f'{BASE_TRENDS_URL}/api/widgetdata/multiline'
+    INTEREST_BY_REGION_URL = f'{BASE_TRENDS_URL}/api/widgetdata/comparedgeo'
+    RELATED_QUERIES_URL = f'{BASE_TRENDS_URL}/api/widgetdata/relatedsearches'
+    TRENDING_SEARCHES_URL = f'{BASE_TRENDS_URL}/hottrends/visualize/internal/data'
+    TOP_CHARTS_URL = f'{BASE_TRENDS_URL}/api/topcharts'
+    SUGGESTIONS_URL = f'{BASE_TRENDS_URL}/api/autocomplete/'
+    CATEGORIES_URL = f'{BASE_TRENDS_URL}/api/explore/pickers/category'
+    TODAY_SEARCHES_URL = f'{BASE_TRENDS_URL}/api/dailytrends'
+    REALTIME_TRENDING_SEARCHES_URL = f'{BASE_TRENDS_URL}/api/realtimetrends'
     ERROR_CODES = (500, 502, 504, 429)
 
     def __init__(self, hl='en-US', tz=360, geo='', timeout=(2, 5), proxies='',
@@ -67,8 +70,7 @@ class TrendReq(object):
             if "proxies" in self.requests_args:
                 try:
                     return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                        'https://trends.google.com/?geo={geo}'.format(
-                            geo=self.hl[-2:]),
+                        f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
                         timeout=self.timeout,
                         **self.requests_args
                     ).cookies.items()))
@@ -81,8 +83,7 @@ class TrendReq(object):
                     proxy = ''
                 try:
                     return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                        'https://trends.google.com/?geo={geo}'.format(
-                            geo=self.hl[-2:]),
+                        f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
                         timeout=self.timeout,
                         proxies=proxy,
                         **self.requests_args
