@@ -129,7 +129,7 @@ pandas/_libs/testing.pyx:168: AssertionError
 
 # Check the returned response and see if it contains valid data.
 # We can use the following values to update our test and make it pass.
-(Pdb) df_expected.to_dict(orient='list')
+(Pdb) df_result.to_dict(orient='list')
 {'pizza': [100, 87, 78, 51, 52], 'bagel': [2, 2, 2, 1, 1], 'isPartial': [False, False, False, False, False]}
 ```
 
