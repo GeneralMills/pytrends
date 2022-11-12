@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 import requests
 
-from pandas.io.json._normalize import nested_to_record
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from requests import status_codes
@@ -348,20 +347,16 @@ class TrendReq(object):
 
             # top topics
             try:
-                top_list = req_json['default']['rankedList'][0][
-                    'rankedKeyword']
-                df_top = pd.DataFrame(
-                    [nested_to_record(d, sep='_') for d in top_list])
+                top_list = req_json['default']['rankedList'][0]['rankedKeyword']
+                df_top = pd.json_normalize(top_list, sep='_')
             except KeyError:
                 # in case no top topics are found, the lines above will throw a KeyError
                 df_top = None
 
             # rising topics
             try:
-                rising_list = req_json['default']['rankedList'][1][
-                    'rankedKeyword']
-                df_rising = pd.DataFrame(
-                    [nested_to_record(d, sep='_') for d in rising_list])
+                rising_list = req_json['default']['rankedList'][1]['rankedKeyword']
+                df_rising = pd.json_normalize(rising_list, sep='_')
             except KeyError:
                 # in case no rising topics are found, the lines above will throw a KeyError
                 df_rising = None
