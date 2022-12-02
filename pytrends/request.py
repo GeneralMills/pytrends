@@ -169,11 +169,17 @@ class TrendReq(object):
             'req': {'comparisonItem': [], 'category': cat, 'property': gprop}
         }
 
-        # build out json for each keyword
-        for kw in self.kw_list:
-            keyword_payload = {'keyword': kw, 'time': timeframe,
-                               'geo': self.geo}
-            self.token_payload['req']['comparisonItem'].append(keyword_payload)
+        # Check if timeframe is a list
+        if isinstance(timeframe, list):
+            for index, kw in enumerate(self.kw_list):
+                keyword_payload = {'keyword': kw, 'time': timeframe[index], 'geo': self.geo}
+                self.token_payload['req']['comparisonItem'].append(keyword_payload)
+        else: 
+            # build out json for each keyword with
+            for kw in self.kw_list:
+                keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': self.geo}
+                self.token_payload['req']['comparisonItem'].append(keyword_payload)
+
         # requests will mangle this if it is not a string
         self.token_payload['req'] = json.dumps(self.token_payload['req'])
         # get tokens
