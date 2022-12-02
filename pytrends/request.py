@@ -436,11 +436,13 @@ class TrendReq(object):
         )['default']['trendingSearchesDays'][0]['trendingSearches']
         result_df = pd.DataFrame()
         # parse the returned json
-        sub_df = pd.DataFrame()
+        title_df = pd.DataFrame()
+        traffic_df = pd.DataFrame()
         for trend in req_json:
-            sub_df = sub_df.append(trend['title'], ignore_index=True)
-        result_df = pd.concat([result_df, sub_df])
-        return result_df.iloc[:, -1]
+            title_df = title_df.append(trend['title'], ignore_index=True)
+            traffic_df = traffic_df.append({'searches': trend['formattedTraffic']}, ignore_index=True)
+        result_df = pd.concat([result_df, title_df, traffic_df], axis=1)
+        return result_df.iloc[:, 1:]
 
     def realtime_trending_searches(self, pn='US', cat='all', count =300):
         """Request data from Google Realtime Search Trends section and returns a dataframe"""

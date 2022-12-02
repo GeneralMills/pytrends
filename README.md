@@ -26,6 +26,7 @@ Only good until Google changes their backend again :-P. When that happens feel f
     * [Related Topics](#related-topics)
     * [Related Queries](#related-queries)
     * [Trending Searches](#trending-searches)
+    * [Today Searches](#today-searches)
     * [Realtime Search Trends](#realtime-search-trends)
     * [Top Charts](#top-charts)
     * [Suggestions](#suggestions)
@@ -114,6 +115,8 @@ The following API methods are available:
 * [Related Queries](#related-queries): returns data for the related keywords to a provided keyword shown on Google Trends' Related Queries section.
 
 * [Trending Searches](#trending-searches): returns data for latest trending searches shown on Google Trends' Trending Searches section.
+
+* [Today Searches](#today-searches): returns data for the latest daily search trends shown on Google Trends' Trending Searches section.
 
 * [Top Charts](#top-charts): returns the data for a given topic shown in Google Trends' Top Charts section.
 
@@ -274,6 +277,15 @@ Returns dictionary of pandas.DataFrames
 
 	pytrends.trending_searches(pn='united_states') # trending searches in real time for United States
 	pytrends.trending_searches(pn='japan') # Japan
+
+Returns pandas.DataFrame
+
+<sub><sup>[back to top](#trending_searches)</sub></sup>
+
+### Today Searches
+
+	pytrends.today_searches(pn='US') # daily search trends with traffic for United States
+	pytrends.today_searches(pn='JP') # Japan
 
 Returns pandas.DataFrame
 
