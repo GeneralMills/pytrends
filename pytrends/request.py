@@ -268,6 +268,49 @@ class TrendReq(object):
 
         return final
 
+    def multirange_interest_over_time(self):
+        """Request data from Google's Interest Over Time section across different time ranges and return a dataframe"""
+
+        over_time_payload = {
+            # convert to string as requests will mangle
+            'req': json.dumps(self.interest_over_time_widget['request']),
+            'token': self.interest_over_time_widget['token'],
+            'tz': self.tz
+        }
+
+        # make the request and parse the returned json
+        req_json = self._get_data(
+            url=TrendReq.MULTIRANGE_INTEREST_OVER_TIME_URL,
+            method=TrendReq.GET_METHOD,
+            trim_chars=5,
+            params=over_time_payload,
+        )
+
+        df = pd.DataFrame(req_json['default']['timelineData'])
+        if (df.empty):
+            return df
+
+        result_df = pd.json_normalize(df['columnData'])
+
+        # Split dictionary columns into seperate ones
+        for i, column in enumerate(result_df.columns):
+            result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " date"] = result_df[i].apply(pd.Series)["formattedTime"]
+            result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " value"] = result_df[i].apply(pd.Series)["value"]   
+            result_df = result_df.drop([i], axis=1)
+        
+        # Adds a row with the averages at the top of the dataframe
+        avg_row = {}
+        for i, avg in enumerate(req_json['default']['averages']):
+            avg_row["[" + str(i) + "] " + str(self.kw_list[i]) + " date"] = "Average"
+            avg_row["[" + str(i) + "] " + str(self.kw_list[i]) + " value"] = req_json['default']['averages'][i]
+
+        result_df.loc[-1] = avg_row
+        result_df.index = result_df.index + 1
+        result_df = result_df.sort_index()
+        
+        return result_df
+
+
     def interest_by_region(self, resolution='COUNTRY', inc_low_vol=False,
                            inc_geo_code=False):
         """Request data from Google's Interest by Region section and return a dataframe"""
