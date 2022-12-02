@@ -35,6 +35,12 @@ suggestions_dict = pytrend.suggestions(keyword='pizza')
 print(suggestions_dict)
 
 # Get Google Realtime Search Trends
-
 realtime_searches = pytrend.realtime_trending_searches(pn='IN')
 print(realtime_searches.head())
+
+# Recreate payload with multiple timeframes
+pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe=['2022-09-04 2022-09-10', '2022-09-18 2022-09-24'])
+
+# Multirange Interest Over Time
+multirange_interest_over_time_df = pytrend.multirange_interest_over_time()
+print(multirange_interest_over_time_df.head())
