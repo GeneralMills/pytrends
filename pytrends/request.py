@@ -60,6 +60,9 @@ class TrendReq(object):
         self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
 
+        self.headers = {'accept-language': self.hl}
+        self.headers.update(self.requests_args.pop('headers', {}))
+        
     def GetGoogleCookie(self):
         """
         Gets google cookie (used for each and every proxy; once on init otherwise)
@@ -124,7 +127,7 @@ class TrendReq(object):
                           method_whitelist=frozenset(['GET', 'POST']))
             s.mount('https://', HTTPAdapter(max_retries=retry))
 
-        s.headers.update({'accept-language': self.hl})
+        s.headers.update(self.headers)
         if len(self.proxies) > 0:
             self.cookies = self.GetGoogleCookie()
             s.proxies.update({'https': self.proxies[self.proxy_index]})
