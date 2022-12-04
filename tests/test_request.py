@@ -250,6 +250,51 @@ def test_interest_over_time_bad_gprop():
     with pytest.raises(ValueError, match=expected_message):
         pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
 
+@pytest.mark.vcr
+def test_multirange_interest_over_time_ok():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe=['2021-01-01 2021-01-05', '2021-01-06 2021-01-10'])
+    df_result = pytrend.multirange_interest_over_time()
+
+    expected_result = ExpectedResult(
+        length=6,
+        df_head=pd.DataFrame({
+            '[0] pizza date': ['Average', 'Jan 1, 2021', 'Jan 2, 2021'],
+            '[0] pizza value': [74, 100, 85],
+            '[1] bagel date': ['Average', 'Jan 6, 2021', 'Jan 7, 2021'],
+            '[1] bagel value': [1, 1, 1]
+        }),
+        df_tail=pd.DataFrame({
+            '[0] pizza date': ['Jan 3, 2021', 'Jan 4, 2021', 'Jan 5, 2021'],
+            '[0] pizza value': [82, 50, 51],
+            '[1] bagel date': ['Jan 8, 2021', 'Jan 9, 2021', 'Jan 10, 2021'],
+            '[1] bagel value': [1, 2, 2]
+        }, index=pd.Index([3, 4, 5]))    
+    )
+    expected_result.assert_equals(df_result)
+
+@pytest.mark.vcr
+def test_multirange_interest_over_time_same_keyword_ok():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'pizza'], timeframe=['2021-01-01 2021-01-05', '2021-01-06 2021-01-10'])
+    df_result = pytrend.multirange_interest_over_time()
+
+    expected_result = ExpectedResult(
+        length=6,
+        df_head=pd.DataFrame({
+            '[0] pizza date': ['Average', 'Jan 1, 2021', 'Jan 2, 2021'],
+            '[0] pizza value': [74, 100, 85],
+            '[1] pizza date': ['Average', 'Jan 6, 2021', 'Jan 7, 2021'],
+            '[1] pizza value': [68, 53, 53]
+        }),
+        df_tail=pd.DataFrame({
+            '[0] pizza date': ['Jan 3, 2021', 'Jan 4, 2021', 'Jan 5, 2021'],
+            '[0] pizza value': [82, 50, 51],
+            '[1] pizza date': ['Jan 8, 2021', 'Jan 9, 2021', 'Jan 10, 2021'],
+            '[1] pizza value': [70, 88, 76]
+        }, index=pd.Index([3, 4, 5]))    
+    )
+    expected_result.assert_equals(df_result)
 
 @pytest.mark.vcr
 def test_interest_by_region_ok():
