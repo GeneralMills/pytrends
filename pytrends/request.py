@@ -432,14 +432,11 @@ class TrendReq(object):
             url=TrendReq.TODAY_SEARCHES_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            params=forms
+            params=forms,
+            **self.requests_args
         )['default']['trendingSearchesDays'][0]['trendingSearches']
-        result_df = pd.DataFrame()
         # parse the returned json
-        sub_df = pd.DataFrame()
-        for trend in req_json:
-            sub_df = sub_df.append(trend['title'], ignore_index=True)
-        result_df = pd.concat([result_df, sub_df])
+        result_df = pd.DataFrame(trend['title'] for trend in req_json)
         return result_df.iloc[:, -1]
 
     def realtime_trending_searches(self, pn='US', cat='all', count =300):
