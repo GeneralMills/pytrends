@@ -21,6 +21,7 @@ Only good until Google changes their backend again :-P. When that happens feel f
   * [Common API Parameters](#common-api-parameters)
 
     * [Interest Over Time](#interest-over-time)
+    * [Multirange Interest Over Time](#multirange-interest-over-time)
     * [Historical Hourly Interest](#historical-hourly-interest)
     * [Interest by Region](#interest-by-region)
     * [Related Topics](#related-topics)
@@ -104,6 +105,8 @@ Parameters
 The following API methods are available:
 
 * [Interest Over Time](#interest-over-time): returns historical, indexed data for when the keyword was searched most as shown on Google Trends' Interest Over Time section.
+
+* [Multirange Interest Over Time](#multirange_interest_over_time): returns historical, indexed data similar to interest over time, but across multiple time date ranges. 
 
 * [Historical Hourly Interest](#historical-hourly-interest): returns historical, indexed, hourly data for when the keyword was searched most as shown on Google Trends' Interest Over Time section. It sends multiple requests to Google, each retrieving one week of hourly data. It seems like this would be the only way to get historical, hourly data. 
 
@@ -205,6 +208,14 @@ Returns pandas.Dataframe
 
 <sub><sup>[back to top](#interest_over_time)</sub></sup>
 
+### Multirange Interest Over Time
+
+    pytrends.build_payload(kw_list=['pizza', 'bagel'], timeframe=['2022-09-04 2022-09-10', '2022-09-18 2022-09-24']))
+    pytrends.multirange_interest_over_time()
+
+Returns pandas.Dataframe. It includes the average in the first row.
+
+<sub><sup>[back to top](#multirange_interest_over_time)</sub></sup>
 
 ### Historical Hourly Interest
 

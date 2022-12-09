@@ -23,6 +23,7 @@ class TrendReq(object):
     POST_METHOD = 'post'
     GENERAL_URL = f'{BASE_TRENDS_URL}/api/explore'
     INTEREST_OVER_TIME_URL = f'{BASE_TRENDS_URL}/api/widgetdata/multiline'
+    MULTIRANGE_INTEREST_OVER_TIME_URL = f'{BASE_TRENDS_URL}/api/widgetdata/multirange'
     INTEREST_BY_REGION_URL = f'{BASE_TRENDS_URL}/api/widgetdata/comparedgeo'
     RELATED_QUERIES_URL = f'{BASE_TRENDS_URL}/api/widgetdata/relatedsearches'
     TRENDING_SEARCHES_URL = f'{BASE_TRENDS_URL}/hottrends/visualize/internal/data'
@@ -168,11 +169,17 @@ class TrendReq(object):
             'req': {'comparisonItem': [], 'category': cat, 'property': gprop}
         }
 
-        # build out json for each keyword
-        for kw in self.kw_list:
-            keyword_payload = {'keyword': kw, 'time': timeframe,
-                               'geo': self.geo}
-            self.token_payload['req']['comparisonItem'].append(keyword_payload)
+        # Check if timeframe is a list
+        if isinstance(timeframe, list):
+            for index, kw in enumerate(self.kw_list):
+                keyword_payload = {'keyword': kw, 'time': timeframe[index], 'geo': self.geo}
+                self.token_payload['req']['comparisonItem'].append(keyword_payload)
+        else: 
+            # build out json for each keyword with
+            for kw in self.kw_list:
+                keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': self.geo}
+                self.token_payload['req']['comparisonItem'].append(keyword_payload)
+
         # requests will mangle this if it is not a string
         self.token_payload['req'] = json.dumps(self.token_payload['req'])
         # get tokens
@@ -260,6 +267,49 @@ class TrendReq(object):
             final['isPartial'] = False
 
         return final
+
+    def multirange_interest_over_time(self):
+        """Request data from Google's Interest Over Time section across different time ranges and return a dataframe"""
+
+        over_time_payload = {
+            # convert to string as requests will mangle
+            'req': json.dumps(self.interest_over_time_widget['request']),
+            'token': self.interest_over_time_widget['token'],
+            'tz': self.tz
+        }
+
+        # make the request and parse the returned json
+        req_json = self._get_data(
+            url=TrendReq.MULTIRANGE_INTEREST_OVER_TIME_URL,
+            method=TrendReq.GET_METHOD,
+            trim_chars=5,
+            params=over_time_payload,
+        )
+
+        df = pd.DataFrame(req_json['default']['timelineData'])
+        if (df.empty):
+            return df
+
+        result_df = pd.json_normalize(df['columnData'])
+
+        # Split dictionary columns into seperate ones
+        for i, column in enumerate(result_df.columns):
+            result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " date"] = result_df[i].apply(pd.Series)["formattedTime"]
+            result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " value"] = result_df[i].apply(pd.Series)["value"]   
+            result_df = result_df.drop([i], axis=1)
+        
+        # Adds a row with the averages at the top of the dataframe
+        avg_row = {}
+        for i, avg in enumerate(req_json['default']['averages']):
+            avg_row["[" + str(i) + "] " + str(self.kw_list[i]) + " date"] = "Average"
+            avg_row["[" + str(i) + "] " + str(self.kw_list[i]) + " value"] = req_json['default']['averages'][i]
+
+        result_df.loc[-1] = avg_row
+        result_df.index = result_df.index + 1
+        result_df = result_df.sort_index()
+        
+        return result_df
+
 
     def interest_by_region(self, resolution='COUNTRY', inc_low_vol=False,
                            inc_geo_code=False):
