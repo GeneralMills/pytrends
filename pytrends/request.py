@@ -61,6 +61,9 @@ class TrendReq(object):
         self.related_topics_widget_list = list()
         self.related_queries_widget_list = list()
 
+        self.headers = {'accept-language': self.hl}
+        self.headers.update(self.requests_args.pop('headers', {}))
+        
     def GetGoogleCookie(self):
         """
         Gets google cookie (used for each and every proxy; once on init otherwise)
@@ -125,7 +128,7 @@ class TrendReq(object):
                           method_whitelist=frozenset(['GET', 'POST']))
             s.mount('https://', HTTPAdapter(max_retries=retry))
 
-        s.headers.update({'accept-language': self.hl})
+        s.headers.update(self.headers)
         if len(self.proxies) > 0:
             self.cookies = self.GetGoogleCookie()
             s.proxies.update({'https': self.proxies[self.proxy_index]})
@@ -482,14 +485,11 @@ class TrendReq(object):
             url=TrendReq.TODAY_SEARCHES_URL,
             method=TrendReq.GET_METHOD,
             trim_chars=5,
-            params=forms
+            params=forms,
+            **self.requests_args
         )['default']['trendingSearchesDays'][0]['trendingSearches']
-        result_df = pd.DataFrame()
         # parse the returned json
-        sub_df = pd.DataFrame()
-        for trend in req_json:
-            sub_df = sub_df.append(trend['title'], ignore_index=True)
-        result_df = pd.concat([result_df, sub_df])
+        result_df = pd.DataFrame(trend['title'] for trend in req_json)
         return result_df.iloc[:, -1]
 
     def realtime_trending_searches(self, pn='US', cat='all', count =300):
