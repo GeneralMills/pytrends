@@ -474,8 +474,11 @@ class TrendReq(object):
         req_json = self._get_data(
             url=TrendReq.TRENDING_SEARCHES_URL,
             method=TrendReq.GET_METHOD
-        )[pn]
-        result_df = pd.DataFrame(req_json)
+        )
+        keys = req_json.keys()
+        if(pn not in keys):
+          return pd.DataFrame(["Data Not Found"])
+        result_df = pd.DataFrame(req_json[pn])
         return result_df
 
     def today_searches(self, pn='US'):
