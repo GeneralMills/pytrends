@@ -477,7 +477,7 @@ class TrendReq(object):
         )
         keys = req_json.keys()
         if(pn not in keys):
-          return pd.DataFrame(["Data Not Found"])
+          return pd.DataFrame([])
         result_df = pd.DataFrame(req_json[pn])
         return result_df
 
