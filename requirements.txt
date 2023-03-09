@@ -1,3 +1,4 @@
 requests>=2.0
 pandas>=0.25
 lxml
+curl_cffi

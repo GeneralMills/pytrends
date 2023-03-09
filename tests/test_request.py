@@ -605,6 +605,15 @@ def test_interest_over_time_partial():
     s_last_row = df_result.iloc[-1]
     assert s_last_row.isPartial is np.bool_(True)
 
+@pytest.mark.vcr
+def test_impersonate_ok():
+    # NOTE: This test may fails if impersonate functionality isn't working. If "test_interest_over_time_partial" also fails => likely fault in TrendReq::interest_over_time()
+    pytrend = TrendReq(impersonate="chrome107")
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    df_result = pytrend.interest_over_time()
+    s_last_row = df_result.iloc[-1]
+    assert s_last_row.isPartial is np.bool_(True)
+    
 
 def test_request_args_passing(mocked_responses):
     mocked_responses.add(
