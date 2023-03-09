@@ -614,6 +614,13 @@ def test_impersonate_ok():
     s_last_row = df_result.iloc[-1]
     assert s_last_row.isPartial is np.bool_(True)
     
+@pytest.mark.vcr
+def test_impersonate_retry_reversal_ok():
+    # NOTE: This test will fail if impersonate functionality doesn't revert retry values
+    pytrend = TrendReq(impersonate="chrome107", retries=10)
+    pytrend.build_payload(kw_list=['pizza', 'bagel'])
+    assert(pytrend.backoff_factor==0 and pytrend.retries==0)
+    
 
 def test_request_args_passing(mocked_responses):
     mocked_responses.add(

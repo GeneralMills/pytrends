@@ -54,8 +54,8 @@ class TrendReq(object):
             assert(BrowserType.has(impersonate))
             if retries or backoff_factor:
                 print('\'impersonate\' flag does not support retries: defaulting to retries=0 and backoff_factor=0')
-                retries = 0
-                backoff_factor = 0
+                self.retries = 0
+                self.backoff_factor = 0
         
         self.impersonate = impersonate
         
