@@ -2,6 +2,8 @@ import json
 
 import pandas as pd
 from curl_cffi import requests as curl_requests
+from curl_cffi.requests import BrowserType
+
 import requests
 
 from requests.adapters import HTTPAdapter
@@ -13,26 +15,7 @@ from pytrends import exceptions
 from enum import Enum
 from urllib.parse import quote
 
-
 BASE_TRENDS_URL = 'https://trends.google.com/trends'
-
-# Taken from curl_cffi broswer type enum (https://github.com/yifeikong/curl_cffi/blob/master/curl_cffi/requests/session.py)
-class BrowserType(str, Enum):
-    edge99 = "edge99"
-    edge101 = "edge101"
-    chrome99 = "chrome99"
-    chrome100 = "chrome100"
-    chrome101 = "chrome101"
-    chrome104 = "chrome104"
-    chrome107 = "chrome107"
-    chrome110 = "chrome110"
-    chrome99_android = "chrome99_android"
-    safari15_3 = "safari15_3"
-    safari15_5 = "safari15_5"
-
-    @classmethod
-    def has(cls, item):
-        return item in cls.__members__
 
 class TrendReq(object):
     """
@@ -75,6 +58,11 @@ class TrendReq(object):
         
         if impersonate:
             assert(BrowserType.has(impersonate))
+            if retries or backoff_factor:
+                print('\'impersonate\' flag does not support retries: defaulting to retries=0 and backoff_factor=0')
+                retries = 0
+                backoff_factor = 0
+        
         self.impersonate = impersonate
         
         self.cookies = self.GetGoogleCookie()

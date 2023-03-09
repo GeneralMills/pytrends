@@ -12,28 +12,30 @@ Only good until Google changes their backend again :-P. When that happens feel f
 
 ## Table of Contents
 
-* [Installation](#installation)
-
-* [API](#api)
-
-  * [API Methods](#api-methods)
-
-  * [Common API Parameters](#common-api-parameters)
-
-    * [Interest Over Time](#interest-over-time)
-    * [Multirange Interest Over Time](#multirange-interest-over-time)
-    * [Historical Hourly Interest](#historical-hourly-interest)
-    * [Interest by Region](#interest-by-region)
-    * [Related Topics](#related-topics)
-    * [Related Queries](#related-queries)
-    * [Trending Searches](#trending-searches)
-    * [Realtime Search Trends](#realtime-search-trends)
-    * [Top Charts](#top-charts)
-    * [Suggestions](#suggestions)
-
-  * [Caveats](#caveats)
-
-* [Credits](#credits)
+- [pytrends](#pytrends)
+  - [Introduction](#introduction)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Requirements](#requirements)
+  - [API](#api)
+    - [Connect to Google](#connect-to-google)
+    - [Build Payload](#build-payload)
+  - [API Methods](#api-methods)
+  - [Common API parameters](#common-api-parameters)
+    - [Interest Over Time](#interest-over-time)
+    - [Multirange Interest Over Time](#multirange-interest-over-time)
+    - [Historical Hourly Interest](#historical-hourly-interest)
+    - [Interest by Region](#interest-by-region)
+    - [Related Topics](#related-topics)
+    - [Related Queries](#related-queries)
+    - [Trending Searches](#trending-searches)
+    - [Realtime Search Trends](#realtime-search-trends)
+    - [Top Charts](#top-charts)
+    - [Suggestions](#suggestions)
+    - [Categories](#categories)
+- [Caveats](#caveats)
+- [Contributing](#contributing)
+- [Credits](#credits)
 
 ## Installation
 
@@ -50,20 +52,30 @@ Only good until Google changes their backend again :-P. When that happens feel f
 
 ### Connect to Google
 
+  ```python
     from pytrends.request import TrendReq
 
     pytrends = TrendReq(hl='en-US', tz=360)
+  ```
 
 or if you want to use proxies as you are blocked due to Google rate limit:
 
-
+  ```python
     from pytrends.request import TrendReq
 
     pytrends = TrendReq(hl='en-US', tz=360, timeout=(10,25), proxies=['https://34.203.233.13:80',], retries=2, backoff_factor=0.1, requests_args={'verify':False})
+  ```
+
+or if you want to use cURL Impersonation:
+  ```python
+    from pytrend.request import TrendReq
+
+    pytrends = TrendReq(hl='en-US', tz=360, impersonate="chrome101")
+  ```
 
 * `timeout(connect, read)`
   - See explantation on this on [requests docs](https://requests.readthedocs.io/en/master/user/advanced/#timeouts)
-* tz
+* `tz`
   - Timezone Offset
   - For example US CST is ```'360'``` (note **NOT** -360, Google uses timezone this way...)
 
@@ -79,6 +91,10 @@ or if you want to use proxies as you are blocked due to Google rate limit:
 * `backoff_factor`
 
   - A backoff factor to apply between attempts after the second try (most errors are resolved immediately by a second try without a delay). urllib3 will sleep for: ```{backoff factor} * (2 ^ ({number of total retries} - 1))``` seconds. If the backoff_factor is 0.1, then sleep() will sleep for [0.0s, 0.2s, 0.4s, …] between retries. It will never be longer than Retry.BACKOFF_MAX. By default, backoff is disabled (set to 0).
+
+* `impersonate`
+
+  - The impersonate option (by defualt `None`) uses the `curl_cffi` requests package to "impersonate" browser usage. Options include: `[chrome99, chrome100, chrome101, chrome104, chrome107, chrome110, chrome99_android, edge99, edge101, safari15_3, safari15_5]`. Currently, does not work with retries.
 
 * `requests_args`
   - A dict with additional parameters to pass along to the underlying requests library, for example verify=False to ignore SSL errors
@@ -366,3 +382,7 @@ See the [CONTRIBUTING](CONTRIBUTING.md) file.
 * With some ideas pulled from Matt Reid's Google Trends API
 
   - https://bitbucket.org/mattreid9956/google-trend-api/overview
+
+* Impersonation was implemented with the clever `curl_cffi` library
+
+  - https://github.com/yifeikong/curl_cffi
