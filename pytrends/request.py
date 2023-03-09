@@ -1,18 +1,12 @@
 import json
-
 import pandas as pd
 from curl_cffi import requests as curl_requests
 from curl_cffi.requests import BrowserType
-
 import requests
-
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from requests import status_codes
-
 from pytrends import exceptions
-
-from enum import Enum
 from urllib.parse import quote
 
 BASE_TRENDS_URL = 'https://trends.google.com/trends'
