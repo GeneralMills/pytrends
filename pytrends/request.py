@@ -1,6 +1,7 @@
 import json
 
 import pandas as pd
+from curl_cffi import requests as curl_requests
 import requests
 
 from requests.adapters import HTTPAdapter
@@ -9,11 +10,29 @@ from requests import status_codes
 
 from pytrends import exceptions
 
+from enum import Enum
 from urllib.parse import quote
 
 
 BASE_TRENDS_URL = 'https://trends.google.com/trends'
 
+# Taken from curl_cffi broswer type enum (https://github.com/yifeikong/curl_cffi/blob/master/curl_cffi/requests/session.py)
+class BrowserType(str, Enum):
+    edge99 = "edge99"
+    edge101 = "edge101"
+    chrome99 = "chrome99"
+    chrome100 = "chrome100"
+    chrome101 = "chrome101"
+    chrome104 = "chrome104"
+    chrome107 = "chrome107"
+    chrome110 = "chrome110"
+    chrome99_android = "chrome99_android"
+    safari15_3 = "safari15_3"
+    safari15_5 = "safari15_5"
+
+    @classmethod
+    def has(cls, item):
+        return item in cls.__members__
 
 class TrendReq(object):
     """
@@ -35,7 +54,7 @@ class TrendReq(object):
     ERROR_CODES = (500, 502, 504, 429)
 
     def __init__(self, hl='en-US', tz=360, geo='', timeout=(2, 5), proxies='',
-                 retries=0, backoff_factor=0, requests_args=None):
+                 retries=0, backoff_factor=0, impersonate=None, requests_args=None):
         """
         Initialize default values for params
         """
@@ -53,6 +72,11 @@ class TrendReq(object):
         self.backoff_factor = backoff_factor
         self.proxy_index = 0
         self.requests_args = requests_args or {}
+        
+        if impersonate:
+            assert(BrowserType.has(impersonate))
+        self.impersonate = impersonate
+        
         self.cookies = self.GetGoogleCookie()
         # intialize widget payloads
         self.token_payload = dict()
@@ -64,6 +88,8 @@ class TrendReq(object):
         self.headers = {'accept-language': self.hl}
         self.headers.update(self.requests_args.pop('headers', {}))
         
+        
+        
     def GetGoogleCookie(self):
         """
         Gets google cookie (used for each and every proxy; once on init otherwise)
@@ -72,11 +98,19 @@ class TrendReq(object):
         while True:
             if "proxies" in self.requests_args:
                 try:
-                    return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                        f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
-                        timeout=self.timeout,
-                        **self.requests_args
-                    ).cookies.items()))
+                    if self.impersonate:
+                        return dict(filter(lambda i: i[0] == 'NID', curl_requests.get(
+                            f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
+                            timeout=self.timeout,
+                            impersonate=self.impersonate,
+                            **self.requests_args
+                        ).cookies.items()))
+                    else:
+                        return dict(filter(lambda i: i[0] == 'NID', requests.get(
+                            f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
+                            timeout=self.timeout,
+                            **self.requests_args
+                        ).cookies.items()))
                 except:
                     continue
             else:
@@ -85,12 +119,21 @@ class TrendReq(object):
                 else:
                     proxy = ''
                 try:
-                    return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                        f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
-                        timeout=self.timeout,
-                        proxies=proxy,
-                        **self.requests_args
-                    ).cookies.items()))
+                    if self.impersonate:
+                        return dict(filter(lambda i: i[0] == 'NID', curl_requests.get(
+                            f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
+                            timeout=self.timeout,
+                            proxies=proxy,
+                            impersonate=self.impersonate,
+                            **self.requests_args
+                        ).cookies.items()))
+                    else:
+                        return dict(filter(lambda i: i[0] == 'NID', requests.get(
+                            f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
+                            timeout=self.timeout,
+                            proxies=proxy,
+                            **self.requests_args
+                        ).cookies.items()))
                 except requests.exceptions.ProxyError:
                     print('Proxy error. Changing IP')
                     if len(self.proxies) > 1:
@@ -118,27 +161,42 @@ class TrendReq(object):
         :param kwargs: any extra key arguments passed to the request builder (usually query parameters or data)
         :return:
         """
-        s = requests.session()
-        # Retries mechanism. Activated when one of statements >0 (best used for proxy)
-        if self.retries > 0 or self.backoff_factor > 0:
-            retry = Retry(total=self.retries, read=self.retries,
-                          connect=self.retries,
-                          backoff_factor=self.backoff_factor,
-                          status_forcelist=TrendReq.ERROR_CODES,
-                          method_whitelist=frozenset(['GET', 'POST']))
-            s.mount('https://', HTTPAdapter(max_retries=retry))
-
+        
+        if self.impersonate:
+            s = curl_requests.Session()
+        else:
+            s = requests.Session()
+            # Retries mechanism. Activated when one of statements >0 (best used for proxy)
+            if self.retries > 0 or self.backoff_factor > 0:
+                retry = Retry(total=self.retries, read=self.retries,
+                            connect=self.retries,
+                            backoff_factor=self.backoff_factor,
+                            status_forcelist=TrendReq.ERROR_CODES,
+                            method_whitelist=frozenset(['GET', 'POST']))
+                s.mount('https://', HTTPAdapter(max_retries=retry))
+       
         s.headers.update(self.headers)
         if len(self.proxies) > 0:
             self.cookies = self.GetGoogleCookie()
             s.proxies.update({'https': self.proxies[self.proxy_index]})
         if method == TrendReq.POST_METHOD:
-            response = s.post(url, timeout=self.timeout,
-                              cookies=self.cookies, **kwargs,
-                              **self.requests_args)  # DO NOT USE retries or backoff_factor here
+            if self.impersonate:
+                response = s.post(url, timeout=self.timeout, impersonate=self.impersonate,
+                                cookies=self.cookies, **kwargs,
+                                **self.requests_args)  # DO NOT USE retries or backoff_factor here
+            else:
+                response = s.post(url, timeout=self.timeout,
+                                cookies=self.cookies, **kwargs,
+                                **self.requests_args)
         else:
-            response = s.get(url, timeout=self.timeout, cookies=self.cookies,
-                             **kwargs, **self.requests_args)  # DO NOT USE retries or backoff_factor here
+            if self.impersonate:
+                response = s.get(url, timeout=self.timeout, cookies=self.cookies, impersonate=self.impersonate,
+                                **kwargs, **self.requests_args)
+            else:
+                response = s.get(url, timeout=self.timeout, cookies=self.cookies,
+                                **kwargs, **self.requests_args)
+            
+            # DO NOT USE retries or backoff_factor here
         # check if the response contains json and throw an exception otherwise
         # Google mostly sends 'application/json' in the Content-Type header,
         # but occasionally it sends 'application/javascript
