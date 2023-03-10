@@ -63,7 +63,7 @@ class TrendReq(object):
 
         self.headers = {'accept-language': self.hl}
         self.headers.update(self.requests_args.pop('headers', {}))
-        
+
     def GetGoogleCookie(self):
         """
         Gets google cookie (used for each and every proxy; once on init otherwise)
@@ -71,14 +71,11 @@ class TrendReq(object):
         """
         while True:
             if "proxies" in self.requests_args:
-                try:
-                    return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                        f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
-                        timeout=self.timeout,
-                        **self.requests_args
-                    ).cookies.items()))
-                except:
-                    continue
+                return dict(filter(lambda i: i[0] == 'NID', requests.get(
+                    f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
+                    timeout=self.timeout,
+                    **self.requests_args
+                ).cookies.items()))
             else:
                 if len(self.proxies) > 0:
                     proxy = {'https': self.proxies[self.proxy_index]}
@@ -177,7 +174,7 @@ class TrendReq(object):
             for index, kw in enumerate(self.kw_list):
                 keyword_payload = {'keyword': kw, 'time': timeframe[index], 'geo': self.geo}
                 self.token_payload['req']['comparisonItem'].append(keyword_payload)
-        else: 
+        else:
             # build out json for each keyword with
             for kw in self.kw_list:
                 keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': self.geo}
@@ -298,9 +295,9 @@ class TrendReq(object):
         # Split dictionary columns into seperate ones
         for i, column in enumerate(result_df.columns):
             result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " date"] = result_df[i].apply(pd.Series)["formattedTime"]
-            result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " value"] = result_df[i].apply(pd.Series)["value"]   
+            result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " value"] = result_df[i].apply(pd.Series)["value"]
             result_df = result_df.drop([i], axis=1)
-        
+
         # Adds a row with the averages at the top of the dataframe
         avg_row = {}
         for i, avg in enumerate(req_json['default']['averages']):
@@ -310,7 +307,7 @@ class TrendReq(object):
         result_df.loc[-1] = avg_row
         result_df.index = result_df.index + 1
         result_df = result_df.sort_index()
-        
+
         return result_df
 
 
