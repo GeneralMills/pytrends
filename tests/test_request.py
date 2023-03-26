@@ -173,7 +173,7 @@ def test_interest_over_time_ok():
     pytrend.build_payload(kw_list=['pizza', 'bagel'], timeframe='2021-01-01 2021-01-05')
     df_result = pytrend.interest_over_time()
     df_expected = build_interest_over_time_df({
-        'pizza': [100, 84, 78, 50, 52],
+        'pizza': [100, 83, 78, 49, 50],
         'bagel': [2, 2, 2, 1, 1]
     }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
     assert_frame_equal(df_result, df_expected)
@@ -189,8 +189,8 @@ def test_interest_over_time_images():
     )
     df_result = pytrend.interest_over_time()
     df_expected = build_interest_over_time_df({
-        'pizza': [83, 100, 89, 93, 93],
-        'bagel': [2, 2, 4, 4, 4]
+        'pizza': [85, 100, 93, 93, 93],
+        'bagel': [3, 2, 9, 4, 4]
     }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
     assert_frame_equal(df_result, df_expected)
 
@@ -205,8 +205,8 @@ def test_interest_over_time_news():
     )
     df_result = pytrend.interest_over_time()
     df_expected = build_interest_over_time_df({
-        'pizza': [100, 51, 76, 44, 49],
-        'bagel': [0, 0, 0, 0, 15]
+        'pizza': [100, 67, 78, 32, 75],
+        'bagel': [0, 0, 0, 20, 0]
     }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
     assert_frame_equal(df_result, df_expected)
 
@@ -221,7 +221,7 @@ def test_interest_over_time_youtube():
     )
     df_result = pytrend.interest_over_time()
     df_expected = build_interest_over_time_df({
-        'pizza': [88, 100, 99, 90, 93],
+        'pizza': [88, 100, 100, 92, 95],
         'bagel': [1, 1, 1, 2, 1]
     }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
     assert_frame_equal(df_result, df_expected)
@@ -237,8 +237,8 @@ def test_interest_over_time_froogle():
     )
     df_result = pytrend.interest_over_time()
     df_expected = build_interest_over_time_df({
-        'pizza': [100, 100, 88, 61, 91],
-        'bagel': [7, 0, 4, 0, 0]
+        'pizza': [94, 99, 94, 62, 100],
+        'bagel': [0, 0, 0, 0, 8]
     }, dates=['2021-01-01', '2021-01-02', '2021-01-03', '2021-01-04', '2021-01-05'])
     assert_frame_equal(df_result, df_expected)
 
@@ -250,6 +250,7 @@ def test_interest_over_time_bad_gprop():
     with pytest.raises(ValueError, match=expected_message):
         pytrend.build_payload(kw_list=['pizza', 'bagel'], gprop=' ')
 
+
 @pytest.mark.vcr
 def test_multirange_interest_over_time_ok():
     pytrend = TrendReq()
@@ -260,18 +261,19 @@ def test_multirange_interest_over_time_ok():
         length=6,
         df_head=pd.DataFrame({
             '[0] pizza date': ['Average', 'Jan 1, 2021', 'Jan 2, 2021'],
-            '[0] pizza value': [74, 100, 85],
+            '[0] pizza value': [72, 100, 83],
             '[1] bagel date': ['Average', 'Jan 6, 2021', 'Jan 7, 2021'],
             '[1] bagel value': [1, 1, 1]
         }),
         df_tail=pd.DataFrame({
             '[0] pizza date': ['Jan 3, 2021', 'Jan 4, 2021', 'Jan 5, 2021'],
-            '[0] pizza value': [82, 50, 51],
+            '[0] pizza value': [78, 49, 50],
             '[1] bagel date': ['Jan 8, 2021', 'Jan 9, 2021', 'Jan 10, 2021'],
             '[1] bagel value': [1, 2, 2]
-        }, index=pd.Index([3, 4, 5]))    
+        }, index=pd.Index([3, 4, 5]))
     )
     expected_result.assert_equals(df_result)
+
 
 @pytest.mark.vcr
 def test_multirange_interest_over_time_same_keyword_ok():
@@ -283,18 +285,19 @@ def test_multirange_interest_over_time_same_keyword_ok():
         length=6,
         df_head=pd.DataFrame({
             '[0] pizza date': ['Average', 'Jan 1, 2021', 'Jan 2, 2021'],
-            '[0] pizza value': [74, 100, 85],
+            '[0] pizza value': [72, 100, 83],
             '[1] pizza date': ['Average', 'Jan 6, 2021', 'Jan 7, 2021'],
-            '[1] pizza value': [68, 53, 53]
+            '[1] pizza value': [68, 52, 52]
         }),
         df_tail=pd.DataFrame({
             '[0] pizza date': ['Jan 3, 2021', 'Jan 4, 2021', 'Jan 5, 2021'],
-            '[0] pizza value': [82, 50, 51],
+            '[0] pizza value': [78, 49, 50],
             '[1] pizza date': ['Jan 8, 2021', 'Jan 9, 2021', 'Jan 10, 2021'],
-            '[1] pizza value': [70, 88, 76]
-        }, index=pd.Index([3, 4, 5]))    
+            '[1] pizza value': [70, 89, 74]
+        }, index=pd.Index([3, 4, 5]))
     )
     expected_result.assert_equals(df_result)
+
 
 @pytest.mark.vcr
 def test_interest_by_region_ok():
@@ -306,8 +309,8 @@ def test_interest_by_region_ok():
     expected_result = ExpectedResult(
         length=250,
         df_head=pd.DataFrame({
-            'pizza': [93, 94, 96],
-            'bagel': [7, 6, 4],
+            'pizza': [92, 94, 96],
+            'bagel': [8, 6, 4],
         }, index=pd.Index(['Singapore', 'Hong Kong', 'Taiwan'], name='geoName')),
         df_tail=pd.DataFrame({
             'pizza': [0, 0, 0],
@@ -327,13 +330,13 @@ def test_interest_by_region_city_resolution():
     expected_result = ExpectedResult(
         length=200,
         df_head=pd.DataFrame({
-            'pizza': [95, 96, 96],
-            'bagel': [5, 4, 4],
-        }, index=pd.Index(['Grafton', 'Melbourne', 'Boston'], name='geoName')),
+            'pizza': [97, 97, 98],
+            'bagel': [3, 3, 2],
+        }, index=pd.Index(['Charlotte', 'Altamonte Springs', 'Portland'], name='geoName')),
         df_tail=pd.DataFrame({
             'pizza': [0, 0, 0],
             'bagel': [0, 0, 0],
-        }, index=pd.Index(['Andover', 'Anchorage', 'Allen'], name='geoName'))
+        }, index=pd.Index(['Albany', 'Aix-en-Provence', 'Aalborg'], name='geoName'))
     )
     expected_result.assert_equals(df_result)
 
@@ -358,10 +361,10 @@ def test_related_topics_result_top():
     pytrend.build_payload(kw_list=['pizza'], timeframe='2021-01-01 2021-12-31')
     df_result = pytrend.related_topics()['pizza']['top']
     expected_result = ExpectedResult(
-        length=22,
+        length=21,
         df_head=pd.DataFrame({
-            'value': [100, 24, 13],
-            'formattedValue': ['100', '24', '13'],
+            'value': [100, 23, 12],
+            'formattedValue': ['100', '23', '12'],
             'hasData': [True, True, True],
             'link': [
                 '/trends/explore?q=/m/0663v&date=2021-01-01+2021-12-31',
@@ -369,22 +372,22 @@ def test_related_topics_result_top():
                 '/trends/explore?q=/m/03clwm&date=2021-01-01+2021-12-31'
             ],
             'topic_mid': ['/m/0663v', '/m/09cfq', '/m/03clwm'],
-            'topic_title': ['Pizza', 'Pizza Hut', "Domino's Pizza"],
-            'topic_type': ['Dish', 'Restaurant company', 'Restaurant company'],
+            'topic_title': ['Pizza', 'Pizza Hut', "Domino's"],
+            'topic_type': ['Dish', 'Restaurant chain', 'Restaurant chain'],
         }),
         df_tail=pd.DataFrame({
             'value': [0, 0, 0],
             'formattedValue': ['<1', '<1', '<1'],
             'hasData': [True, True, True],
             'link': [
-                '/trends/explore?q=/g/11g6qhxwmd&date=2021-01-01+2021-12-31',
                 '/trends/explore?q=/g/11b7c9w1y6&date=2021-01-01+2021-12-31',
                 '/trends/explore?q=/m/09nghg&date=2021-01-01+2021-12-31',
+                '/trends/explore?q=/m/0gwh_4&date=2021-01-01+2021-12-31',
             ],
-            'topic_mid': ['/g/11g6qhxwmd', '/g/11b7c9w1y6', '/m/09nghg'],
-            'topic_title': ['Ooni', "Roman's Pizza", 'Sam Goody'],
-            'topic_type': ['Topic', 'Topic', 'Retail company']
-        }, index=pd.Index([19, 20, 21]))
+            'topic_mid': ['/g/11b7c9w1y6', '/m/09nghg', '/m/0gwh_4'],
+            'topic_title': ["Roman's Pizza", 'Sam Goody', 'Detroit-style pizza'],
+            'topic_type': ['Topic', 'Retail company', 'Food']
+        }, index=pd.Index([18, 19, 20]))
     )
     expected_result.assert_equals(df_result)
 
@@ -395,17 +398,17 @@ def test_related_topics_result_rising():
     pytrend.build_payload(kw_list=['pizza'], timeframe='2021-01-01 2021-12-31')
     df_result = pytrend.related_topics()['pizza']['rising']
     df_expected = pd.DataFrame({
-        'value': [12100, 160, 80, 80],
-        'formattedValue': ['Breakout', '+160%', '+80%', '+80%'],
+        'value': [12600, 160, 80, 70],
+        'formattedValue': ['Breakout', '+160%', '+80%', '+70%'],
         'link': [
             '/trends/explore?q=/m/09nghg&date=2021-01-01+2021-12-31',
             '/trends/explore?q=/m/0gwh_4&date=2021-01-01+2021-12-31',
+            '/trends/explore?q=/g/11g6qhxwmd&date=2021-01-01+2021-12-31',
             '/trends/explore?q=/m/02hvyj&date=2021-01-01+2021-12-31',
-            '/trends/explore?q=/g/11g6qhxwmd&date=2021-01-01+2021-12-31'
         ],
-        'topic_mid': ['/m/09nghg', '/m/0gwh_4', '/m/02hvyj', '/g/11g6qhxwmd'],
-        'topic_title': ['Sam Goody', 'Detroit-style pizza', 'Mystic Pizza', 'Ooni'],
-        'topic_type': ['Retail company', 'Food', '1988 film', 'Topic'],
+        'topic_mid': ['/m/09nghg', '/m/0gwh_4', '/g/11g6qhxwmd', '/m/02hvyj'],
+        'topic_title': ['Sam Goody', 'Detroit-style pizza', 'Ooni', 'Mystic Pizza'],
+        'topic_type': ['Retail company', 'Food', 'Topic', '1988 film'],
     })
     assert_frame_equal(df_result, df_expected)
 
@@ -432,10 +435,10 @@ def test_related_queries_result_top():
         length=25,
         df_head=pd.DataFrame({
             'query': ['pizza hut', 'pizza near me', 'pizza pizza near me'],
-            'value': [100, 67, 65],
+            'value': [100, 68, 65],
         }),
         df_tail=pd.DataFrame({
-            'query': ['pizza papa johns', 'little caesars', 'boston pizza'],
+            'query': ['pizza little caesars', 'cheese pizza', 'new york pizza'],
             'value': [5, 5, 5],
         }, index=pd.Index([22, 23, 24]))
     )
@@ -444,12 +447,12 @@ def test_related_queries_result_top():
     expected_bagel = ExpectedResult(
         length=25,
         df_head=pd.DataFrame({
-            'query': ['the bagel', 'bagel me', 'bagel near me'],
-            'value': [100, 92, 85],
+            'query': ['the bagel', 'bagel me', 'everything bagel'],
+            'value': [100, 97, 92],
         }),
         df_tail=pd.DataFrame({
-            'query': ['manhattan bagel', 'bagel sandwich', 'what a bagel'],
-            'value': [21, 21, 20],
+            'query': ['what a bagel', 'bagel sandwich', 'coffee meets bagel'],
+            'value': [22, 22, 22],
         }, index=pd.Index([22, 23, 24]))
     )
     expected_bagel.assert_equals(df_result['bagel']['top'])
@@ -462,28 +465,28 @@ def test_related_queries_result_rising():
     df_result = pytrend.related_queries()
 
     expected_pizza = ExpectedResult(
-        length=13,
+        length=11,
         df_head=pd.DataFrame({
             'query': ['licorice pizza', 'history of pizza', 'stoned pizza'],
-            'value': [9100, 400, 300],
+            'value': [8550, 400, 300],
         }),
         df_tail=pd.DataFrame({
-            'query': ['mountain mike pizza', 'pizza raul', 'pizza cosy'],
-            'value': [50, 50, 50],
-        }, index=pd.Index([10, 11, 12]))
+            'query': ['incredible pizza', 'mountain mike pizza', 'angels pizza'],
+            'value': [60, 50, 40],
+        }, index=pd.Index([8, 9, 10]))
     )
     expected_pizza.assert_equals(df_result['pizza']['rising'])
 
     expected_bagel = ExpectedResult(
-        length=19,
+        length=18,
         df_head=pd.DataFrame({
             'query': ['rover bagel', 'kettlemans bagel', 'bagel karen'],
-            'value': [450, 250, 190],
+            'value': [350, 250, 180],
         }),
         df_tail=pd.DataFrame({
-            'query': ['bagel street deli', 'best bagel near me', 'bloomington bagel company'],
-            'value': [40, 40, 40],
-        }, index=pd.Index([16, 17, 18]))
+            'query': ['bagel street deli', 'best bagel near me', 'the bagel nook'],
+            'value': [50, 50, 40],
+        }, index=pd.Index([15, 16, 17]))
     )
     expected_bagel.assert_equals(df_result['bagel']['rising'])
 
@@ -497,9 +500,9 @@ def test_trending_searches_ok():
     # They're time-dependent.
     expected_result = ExpectedResult(
         length=20,
-        df_head=pd.DataFrame({0: ['Kevin Conroy', 'Gallagher', 'Student loan forgiveness']}),
+        df_head=pd.DataFrame({0: ['Chabelo', 'Jonathan Majors', 'Benavidez vs Plant']}),
         df_tail=pd.DataFrame(
-            {0: ['Nick Cannon', 'CPI', 'Daytona Beach']},
+            {0: ['Gonzaga', 'Reese Witherspoon', 'France vs Netherlands']},
             index=pd.Index([17, 18, 19])
         )
     )
@@ -518,42 +521,41 @@ def test_realtime_trending_searches_ok():
     # Rebuilding a full 3-head-tail result from scratch is a chore, with a single record for head
     # and tail is more than enough.
     expected_result = ExpectedResult(
-        length=122,
+        length=111,
         head_tail_length=1,
         df_head=pd.DataFrame({
             'title': [
-                ("Gonzaga Bulldogs men's basketball, "
-                 "Michigan State Spartans men's basketball, "
-                 'College basketball, '
-                 'Armed Forces Classic, '
-                 'Michigan State Spartans football')
+                ('Caleb Plant, '
+                 'Boxing, Canelo Álvarez, '
+                 'David Benavidez, '
+                 'Anthony Dirrell')
             ],
             'entityNames': [
                 [
-                    "Gonzaga Bulldogs men's basketball",
-                    "Michigan State Spartans men's basketball",
-                    'College basketball',
-                    'Armed Forces Classic',
-                    'Michigan State Spartans football',
-                ],
+                    'Caleb Plant',
+                    'Boxing',
+                    'Canelo Álvarez',
+                    'David Benavidez',
+                    'Anthony Dirrell',
+                ]
             ]
         }),
         df_tail=pd.DataFrame({
             'title': [
-                ('Wake Forest University, '
-                 'Georgia Bulldogs football, '
-                 'Atlantic Coast Conference, '
-                 'College basketball')
+                ('Ron DeSantis, '
+                 'Casey DeSantis, '
+                 'Republican Party, '
+                 'Christina DeSantis')
             ],
             'entityNames': [
                 [
-                    'Wake Forest University',
-                    'Georgia Bulldogs football',
-                    'Atlantic Coast Conference',
-                    'College basketball'
-                ],
+                    'Ron DeSantis',
+                    'Casey DeSantis',
+                    'Republican Party',
+                    'Christina DeSantis',
+                ]
             ]
-        }, index=pd.Index([121]))
+        }, index=pd.Index([110]))
     )
     expected_result.assert_equals(df_result)
 
@@ -589,9 +591,9 @@ def test_suggestions_ok():
     expected = [
         {'mid': '/m/0663v', 'title': 'Pizza', 'type': 'Dish'},
         {'mid': '/g/11k19hmrkk', 'title': 'Licorice Pizza', 'type': '2021 film'},
+        {'mid': '/m/0rg8s1t', 'title': 'Dominos Pizza', 'type': 'Topic'},
         {'mid': '/m/0dfxdnc', 'title': 'Pizza dough', 'type': 'Food'},
         {'mid': '/g/11hdxfw7c0', 'title': 'history of pizza', 'type': 'Food'},
-        {'mid': '/g/11fl7dydwb', 'title': 'Pizza Oven', 'type': 'Topic'},
     ]
     assert result == expected
 
@@ -608,7 +610,7 @@ def test_interest_over_time_partial():
 
 def test_request_args_passing(mocked_responses):
     mocked_responses.add(
-        url=f'{BASE_TRENDS_URL}/?geo=US',
+        url=f'{BASE_TRENDS_URL}/explore/?geo=US',
         method='GET',
         match=[responses.matchers.header_matcher({'User-Agent': 'pytrends'})]
     )

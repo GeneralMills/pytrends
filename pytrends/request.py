@@ -73,7 +73,7 @@ class TrendReq(object):
             if "proxies" in self.requests_args:
                 try:
                     return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                        f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
+                        f'{BASE_TRENDS_URL}/explore/?geo={self.hl[-2:]}',
                         timeout=self.timeout,
                         **self.requests_args
                     ).cookies.items()))
@@ -86,7 +86,7 @@ class TrendReq(object):
                     proxy = ''
                 try:
                     return dict(filter(lambda i: i[0] == 'NID', requests.get(
-                        f'{BASE_TRENDS_URL}/?geo={self.hl[-2:]}',
+                        f'{BASE_TRENDS_URL}/explore/?geo={self.hl[-2:]}',
                         timeout=self.timeout,
                         proxies=proxy,
                         **self.requests_args
@@ -194,7 +194,7 @@ class TrendReq(object):
         # make the request and parse the returned json
         widget_dicts = self._get_data(
             url=TrendReq.GENERAL_URL,
-            method=TrendReq.GET_METHOD,
+            method=TrendReq.POST_METHOD,
             params=self.token_payload,
             trim_chars=4,
         )['widgets']
