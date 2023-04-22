@@ -390,10 +390,9 @@ class TrendReq(object):
         for request_json in self.related_topics_widget_list:
             # ensure we know which keyword we are looking at rather than relying on order
             try:
-                kw = request_json['request']['restriction'][
-                    'complexKeywordsRestriction']['keyword'][0]['value']
+                kw = request_json["keywordName"]
             except KeyError:
-                kw = ''
+                kw = ""
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
             related_payload['token'] = request_json['token']
@@ -438,10 +437,9 @@ class TrendReq(object):
         for request_json in self.related_queries_widget_list:
             # ensure we know which keyword we are looking at rather than relying on order
             try:
-                kw = request_json['request']['restriction'][
-                    'complexKeywordsRestriction']['keyword'][0]['value']
+                kw = request_json["keywordName"]
             except KeyError:
-                kw = ''
+                kw = ""
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
             related_payload['token'] = request_json['token']
