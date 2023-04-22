@@ -328,15 +328,15 @@ def test_interest_by_region_city_resolution():
     # Both head and tail have all 0's in both values, sort the result to test more meaningful values
     df_result = df_result.sort_values(by=['bagel', 'pizza', 'geoName'], ascending=False)
     expected_result = ExpectedResult(
-        length=200,
+        length=250,
         df_head=pd.DataFrame({
-            'pizza': [97, 97, 98],
-            'bagel': [3, 3, 2],
-        }, index=pd.Index(['Charlotte', 'Altamonte Springs', 'Portland'], name='geoName')),
+            'pizza': [93, 94, 95],
+            'bagel': [7, 6, 5],
+        }, index=pd.Index(['Singapore', 'Hong Kong', 'Japan'], name='geoName')),
         df_tail=pd.DataFrame({
             'pizza': [0, 0, 0],
             'bagel': [0, 0, 0],
-        }, index=pd.Index(['Albany', 'Aix-en-Provence', 'Aalborg'], name='geoName'))
+        }, index=pd.Index(['Algeria', 'Albania', 'Afghanistan'], name='geoName'))
     )
     expected_result.assert_equals(df_result)
 
@@ -627,3 +627,28 @@ def test_request_args_passing(mocked_responses):
     }}
     pytrend = TrendReq(requests_args=requests_args)
     pytrend.trending_searches()
+
+
+@pytest.mark.vcr
+def test_interest_over_time_multiple_regions():
+    pytrend = TrendReq()
+    pytrend.build_payload(kw_list=['pizza', 'bagel'], geo=['US-NY', 'US-IL'])
+    df = pytrend.interest_over_time()
+    assert df is not None
+    pd.testing.assert_index_equal(
+        df.columns,
+        pd.MultiIndex.from_tuples(
+            [
+                ('pizza', 'US-NY'),
+                ('pizza', 'US-IL'),
+                ('bagel', 'US-NY'),
+                ('bagel', 'US-IL'),
+                ('isPartial', ),
+            ],
+            names=['keyword', 'region']
+        )
+    )
+    assert df[('pizza', 'US-NY')].notna().all()
+    assert df[('pizza', 'US-IL')].notna().all()
+    assert (df[('pizza', 'US-NY')] >= 0).all()
+    assert (df[('pizza', 'US-IL')] >= 0).all()

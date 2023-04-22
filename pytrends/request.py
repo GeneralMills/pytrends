@@ -1,3 +1,4 @@
+from itertools import product
 import json
 
 import pandas as pd
@@ -63,7 +64,7 @@ class TrendReq(object):
 
         self.headers = {'accept-language': self.hl}
         self.headers.update(self.requests_args.pop('headers', {}))
-        
+
     def GetGoogleCookie(self):
         """
         Gets google cookie (used for each and every proxy; once on init otherwise)
@@ -172,15 +173,18 @@ class TrendReq(object):
             'req': {'comparisonItem': [], 'category': cat, 'property': gprop}
         }
 
+        if not isinstance(self.geo, list):
+            self.geo = [self.geo]
+
         # Check if timeframe is a list
         if isinstance(timeframe, list):
-            for index, kw in enumerate(self.kw_list):
-                keyword_payload = {'keyword': kw, 'time': timeframe[index], 'geo': self.geo}
+            for index, (kw, geo) in enumerate(product(self.kw_list, self.geo)):
+                keyword_payload = {'keyword': kw, 'time': timeframe[index], 'geo': geo}
                 self.token_payload['req']['comparisonItem'].append(keyword_payload)
-        else: 
+        else:
             # build out json for each keyword with
-            for kw in self.kw_list:
-                keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': self.geo}
+            for kw, geo in product(self.kw_list, self.geo):
+                keyword_payload = {'keyword': kw, 'time': timeframe, 'geo': geo}
                 self.token_payload['req']['comparisonItem'].append(keyword_payload)
 
         # requests will mangle this if it is not a string
@@ -247,10 +251,12 @@ class TrendReq(object):
         result_df = df['value'].apply(lambda x: pd.Series(
             str(x).replace('[', '').replace(']', '').split(',')))
         # rename each column with its search term, relying on order that google provides...
-        for idx, kw in enumerate(self.kw_list):
+
+        for idx, (kw, g) in enumerate(product(self.kw_list, self.geo)):
             # there is currently a bug with assigning columns that may be
             # parsed as a date in pandas: use explicit insert column method
-            result_df.insert(len(result_df.columns), kw,
+            name = kw if len(self.geo) == 1 else (kw, g)
+            result_df.insert(len(result_df.columns), name,
                              result_df[idx].astype('int'))
             del result_df[idx]
 
@@ -269,6 +275,11 @@ class TrendReq(object):
             final = result_df
             final['isPartial'] = False
 
+        if len(self.geo) > 1:
+            final.columns = pd.MultiIndex.from_tuples(
+                [c if isinstance(c, tuple) else (c, ) for c in final],
+                names=['keyword', 'region']
+            )
         return final
 
     def multirange_interest_over_time(self):
@@ -298,9 +309,9 @@ class TrendReq(object):
         # Split dictionary columns into seperate ones
         for i, column in enumerate(result_df.columns):
             result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " date"] = result_df[i].apply(pd.Series)["formattedTime"]
-            result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " value"] = result_df[i].apply(pd.Series)["value"]   
+            result_df["[" + str(i) + "] " + str(self.kw_list[i]) + " value"] = result_df[i].apply(pd.Series)["value"]
             result_df = result_df.drop([i], axis=1)
-        
+
         # Adds a row with the averages at the top of the dataframe
         avg_row = {}
         for i, avg in enumerate(req_json['default']['averages']):
@@ -310,7 +321,7 @@ class TrendReq(object):
         result_df.loc[-1] = avg_row
         result_df.index = result_df.index + 1
         result_df = result_df.sort_index()
-        
+
         return result_df
 
 
@@ -588,7 +599,7 @@ class TrendReq(object):
         raise NotImplementedError(
             """This method has been removed for incorrectness. It will be removed completely in v5.
 If you'd like similar functionality, please try implementing it yourself and consider submitting a pull request to add it to pytrends.
-          
+
 There is discussion at:
 https://github.com/GeneralMills/pytrends/pull/542"""
         )
