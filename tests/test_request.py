@@ -328,15 +328,15 @@ def test_interest_by_region_city_resolution():
     # Both head and tail have all 0's in both values, sort the result to test more meaningful values
     df_result = df_result.sort_values(by=['bagel', 'pizza', 'geoName'], ascending=False)
     expected_result = ExpectedResult(
-        length=200,
+        length=250,
         df_head=pd.DataFrame({
-            'pizza': [97, 97, 98],
-            'bagel': [3, 3, 2],
-        }, index=pd.Index(['Charlotte', 'Altamonte Springs', 'Portland'], name='geoName')),
+            'pizza': [93, 94, 95],
+            'bagel': [7, 6, 5],
+        }, index=pd.Index(['Singapore', 'Hong Kong', 'Japan'], name='geoName')),
         df_tail=pd.DataFrame({
             'pizza': [0, 0, 0],
             'bagel': [0, 0, 0],
-        }, index=pd.Index(['Albany', 'Aix-en-Provence', 'Aalborg'], name='geoName'))
+        }, index=pd.Index(['Algeria', 'Albania', 'Afghanistan'], name='geoName'))
     )
     expected_result.assert_equals(df_result)
 
