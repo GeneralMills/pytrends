@@ -6,8 +6,8 @@ First of all, create a virtualenv usign `python -m venv` or whatever tool you us
 
 ```bash
 $ python -m venv ~/virtualenvs/pytrends
-$ pip -r install requirements.txt  # library requirements
-$ pip -r install requirements-dev.txt  # development requirements
+$ pip install -r requirements.txt  # library requirements
+$ pip install -r requirements-dev.txt  # development requirements
 ```
 
 ## Running the tests
